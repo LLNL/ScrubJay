@@ -21,17 +21,16 @@ object TestScrubJay {
                          new Meta("elapsed",   "ElapsedTime", "seconds"),
                          new Meta("nodelist",  "NodeList",    "ID List"))
 
-    val testds = new DataSource(testdata, testmeta)
+    val testds = Some(new DataSource(testdata, testmeta))
 
     val dds = Derivations.ExpandTimeRange(session.sc, testds)
 
-    println("testds")
-    testds.rdd.foreach(println)
+    val dds2 = Derivations.ExpandNodeList(session.sc, dds)
 
-    println("dds")
-    if (dds.get != None)
-      dds.get.rdd.foreach(println)
-    else
-      println("None")
+    println("testds")
+    testds.get.rdd.foreach(println)
+
+    println("dds2")
+    dds2.get.rdd.foreach(println)
   }
 }
