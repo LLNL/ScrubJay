@@ -7,18 +7,35 @@ import org.apache.spark.sql.SQLContext
 // Datastax
 import com.datastax.spark.connector._
 
+// ScrubJay
+import scrubjay.util._
+
 package scrubjay {
 
-  class ScrubJaySession(val hostname: String = "localhost",
-                        val username: String = "cassandra",
-                        val password: String = "cassandra") {
+  case class CassandraConnection(
+    val hostname: String = "localhost", 
+    val username: String = "cassandra", 
+    val password: String = "cassandra") {
+      val spark_conf_fields = Array(
+        ("spark.cassandra.connection.host", hostname),
+        ("spark.cassandra.auth.username", username),
+        ("spark.cassandra.auth.password", password),
+        ("spark.cassandra.output.ignoreNulls", "true"))
+  }
+
+  class ScrubJaySession(
+    spark_master: String = "local[*]",
+    cassandra_connection: Option[CassandraConnection] = None) {
 
     val sparkConf = new SparkConf(true)
-      .set("spark.cassandra.connection.host", hostname)
-      .set("spark.cassandra.auth.username", username)            
-      .set("spark.cassandra.auth.password", password)            
       .set("spark.app.id", "ScrubJayAppID")
-    val sc = new SparkContext("local[*]", "ScrubJay", sparkConf)
+
+    // Set cassandra connection fields for spark-cassandra-connector
+    //   if parameter is specified (map doesn't run for None values)
+    cassandra_connection.map(_.spark_conf_fields.map{
+      case (field, value) => sparkConf.set(field, value)})
+
+    val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
     val sqlc = new SQLContext(sc)
   }
 }

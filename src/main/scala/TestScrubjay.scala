@@ -3,6 +3,7 @@ import scala.collection.immutable.Map
 
 import scrubjay._
 import scrubjay.datasource._
+import scrubjay.cassandra._
 
 import com.datastax.spark.connector._
 
@@ -21,21 +22,28 @@ object TestScrubJay {
           "nodelist"  -> List(4,5,6))))
 
     val testMeta = Map(
-      (new MetaEntry(META_VALUE_JOB_ID, META_UNITS_ID)         -> "jobid"),
-      (new MetaEntry(META_VALUE_START_TIME, META_UNITS_TIME)   -> "starttime"),
-      (new MetaEntry(META_VALUE_DURATION, META_UNITS_SECONDS)  -> "elapsed"),
-      (new MetaEntry(META_VALUE_NODE_LIST, META_UNITS_ID_LIST) -> "nodelist"))
+      (MetaEntry(META_VALUE_JOB_ID, META_UNITS_ID)         -> "jobid"),
+      (MetaEntry(META_VALUE_START_TIME, META_UNITS_TIME)   -> "starttime"),
+      (MetaEntry(META_VALUE_DURATION, META_UNITS_SECONDS)  -> "elapsed"),
+      (MetaEntry(META_VALUE_NODE_LIST, META_UNITS_ID_LIST) -> "nodelist"))
 
     new LocalDataSource(testMeta, testData)
   }
 
+  def TestInputCassandra(session: ScrubJaySession): DataSource = {
+    new CassandraDataSource(session.sc, "test", "job_queue")
+  }
+
   def main(args: Array[String]) {
 
-    val session = new ScrubJaySession("sonar11")
+    val session = new ScrubJaySession(
+      cassandra_connection = Some(CassandraConnection(hostname = "sonar11")))
 
     val testds = TestInputLocal(session)
+    //val testds = TestInputCassandra(session)
 
     println("testds")
+    testds.Meta.foreach(println)
     testds.Data.foreach(println)
 
     val dds2 = new ExpandedNodeList(testds)

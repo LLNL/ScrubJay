@@ -22,8 +22,8 @@ package scrubjay {
 
     // Derivation-specific variables for reuse
     val ds = datasources(0)
-    val nodelist_meta_entry = new MetaEntry(META_VALUE_NODE_LIST, META_UNITS_ID_LIST)
-    val node_meta_entry = new MetaEntry(META_VALUE_NODE, META_UNITS_ID)
+    val nodelist_meta_entry = MetaEntry(META_VALUE_NODE_LIST, META_UNITS_ID_LIST)
+    val node_meta_entry = MetaEntry(META_VALUE_NODE, META_UNITS_ID)
 
     // Required input attributes and derived output attributes
     val RequiredMetaEntries = List(List(nodelist_meta_entry))

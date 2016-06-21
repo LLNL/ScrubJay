@@ -11,49 +11,12 @@ package scrubjay {
     type MetaMap = Map[MetaEntry, String]
     type DataRow = Map[String, Any]
 
-    class MetaValue(val title: String, val description: String) extends java.io.Serializable {
+    case class MetaValue(title: String, description: String) extends Serializable
+    case class MetaUnits(title: String, description: String) extends Serializable
 
-      override def equals(other: Any): Boolean = {
-        other match {
-          case v: MetaValue => title == v.title && description == v.description
-          case _ => false
-        }
-      }
+    case class MetaEntry(value: MetaValue, units: MetaUnits) extends Serializable
 
-      override def toString: String = {
-        "MetaValue: title=\"" + title + "\", description=\"" + description + "\""
-      }
-    }
-
-    class MetaUnits(val title: String, val description: String) extends java.io.Serializable {
-
-      override def equals(other: Any): Boolean = {
-        other match {
-          case u: MetaUnits => title == u.title && description == u.description
-          case _ => false
-        }
-      }
-
-      override def toString: String = {
-        "MetaUnits: title=\"" + title + "\", description=\"" + description + "\""
-      }
-    }
-
-    class MetaEntry(val value: MetaValue, val units: MetaUnits) extends java.io.Serializable {
-
-      override def equals(other: Any): Boolean = {
-        other match {
-          case e: MetaEntry => value == e.value && units == e.units
-          case _ => false
-        }
-      }
-
-      override def toString: String = {
-        "MetaEntry: [" + value.toString + "], [" + units.toString + "]"
-      }
-    }
-
-    abstract class DataSource extends java.io.Serializable {
+    abstract class DataSource extends Serializable {
       val Meta: MetaMap
       val Data: RDD[DataRow]
     }
@@ -84,17 +47,16 @@ package scrubjay {
     */
 
     // Values
-    final val META_VALUE_JOB_ID     : MetaValue = new MetaValue("Job ID", "Unique identifier for a job submitted via SLURM")
-    final val META_VALUE_START_TIME : MetaValue = new MetaValue("Start Time", "An instantaneous point in time")
-    final val META_VALUE_DURATION   : MetaValue = new MetaValue("Time Duration", "A quantity of time")
-    final val META_VALUE_NODE       : MetaValue = new MetaValue("Node", "An individual node in an HPC cluster")
-    final val META_VALUE_NODE_LIST  : MetaValue = new MetaValue("Node List", "A list of nodes in an HPC cluster")
+    final val META_VALUE_JOB_ID     : MetaValue = MetaValue("Job ID", "Unique identifier for a job submitted via SLURM")
+    final val META_VALUE_START_TIME : MetaValue = MetaValue("Start Time", "An instantaneous point in time")
+    final val META_VALUE_DURATION   : MetaValue = MetaValue("Time Duration", "A quantity of time")
+    final val META_VALUE_NODE       : MetaValue = MetaValue("Node", "An individual node in an HPC cluster")
+    final val META_VALUE_NODE_LIST  : MetaValue = MetaValue("Node List", "A list of nodes in an HPC cluster")
 
     // Units
-    final val META_UNITS_ID         : MetaUnits = new MetaUnits("Identifier", "Categorical value that describes an individual element")
-    final val META_UNITS_TIME       : MetaUnits = new MetaUnits("Human Time", "Time represented by human clocks/calendars")
-    final val META_UNITS_SECONDS    : MetaUnits = new MetaUnits("Seconds", "Seconds as described by human clocks")
-    final val META_UNITS_ID_LIST    : MetaUnits = new MetaUnits("ID List", "A list of categorical values that describe elements")
-
+    final val META_UNITS_ID         : MetaUnits = MetaUnits("Identifier", "Categorical value that describes an individual element")
+    final val META_UNITS_TIME       : MetaUnits = MetaUnits("Human Time", "Time represented by human clocks/calendars")
+    final val META_UNITS_SECONDS    : MetaUnits = MetaUnits("Seconds", "Seconds as described by human clocks")
+    final val META_UNITS_ID_LIST    : MetaUnits = MetaUnits("ID List", "A list of categorical values that describe elements")
   }
 }
