@@ -43,17 +43,20 @@ object TestScrubJay {
     //val testds = TestInputCassandra(session)
 
     println("testds")
-    testds.Meta.foreach(println)
-    testds.Data.foreach(println)
+    //testds.Meta.foreach(println)
+    //testds.Data.foreach(println)
 
     val dds2 = new ExpandedNodeList(testds)
 
     println("dds2")
     if (dds2.Defined) {
+      dds2.Meta.foreach(println)
       dds2.Data.foreach(println)
     }
     else {
       println("UNDEFINED")
     }
+
+    dds2.saveToCassandra(session.sc, "test", "dds2")
   }
 }

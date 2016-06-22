@@ -11,6 +11,7 @@ import org.apache.spark.rdd.RDD
 // Datastax
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.rdd._
+import com.datastax.spark.connector.cql.CassandraConnector
 
 // ScrubJay
 import scrubjay.datasource._
@@ -19,7 +20,8 @@ package scrubjay {
 
   object cassandra {
 
-    def inferCassandraTypeString(v: Any): String = v match {
+    // Match Scala type to Cassandra type string
+    def InferCassandraTypeString(v: Any): String = v match {
       case _: String     => "text"
       case _: Int        => "int"
       case _: Float      => "float"
@@ -28,42 +30,88 @@ package scrubjay {
       case _: BigInt     => "varint"
 
       // Cassandra collections, assume at least one element if column is defined
-      case l: List[_]  => "list<" + inferCassandraTypeString(l(0)) + ">"
-      case s: Set[_]   => "set<"  + inferCassandraTypeString(s.head) + ">"
-      case m: Map[_,_] => "map<"  + inferCassandraTypeString(m.head._1) + "," + inferCassandraTypeString(m.head._2) + ">"
+      case l: List[_]  => "list<" + InferCassandraTypeString(l(0)) + ">"
+      case s: Set[_]   => "set<"  + InferCassandraTypeString(s.head) + ">"
+      case m: Map[_,_] => "map<"  + InferCassandraTypeString(m.head._1) + "," + InferCassandraTypeString(m.head._2) + ">"
+    }
+
+    // Get columns and datatypes from the data and add meta_value and meta_units for each column
+    def DataSourceCassandraSchema(ds: DataSource): List[(String, String)] = {
+      ds.Data
+        .reduce((m1, m2) => m1 ++ m2)
+        .flatMap{case (s, v) => 
+          Seq((s, InferCassandraTypeString(v)), 
+              (s"meta_value_$s", "varint"),
+              (s"meta_units_$s", "varint"))}
+        .toList
+    }
+
+    // The CQL command to create the Cassandra meta table
+    def CreateCassandraMetaTableCQL(keyspace: String): String = {
+      s"CREATE TABLE IF NOT EXISTS $keyspace.meta (meta_key varint PRIMARY KEY, title text, description text)"
+    }
+
+    // The CQL command to create a Cassandra table with the specified schema
+    def CreateCassandraDataTableCQL(keyspace: String, 
+                                    table: String, 
+                                    schema: List[(String, String)], 
+                                    primaryKey: String): String = {
+      val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
+      s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY ($primaryKey))" 
+    }
+
+    // The sequence of CQL commands to insert meta entries into the Cassandra meta table
+    def CreateMetaEntriesCQL(keyspace: String,
+                             table: String,
+                             schema: List[(String, String)], 
+                             primaryKey: String,
+                             metaMap: MetaMap): List[String] = {
+      val reverseMetaMap = metaMap.map(_.swap)
+
+      // For each data column, create: 
+      schema.filterNot(_._1 startsWith "meta_")
+        .flatMap(column => {
+          val columnName = column._1
+          val metaEntry = reverseMetaMap(columnName)
+          List(
+            // 1. a meta reference in the data table
+            s"""
+            |INSERT INTO $keyspace.$table ($primaryKey, meta_units_${columnName}, meta_value_${columnName}) 
+            |VALUES (0, ${metaEntry.units.hashCode}, ${metaEntry.value.hashCode})
+            |""".stripMargin.replaceAll("\n"," "),
+
+            // 2. a meta units entry in the meta table
+            s"""
+            |INSERT INTO $keyspace.meta (meta_key, title, description)
+            |VALUES (${metaEntry.units.hashCode}, \'${metaEntry.units.title}\', \'${metaEntry.units.description}\')
+            |""".stripMargin.replaceAll("\n"," "),
+
+            // 3. a meta value entry in the meta table
+            s"""
+            |INSERT INTO $keyspace.meta (meta_key, title, description)
+            |VALUES (${metaEntry.value.hashCode}, \'${metaEntry.value.title}\', \'${metaEntry.value.description}\')
+            |""".stripMargin.replaceAll("\n"," ")
+        )})
     }
 
     implicit class CassandraDataSourceWriter(ds: DataSource) {
       def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
-        // Get columns and datatypes from the data
-        // and add meta_value and meta_units for each column
-        val schema = ds.Data
-          .reduce((m1, m2) => m1 ++ m2)
-          .flatMap{case (s, v) => 
-            Seq((s, inferCassandraTypeString(v)), 
-                (s"meta_value_$s", "varint"),
-                (s"meta_units_$s", "varint"))}
-          .toList
+        val schema = DataSourceCassandraSchema(ds)
 
-        // Schema as needed for CQL command
-        val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
+        // default primary key is first column
+        val primaryKey = schema(0)._1 
+        
+        val CQLcommands = CreateCassandraMetaTableCQL(keyspace) +: 
+                          CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey) +: 
+                          CreateMetaEntriesCQL(keyspace, table, schema, primaryKey, ds.Meta)
 
-        // Choose first column as primary key (default)
-        val primaryKey = schema(0)._1
-
-        // The command to create the table with specified schema 
-        val createTableCQLcmd = s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY ($primaryKey))" 
-
-        // Find the matching meta entries for each column
-        val reverseMetaMap = ds.Meta.map(_.swap)
-
-        // The command to insert meta rows into table
-        val insertMetaCQLcmd = s"INSERT INTO $keyspace.$table ("
-
-
-        // Create meta entries in meta table
-        // Save data to Cassandra
+        CassandraConnector(sc.getConf).withSessionDo { session =>
+          for (CQLcmd <- CQLcommands) {
+            println(CQLcmd)
+            session.execute(CQLcmd)
+          }
+        }
       }
     }
 
