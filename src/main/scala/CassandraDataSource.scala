@@ -75,6 +75,8 @@ package scrubjay {
           val metaEntry = reverseMetaMap(columnName)
           List(
             // 1. a meta reference in the data table
+            // FIXME: inserting into primary key 0, not guaranteed to not be overwritten!!!
+            //        but is that actually a problem?
             s"""
             |INSERT INTO $keyspace.$table ($primaryKey, meta_units_${columnName}, meta_value_${columnName}) 
             |VALUES (0, ${metaEntry.units.hashCode}, ${metaEntry.value.hashCode})
@@ -97,21 +99,28 @@ package scrubjay {
     implicit class CassandraDataSourceWriter(ds: DataSource) {
       def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
+        // Infer the schema from the DataSource
         val schema = DataSourceCassandraSchema(ds)
 
-        // default primary key is first column
+        // Choose a primary key (first column for now)
         val primaryKey = schema(0)._1 
         
+        // Generate CQL commands for creating/inserting meta information
         val CQLcommands = CreateCassandraMetaTableCQL(keyspace) +: 
                           CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey) +: 
                           CreateMetaEntriesCQL(keyspace, table, schema, primaryKey, ds.Meta)
 
+        // Run the generated CQL commands
         CassandraConnector(sc.getConf).withSessionDo { session =>
           for (CQLcmd <- CQLcommands) {
-            println(CQLcmd)
+            //println(CQLcmd)
             session.execute(CQLcmd)
           }
         }
+
+        // Save the data into the created table
+        val metaColumns = schema.map(_._1).filter(_ startsWith "meta_").map(meta => Map(meta -> None)).reduce((a,b) => a ++ b)
+        ds.Data.map(_ ++ metaColumns).map(CassandraRow.fromMap(_)).saveToCassandra(keyspace, table)
       }
     }
 
@@ -128,9 +137,10 @@ package scrubjay {
         val meta_columns = cassandra_meta_table.selectedColumnNames
 
         val data_meta_columns = data_columns
-          .filter(!_.startsWith("meta_"))
+          .filterNot(_ startsWith "meta_")
           .flatMap(col => Seq(ColumnName("meta_attribute_"+col), ColumnName("meta_units_"+col)))
 
+        // TODO: this
         val data_meta_keys = cassandra_data_table.select(data_meta_columns:_*).collect()
 
         println(data_meta_keys)
