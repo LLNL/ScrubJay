@@ -41,14 +41,13 @@ package scrubjay {
         .reduce((m1, m2) => m1 ++ m2)
         .flatMap{case (s, v) => 
           Seq((s, InferCassandraTypeString(v)), 
-              (s"meta_value_$s", "varint"),
-              (s"meta_units_$s", "varint"))}
+              (s"meta_$s", "tuple<int,int>"))}
         .toList
     }
 
     // The CQL command to create the Cassandra meta table
     def CreateCassandraMetaTableCQL(keyspace: String): String = {
-      s"CREATE TABLE IF NOT EXISTS $keyspace.meta (meta_key varint PRIMARY KEY, title text, description text)"
+      s"CREATE TABLE IF NOT EXISTS $keyspace.meta (meta_key int PRIMARY KEY, title text, description text)"
     }
 
     // The CQL command to create a Cassandra table with the specified schema
@@ -75,23 +74,21 @@ package scrubjay {
           val metaEntry = reverseMetaMap(columnName)
           List(
             // 1. a meta reference in the data table
-            // FIXME: inserting into primary key 0, not guaranteed to not be overwritten!!!
-            //        but is that actually a problem?
             s"""
-            |INSERT INTO $keyspace.$table ($primaryKey, meta_units_${columnName}, meta_value_${columnName}) 
-            |VALUES (0, ${metaEntry.units.hashCode}, ${metaEntry.value.hashCode})
+            |INSERT INTO $keyspace.$table ($primaryKey, meta_${columnName})
+            |VALUES (0, (${metaEntry.value.hashCode}, ${metaEntry.units.hashCode}))
             |""".stripMargin.replaceAll("\n"," "),
 
-            // 2. a meta units entry in the meta table
-            s"""
-            |INSERT INTO $keyspace.meta (meta_key, title, description)
-            |VALUES (${metaEntry.units.hashCode}, \'${metaEntry.units.title}\', \'${metaEntry.units.description}\')
-            |""".stripMargin.replaceAll("\n"," "),
-
-            // 3. a meta value entry in the meta table
+            // 2. a meta value entry in the meta table
             s"""
             |INSERT INTO $keyspace.meta (meta_key, title, description)
             |VALUES (${metaEntry.value.hashCode}, \'${metaEntry.value.title}\', \'${metaEntry.value.description}\')
+            |""".stripMargin.replaceAll("\n"," "),
+
+            // 3. a meta units entry in the meta table
+            s"""
+            |INSERT INTO $keyspace.meta (meta_key, title, description)
+            |VALUES (${metaEntry.units.hashCode}, \'${metaEntry.units.title}\', \'${metaEntry.units.description}\')
             |""".stripMargin.replaceAll("\n"," ")
         )})
     }
@@ -103,7 +100,7 @@ package scrubjay {
         val schema = DataSourceCassandraSchema(ds)
 
         // Choose a primary key (first column for now)
-        val primaryKey = schema(0)._1 
+        val primaryKey = schema.filterNot{case (k,v) => k startsWith "meta_"}.head._1
         
         // Generate CQL commands for creating/inserting meta information
         val CQLcommands = CreateCassandraMetaTableCQL(keyspace) +: 
@@ -113,14 +110,21 @@ package scrubjay {
         // Run the generated CQL commands
         CassandraConnector(sc.getConf).withSessionDo { session =>
           for (CQLcmd <- CQLcommands) {
-            //println(CQLcmd)
+            println(CQLcmd)
             session.execute(CQLcmd)
           }
         }
 
-        // Save the data into the created table
-        val metaColumns = schema.map(_._1).filter(_ startsWith "meta_").map(meta => Map(meta -> None)).reduce((a,b) => a ++ b)
-        ds.Data.map(_ ++ metaColumns).map(CassandraRow.fromMap(_)).saveToCassandra(keyspace, table)
+        // Create meta columns with None entries (will be ignored from writes)
+        val metaColumns = schema.map(_._1)
+          .filter(_ startsWith "meta_")
+          .map(meta => Map(meta -> None))
+          .reduce((a,b) => a ++ b)
+
+        // Convert rows to CassandraRow instances and save to the table
+        ds.Data.map(_ ++ metaColumns)
+          .map(CassandraRow.fromMap(_))
+          .saveToCassandra(keyspace, table)
       }
     }
 
@@ -131,25 +135,20 @@ package scrubjay {
       lazy val cassandra_data_table = sc.cassandraTable(keyspace, table)
       lazy val cassandra_meta_table = sc.cassandraTable(keyspace, "meta")
 
+      lazy val meta_columns = cassandra_data_table.selectedColumnRefs.filter(_.toString startsWith "meta_")
+      lazy val data_columns = cassandra_data_table.selectedColumnRefs.filterNot(_.toString startsWith "meta_")
+
       lazy val Meta: MetaMap = {
-
-        val data_columns = cassandra_data_table.selectedColumnNames
-        val meta_columns = cassandra_meta_table.selectedColumnNames
-
-        val data_meta_columns = data_columns
-          .filterNot(_ startsWith "meta_")
-          .flatMap(col => Seq(ColumnName("meta_attribute_"+col), ColumnName("meta_units_"+col)))
-
-        // TODO: this
-        val data_meta_keys = cassandra_data_table.select(data_meta_columns:_*).collect()
-
-        println(data_meta_keys)
-        
-        Map(MetaEntry(MetaValue("", ""), MetaUnits("", "")) -> "blah")
+        cassandra_data_table.select(meta_columns:_*)            // select meta_xxx columns
+          .map(_.toMap).reduce((a,b) => a ++ b)                 // Map(meta_xxx -> (int, int))
+          .mapValues{case t: TupleValue =>                      
+            MetaEntry(MetaDescriptorLookup(t.getInt(0)), 
+                      MetaDescriptorLookup(t.getInt(1)))}       // Map(meta_xxx -> MetaEntry)
+          .map{case (k, v) => (v, k.substring("meta_".length))} // Map(MetaEntry -> xxx)
       }
 
       lazy val Data: RDD[DataRow] = {
-        cassandra_data_table.map(_.toMap)
+        cassandra_data_table.select(data_columns:_*).map(_.toMap)
       }
     }
   }
