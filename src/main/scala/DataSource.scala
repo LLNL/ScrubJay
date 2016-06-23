@@ -46,7 +46,7 @@ package scrubjay {
 
     var MetaDescriptorLookup: Map[Int, MetaDescriptor] = null
 
-    def DefineMeta(meta_desc: MetaDescriptor): MetaDescriptor = {
+    def DefineMetaDescriptor(meta_desc: MetaDescriptor): MetaDescriptor = {
       if (MetaDescriptorLookup == null) {
         MetaDescriptorLookup = Map(meta_desc.hashCode -> meta_desc)
       }
@@ -57,17 +57,17 @@ package scrubjay {
     }
 
     // Values
-    final val META_VALUE_JOB_ID     : MetaDescriptor = DefineMeta(MetaDescriptor("Job ID", "Unique identifier for a job submitted via SLURM"))
-    final val META_VALUE_START_TIME : MetaDescriptor = DefineMeta(MetaDescriptor("Start Time", "An instantaneous point in time"))
-    final val META_VALUE_DURATION   : MetaDescriptor = DefineMeta(MetaDescriptor("Time Duration", "A quantity of time"))
-    final val META_VALUE_NODE       : MetaDescriptor = DefineMeta(MetaDescriptor("Node", "An individual node in an HPC cluster"))
-    final val META_VALUE_NODE_LIST  : MetaDescriptor = DefineMeta(MetaDescriptor("Node List", "A list of nodes in an HPC cluster"))
+    final val META_VALUE_JOB_ID     = DefineMetaDescriptor(MetaDescriptor("Job ID", "Unique identifier for a job submitted via SLURM"))
+    final val META_VALUE_START_TIME = DefineMetaDescriptor(MetaDescriptor("Start Time", "An instantaneous point in time"))
+    final val META_VALUE_DURATION   = DefineMetaDescriptor(MetaDescriptor("Time Duration", "A quantity of time"))
+    final val META_VALUE_NODE       = DefineMetaDescriptor(MetaDescriptor("Node", "An individual node in an HPC cluster"))
+    final val META_VALUE_NODE_LIST  = DefineMetaDescriptor(MetaDescriptor("Node List", "A list of nodes in an HPC cluster"))
 
     // Units
-    final val META_UNITS_ID         : MetaDescriptor = DefineMeta(MetaDescriptor("Identifier", "Categorical value that describes an individual element"))
-    final val META_UNITS_TIME       : MetaDescriptor = DefineMeta(MetaDescriptor("Human Time", "Time represented by human clocks/calendars"))
-    final val META_UNITS_SECONDS    : MetaDescriptor = DefineMeta(MetaDescriptor("Seconds", "Seconds as described by human clocks"))
-    final val META_UNITS_ID_LIST    : MetaDescriptor = DefineMeta(MetaDescriptor("ID List", "A list of categorical values that describe elements"))
+    final val META_UNITS_ID         = DefineMetaDescriptor(MetaDescriptor("Identifier", "Categorical value that describes an individual element"))
+    final val META_UNITS_TIME       = DefineMetaDescriptor(MetaDescriptor("Human Time", "Time represented by human clocks/calendars"))
+    final val META_UNITS_SECONDS    = DefineMetaDescriptor(MetaDescriptor("Seconds", "Seconds as described by human clocks"))
+    final val META_UNITS_ID_LIST    = DefineMetaDescriptor(MetaDescriptor("ID List", "A list of categorical values that describe elements"))
 
     
   }

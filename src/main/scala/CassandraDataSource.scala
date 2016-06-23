@@ -45,11 +45,6 @@ package scrubjay {
         .toList
     }
 
-    // The CQL command to create the Cassandra meta table
-    def CreateCassandraMetaTableCQL(keyspace: String): String = {
-      s"CREATE TABLE IF NOT EXISTS $keyspace.meta (meta_key int PRIMARY KEY, title text, description text)"
-    }
-
     // The CQL command to create a Cassandra table with the specified schema
     def CreateCassandraDataTableCQL(keyspace: String, 
                                     table: String, 
@@ -103,8 +98,7 @@ package scrubjay {
         val primaryKey = schema.filterNot{case (k,v) => k startsWith "meta_"}.head._1
         
         // Generate CQL commands for creating/inserting meta information
-        val CQLcommands = CreateCassandraMetaTableCQL(keyspace) +: 
-                          CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey) +: 
+        val CQLcommands = CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey) +: 
                           CreateMetaEntriesCQL(keyspace, table, schema, primaryKey, ds.Meta)
 
         // Run the generated CQL commands
