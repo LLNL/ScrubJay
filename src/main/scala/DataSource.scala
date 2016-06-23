@@ -44,15 +44,10 @@ package scrubjay {
      * Meta attribute ontology
     */
 
-    var MetaDescriptorLookup: Map[Int, MetaDescriptor] = null
+    var MetaDescriptorLookup: Map[Int, MetaDescriptor] = Map()
 
     def DefineMetaDescriptor(meta_desc: MetaDescriptor): MetaDescriptor = {
-      if (MetaDescriptorLookup == null) {
-        MetaDescriptorLookup = Map(meta_desc.hashCode -> meta_desc)
-      }
-      else {
-        MetaDescriptorLookup = MetaDescriptorLookup ++ Map(meta_desc.hashCode -> meta_desc)
-      }
+      MetaDescriptorLookup = MetaDescriptorLookup ++ Map(meta_desc.hashCode -> meta_desc)
       meta_desc
     }
 
