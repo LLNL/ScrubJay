@@ -31,13 +31,14 @@ package scrubjay {
       case _: BigDecimal => "decimal"
       case _: BigInt     => "varint"
 
-      // Cassandra collections, assume at least one element if column is defined
+      // Cassandra "collections"
       case l: List[_]  => "list<" + InferCassandraTypeString(l(0)) + ">"
       case s: Set[_]   => "set<"  + InferCassandraTypeString(s.head) + ">"
       case m: Map[_,_] => "map<"  + InferCassandraTypeString(m.head._1) + "," + InferCassandraTypeString(m.head._2) + ">"
     }
 
     // Get columns and datatypes from the data and add meta_data for each column
+    // FIXME: is it possible for the reduction to create None value entries, e.g. ("jobid" -> None )?
     def DataSourceCassandraSchema(ds: DataSource): List[(String, String)] = {
       ds.Data
         .reduce((m1, m2) => m1 ++ m2)
@@ -79,6 +80,8 @@ package scrubjay {
     implicit class CassandraDataSourceWriter(ds: DataSource) {
       def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
+        // FIXME: default primary key? clustering order? secondary keys?
+        
         // Infer the schema from the DataSource
         val schema = DataSourceCassandraSchema(ds)
 
