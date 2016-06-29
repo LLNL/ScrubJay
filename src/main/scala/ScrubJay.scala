@@ -38,6 +38,6 @@ package scrubjay {
 
     val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
     val sqlc = new SQLContext(sc)
-    val metaDefinitions = new MetaDefinitionMaker
+    val metaOntology = new MetaOntology
   }
 }

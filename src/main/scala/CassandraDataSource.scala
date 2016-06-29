@@ -18,9 +18,7 @@ import scrubjay.datasource._
 
 package scrubjay {
 
-  object cassandra {
-
-    final val META_PREFIX = "meta_"
+  object cassandraDataSource {
 
     // Match Scala type to Cassandra type string
     def InferCassandraTypeString(v: Any): String = v match {
@@ -40,11 +38,9 @@ package scrubjay {
     // Get columns and datatypes from the data and add meta_data for each column
     // FIXME: is it possible for the reduction to create None value entries, e.g. ("jobid" -> None )?
     def DataSourceCassandraSchema(ds: DataSource): List[(String, String)] = {
-      ds.Data
+      ds.rdd
         .reduce((m1, m2) => m1 ++ m2)
-        .flatMap{case (s, v) => 
-          Seq((s, InferCassandraTypeString(v)), 
-              (META_PREFIX + s, "tuple<int,int>"))}
+        .mapValues(InferCassandraTypeString(_))
         .toList
     }
 
@@ -57,26 +53,6 @@ package scrubjay {
       s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY ($primaryKey))" 
     }
 
-    // The sequence of CQL commands to insert meta entries into the Cassandra meta table
-    def CreateMetaEntriesCQL(keyspace: String,
-                             table: String,
-                             schema: List[(String, String)], 
-                             primaryKey: String,
-                             metaMap: MetaMap): List[String] = {
-      val reverseMetaMap = metaMap.map(_.swap)
-
-      // For each data column, create a meta reference in the data table
-      schema.filterNot(_._1 startsWith META_PREFIX)
-        .map(column => {
-          val columnName = column._1
-          val metaEntry = reverseMetaMap(columnName)
-          s"""
-          |INSERT INTO $keyspace.$table ($primaryKey, $META_PREFIX${columnName})
-          |VALUES (0, (${metaEntry.value.hashCode}, ${metaEntry.units.hashCode}))
-          |""".stripMargin.replaceAll("\n"," ")
-        })
-    }
-
     implicit class CassandraDataSourceWriter(ds: DataSource) {
       def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
@@ -86,53 +62,41 @@ package scrubjay {
         val schema = DataSourceCassandraSchema(ds)
 
         // Choose a primary key (first column for now)
-        val primaryKey = schema.filterNot{case (k,v) => k startsWith META_PREFIX}.head._1
+        val primaryKey = schema.head._1
         
         // Generate CQL commands for creating/inserting meta information
-        val CQLcommands = CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey) +: 
-                          CreateMetaEntriesCQL(keyspace, table, schema, primaryKey, ds.Meta)
+        val CQLcmd = CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey)
 
         // Run the generated CQL commands
         CassandraConnector(sc.getConf).withSessionDo { session =>
-          for (CQLcmd <- CQLcommands) {
-            println(CQLcmd)
-            //session.execute(CQLcmd)
-          }
+          println(CQLcmd)
+          //session.execute(CQLcmd)
         }
 
-        // Create meta columns with None entries (will be ignored from writes)
-        val metaColumns = schema.map(_._1)
-          .filter(_ startsWith META_PREFIX)
-          .map(meta => Map(meta -> None))
-          .reduce((a,b) => a ++ b)
-
         // Convert rows to CassandraRow instances and save to the table
-        ds.Data.map(_ ++ metaColumns)
-          .map(CassandraRow.fromMap(_))
+        ds.rdd.map(CassandraRow.fromMap(_))
           //.saveToCassandra(keyspace, table)
       }
     }
 
     class CassandraDataSource(sc: SparkContext,
+                              metaOntology: MetaOntology,
+                              metaMap: MetaMap,
                               val keyspace: String, 
-                              val table: String) extends DataSource {
+                              val table: String) extends OriginalDataSource(metaOntology, metaMap)  {
 
       lazy val cassandra_data_table = sc.cassandraTable(keyspace, table)
 
-      lazy val meta_columns = cassandra_data_table.selectedColumnRefs.filter(_.toString startsWith META_PREFIX)
-      lazy val data_columns = cassandra_data_table.selectedColumnRefs.filterNot(_.toString startsWith META_PREFIX)
+      lazy val data_columns = cassandra_data_table.selectedColumnRefs
 
-      lazy val Meta: MetaMap = {
-        cassandra_data_table.select(meta_columns:_*)            // select meta_xxx columns
-          .map(_.toMap).reduce((a,b) => a ++ b)                 // Map(meta_xxx -> (int, int))
-          .mapValues{case t: TupleValue =>                      
-            MetaEntry(MetaDefinitions.lookup(t.getInt(0)), 
-                      MetaDefinitions.lookup(t.getInt(1)))}       // Map(meta_xxx -> MetaEntry)
-          .map{case (k, v) => (v, k.substring(META_PREFIX.length))} // Map(MetaEntry -> xxx)
-      }
-
-      lazy val Data: RDD[DataRow] = {
+      lazy val rdd: RDD[DataRow] = {
         cassandra_data_table.select(data_columns:_*).map(_.toMap)
+      }
+    }
+
+    implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
+      def createCassandraDataSource(metaMap: MetaMap, keyspace: String, table: String): CassandraDataSource = {
+        new CassandraDataSource(sjs.sc, sjs.metaOntology, metaMap, keyspace, table)
       }
     }
   }
