@@ -19,38 +19,48 @@ package scrubjay {
    *  a new row with identical attributes <a1, a2, 1>, <a1, a2, 2>, etc ...
    */
 
-  class ExpandedNodeList(datasources: DataSource*) extends DerivedDataSource(datasources:_*) {
+  object expandedNodeList {
 
-    // Derivation-specific variables for reuse
-    val ds = datasources(0)
-    val nodelist_meta_entry = MetaEntry(MetaDefinitions.VALUE_NODE_LIST, MetaDefinitions.UNITS_ID_LIST)
-    val node_meta_entry = MetaEntry(MetaDefinitions.VALUE_NODE, MetaDefinitions.UNITS_ID)
+    class ExpandedNodeList(metaOntology: MetaOntology,
+                           datasources: DataSource*) extends DerivedDataSource(metaOntology, datasources:_*) {
 
-    // Required input attributes and derived output attributes
-    val RequiredMetaEntries = List(List(nodelist_meta_entry))
-    val DerivedMetaEntries: MetaMap = Map(node_meta_entry -> "node")
+      // Derivation-specific variables for reuse
+      val ds = datasources(0)
+      val nodelist_meta_entry = MetaEntry(metaOntology.VALUE_NODE_LIST, metaOntology.UNITS_ID_LIST)
+      val node_meta_entry = MetaEntry(metaOntology.VALUE_NODE, metaOntology.UNITS_ID)
 
-    // Data derivation defined here
-    lazy val Data: RDD[DataRow] = {
+      // Required input attributes and derived output attributes
+      val requiredMetaEntries = List(List(nodelist_meta_entry))
+      val derivedMetaEntries: MetaMap = Map(node_meta_entry -> "node")
 
-      // Derivation function for flatMap returns a sequence of DataRows
-      def derivation(row: DataRow, nodelist_column: String, node_column: String): Seq[DataRow] = {
+      // rdd derivation defined here
+      lazy val rdd: RDD[DataRow] = {
 
-        // Get column value
-        val nodelist_val = row(nodelist_column)
+        // Derivation function for flatMap returns a sequence of DataRows
+        def derivation(row: DataRow, nodelist_column: String, node_column: String): Seq[DataRow] = {
 
-        // Create a row for each node in list
-        nodelist_val match {
-          case nodelist: List[_] => 
-            for (node <- nodelist) yield { row + (node_column -> node) }
-          case _ => // not a list, store single value
-            Seq(row + (node_column -> nodelist_val))
+          // Get column value
+          val nodelist_val = row(nodelist_column)
+
+          // Create a row for each node in list
+          nodelist_val match {
+            case nodelist: List[_] => 
+              for (node <- nodelist) yield { row + (node_column -> node) }
+            case _ => // not a list, store single value
+              Seq(row + (node_column -> nodelist_val))
+          }
         }
-      }
 
-      // Create the derived dataset
-      ds.Data.flatMap(row => 
-          derivation(row, ds.Meta(nodelist_meta_entry), DerivedMetaEntries(node_meta_entry)))
+        // Create the derived dataset
+        ds.rdd.flatMap(row => 
+            derivation(row, ds.metaMap(nodelist_meta_entry), derivedMetaEntries(node_meta_entry)))
+      }
+    }
+
+    implicit class ScrubJaySession_ExpandedNodeList(sjs: ScrubJaySession) {
+      def deriveExpandedNodeList(ds: DataSource): ExpandedNodeList = {
+        new ExpandedNodeList(sjs.metaOntology, ds)
+      }
     }
   }
 }
