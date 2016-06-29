@@ -11,6 +11,7 @@ val sparkCassandraConnectorVersion = "1.6.0"
 
 // Misc
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
+libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 
 // Spark
 libraryDependencies += "org.apache.spark" % "spark-core_2.10"   % sparkVersion

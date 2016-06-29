@@ -1,3 +1,5 @@
+import scrubjay._
+
 // Scala
 import scala.collection.immutable.Map
 
@@ -17,6 +19,7 @@ package scrubjay {
     abstract class DataSource extends Serializable {
       val Meta: MetaMap
       val Data: RDD[DataRow]
+      val MetaDefinitions: MetaDefinitionMaker = new MetaDefinitionMaker
     }
 
     abstract class DerivedDataSource(val datasources: DataSource*) extends DataSource {
@@ -39,31 +42,5 @@ package scrubjay {
       }
 
     }
-
-    /*
-     * Meta attribute ontology
-    */
-
-    var MetaDescriptorLookup: Map[Int, MetaDescriptor] = Map()
-
-    def DefineMetaDescriptor(meta_desc: MetaDescriptor): MetaDescriptor = {
-      MetaDescriptorLookup = MetaDescriptorLookup ++ Map(meta_desc.hashCode -> meta_desc)
-      meta_desc
-    }
-
-    // Values
-    final val META_VALUE_JOB_ID     = DefineMetaDescriptor(MetaDescriptor("Job ID", "Unique identifier for a job submitted via SLURM"))
-    final val META_VALUE_START_TIME = DefineMetaDescriptor(MetaDescriptor("Start Time", "An instantaneous point in time"))
-    final val META_VALUE_DURATION   = DefineMetaDescriptor(MetaDescriptor("Time Duration", "A quantity of time"))
-    final val META_VALUE_NODE       = DefineMetaDescriptor(MetaDescriptor("Node", "An individual node in an HPC cluster"))
-    final val META_VALUE_NODE_LIST  = DefineMetaDescriptor(MetaDescriptor("Node List", "A list of nodes in an HPC cluster"))
-
-    // Units
-    final val META_UNITS_ID         = DefineMetaDescriptor(MetaDescriptor("Identifier", "Categorical value that describes an individual element"))
-    final val META_UNITS_TIME       = DefineMetaDescriptor(MetaDescriptor("Human Time", "Time represented by human clocks/calendars"))
-    final val META_UNITS_SECONDS    = DefineMetaDescriptor(MetaDescriptor("Seconds", "Seconds as described by human clocks"))
-    final val META_UNITS_ID_LIST    = DefineMetaDescriptor(MetaDescriptor("ID List", "A list of categorical values that describe elements"))
-
-    
   }
 }

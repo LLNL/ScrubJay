@@ -44,7 +44,7 @@ package scrubjay {
         .reduce((m1, m2) => m1 ++ m2)
         .flatMap{case (s, v) => 
           Seq((s, InferCassandraTypeString(v)), 
-              (s"$META_PREFIX$s", "tuple<int,int>"))}
+              (META_PREFIX + s, "tuple<int,int>"))}
         .toList
     }
 
@@ -96,7 +96,7 @@ package scrubjay {
         CassandraConnector(sc.getConf).withSessionDo { session =>
           for (CQLcmd <- CQLcommands) {
             println(CQLcmd)
-            session.execute(CQLcmd)
+            //session.execute(CQLcmd)
           }
         }
 
@@ -109,11 +109,11 @@ package scrubjay {
         // Convert rows to CassandraRow instances and save to the table
         ds.Data.map(_ ++ metaColumns)
           .map(CassandraRow.fromMap(_))
-          .saveToCassandra(keyspace, table)
+          //.saveToCassandra(keyspace, table)
       }
     }
 
-    class CassandraDataSource(val sc: SparkContext, 
+    class CassandraDataSource(sc: SparkContext,
                               val keyspace: String, 
                               val table: String) extends DataSource {
 
@@ -126,8 +126,8 @@ package scrubjay {
         cassandra_data_table.select(meta_columns:_*)            // select meta_xxx columns
           .map(_.toMap).reduce((a,b) => a ++ b)                 // Map(meta_xxx -> (int, int))
           .mapValues{case t: TupleValue =>                      
-            MetaEntry(MetaDescriptorLookup(t.getInt(0)), 
-                      MetaDescriptorLookup(t.getInt(1)))}       // Map(meta_xxx -> MetaEntry)
+            MetaEntry(MetaDefinitions.lookup(t.getInt(0)), 
+                      MetaDefinitions.lookup(t.getInt(1)))}       // Map(meta_xxx -> MetaEntry)
           .map{case (k, v) => (v, k.substring(META_PREFIX.length))} // Map(MetaEntry -> xxx)
       }
 

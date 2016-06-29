@@ -22,10 +22,10 @@ object TestScrubJay {
           "nodelist"  -> List(4,5,6))))
 
     val testMeta = Map(
-      (MetaEntry(META_VALUE_JOB_ID, META_UNITS_ID)         -> "jobid"),
-      (MetaEntry(META_VALUE_START_TIME, META_UNITS_TIME)   -> "starttime"),
-      (MetaEntry(META_VALUE_DURATION, META_UNITS_SECONDS)  -> "elapsed"),
-      (MetaEntry(META_VALUE_NODE_LIST, META_UNITS_ID_LIST) -> "nodelist"))
+      (MetaEntry(session.metaDefinitions.VALUE_JOB_ID, session.metaDefinitions.UNITS_ID)         -> "jobid"),
+      (MetaEntry(session.metaDefinitions.VALUE_START_TIME, session.metaDefinitions.UNITS_TIME)   -> "starttime"),
+      (MetaEntry(session.metaDefinitions.VALUE_DURATION, session.metaDefinitions.UNITS_SECONDS)  -> "elapsed"),
+      (MetaEntry(session.metaDefinitions.VALUE_NODE_LIST, session.metaDefinitions.UNITS_ID_LIST) -> "nodelist"))
 
     new LocalDataSource(testMeta, testData)
   }

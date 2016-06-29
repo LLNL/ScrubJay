@@ -24,6 +24,7 @@ package scrubjay {
   }
 
   class ScrubJaySession(
+    //meta_file: String,
     spark_master: String = "local[*]",
     cassandra_connection: Option[CassandraConnection] = None) {
 
@@ -37,5 +38,6 @@ package scrubjay {
 
     val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
     val sqlc = new SQLContext(sc)
+    val metaDefinitions = new MetaDefinitionMaker
   }
 }
