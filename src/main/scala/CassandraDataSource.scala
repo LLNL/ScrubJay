@@ -53,7 +53,7 @@ package scrubjay {
       s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY ($primaryKey))" 
     }
 
-    implicit class CassandraDataSourceWriter(ds: DataSource) {
+    implicit class DataSource_SaveToCassandra(ds: DataSource) {
       def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
         // FIXME: default primary key? clustering order? secondary keys?
@@ -79,24 +79,18 @@ package scrubjay {
       }
     }
 
-    class CassandraDataSource(sc: SparkContext,
-                              metaOntology: MetaOntology,
+    class CassandraDataSource(metaOntology: MetaOntology,
                               metaMap: MetaMap,
-                              val keyspace: String, 
-                              val table: String) extends OriginalDataSource(metaOntology, metaMap)  {
-
-      lazy val cassandra_data_table = sc.cassandraTable(keyspace, table)
-
-      lazy val data_columns = cassandra_data_table.selectedColumnRefs
+                              cassRdd: RDD[CassandraRow]) extends OriginalDataSource(metaOntology, metaMap)  {
 
       lazy val rdd: RDD[DataRow] = {
-        cassandra_data_table.select(data_columns:_*).map(_.toMap)
+        cassRdd.map(_.toMap)
       }
     }
 
     implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
       def createCassandraDataSource(metaMap: MetaMap, keyspace: String, table: String): CassandraDataSource = {
-        new CassandraDataSource(sjs.sc, sjs.metaOntology, metaMap, keyspace, table)
+        new CassandraDataSource(sjs.metaOntology, metaMap, sjs.sc.cassandraTable(keyspace, table))
       }
     }
   }

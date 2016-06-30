@@ -33,7 +33,18 @@ object TestScrubJay {
   }
 
   def TestInputCassandra(sjs: ScrubJaySession): DataSource = {
-    sjs.createCassandraDataSource(Map[MetaEntry,String](), "test", "job_queue")
+    val jobQueueMeta = Map(
+      (MetaEntry(sjs.metaOntology.VALUE_JOB_ID, sjs.metaOntology.UNITS_ID)          -> "job_id"),
+      (MetaEntry(sjs.metaOntology.VALUE_START_TIME, sjs.metaOntology.UNITS_TIME)    -> "start_time"),
+      (MetaEntry(sjs.metaOntology.VALUE_DURATION, sjs.metaOntology.UNITS_SECONDS)   -> "elapsed_time"),
+      (MetaEntry(sjs.metaOntology.VALUE_JOB_NAME, sjs.metaOntology.UNITS_ID)        -> "job_name"),
+      (MetaEntry(sjs.metaOntology.VALUE_NODE_LIST, sjs.metaOntology.UNITS_ID_LIST)  -> "node_list"),
+      (MetaEntry(sjs.metaOntology.VALUE_NUM_NODES, sjs.metaOntology.UNITS_QUANTITY) -> "num_nodes"),
+      (MetaEntry(sjs.metaOntology.VALUE_PARTITION, sjs.metaOntology.UNITS_ID)       -> "partition"),
+      (MetaEntry(sjs.metaOntology.VALUE_STATE, sjs.metaOntology.UNITS_ID)           -> "state"),
+      (MetaEntry(sjs.metaOntology.VALUE_USER_NAME, sjs.metaOntology.UNITS_ID)       -> "user_name"))
+
+    sjs.createCassandraDataSource(jobQueueMeta, "cab_dat_2015_08_05", "job_queue")
   }
 
   def main(args: Array[String]) {
@@ -41,12 +52,12 @@ object TestScrubJay {
     val sjs = new ScrubJaySession(
       cassandra_connection = Some(CassandraConnection(hostname = "sonar11")))
 
-    val testds = TestInputLocal(sjs)
-    //val testds = TestInputCassandra(sjs)
+    //val testds = TestInputLocal(sjs)
+    val testds = TestInputCassandra(sjs)
 
     println("testds")
-    testds.metaMap.foreach(println)
-    testds.rdd.foreach(println)
+    //testds.metaMap.foreach(println)
+    //testds.rdd.foreach(println)
 
     val dds2 = sjs.deriveExpandedNodeList(testds)
 
@@ -59,6 +70,6 @@ object TestScrubJay {
       println("UNDEFINED")
     }
 
-    dds2.saveToCassandra(sjs.sc, "test", "dds2")
+    //dds2.saveToCassandra(sjs.sc, "test", "dds2")
   }
 }

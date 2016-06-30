@@ -29,7 +29,6 @@ package scrubjay {
                                      val datasources: DataSource*) extends DataSource(metaOntology) {
 
       val requiredMetaEntries: List[List[MetaEntry]]
-      val derivedMetaEntries: MetaMap
 
       lazy val defined: Boolean = {
         // Check that each datasource contains all required meta entries
@@ -39,12 +38,6 @@ package scrubjay {
           })
         })
       }
-
-      lazy val metaMap: MetaMap = {
-        // Union of meta entries of all datasources and newly derived ones
-        datasources.map(ds => ds.metaMap).reduce((m1, m2) => m1 ++ m2) ++ derivedMetaEntries
-      }
-
     }
   }
 }

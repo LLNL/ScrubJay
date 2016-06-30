@@ -31,7 +31,7 @@ package scrubjay {
 
       // Required input attributes and derived output attributes
       val requiredMetaEntries = List(List(nodelist_meta_entry))
-      val derivedMetaEntries: MetaMap = Map(node_meta_entry -> "node")
+      val metaMap: MetaMap = (datasources.map(_.metaMap).reduce(_ ++ _) ++ Map(node_meta_entry -> "node")) - nodelist_meta_entry
 
       // rdd derivation defined here
       lazy val rdd: RDD[DataRow] = {
@@ -45,7 +45,7 @@ package scrubjay {
           // Create a row for each node in list
           nodelist_val match {
             case nodelist: List[_] => 
-              for (node <- nodelist) yield { row + (node_column -> node) }
+              for (node <- nodelist) yield { row + (node_column -> node) - nodelist_column}
             case _ => // not a list, store single value
               Seq(row + (node_column -> nodelist_val))
           }
@@ -53,7 +53,7 @@ package scrubjay {
 
         // Create the derived dataset
         ds.rdd.flatMap(row => 
-            derivation(row, ds.metaMap(nodelist_meta_entry), derivedMetaEntries(node_meta_entry)))
+            derivation(row, ds.metaMap(nodelist_meta_entry), metaMap(node_meta_entry)))
       }
     }
 
