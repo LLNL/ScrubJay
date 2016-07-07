@@ -4,7 +4,7 @@ package scrubjay {
 
   object util {
 
-    def TimeExpr[R](block: => R): R = {
+    def timeExpr[R](block: => R): R = {
       val t0 = System.nanoTime()
       val result = block    // call-by-name
       val t1 = System.nanoTime()
@@ -12,7 +12,7 @@ package scrubjay {
       result
     }
 
-    def DateRange(start: DateTime, end: DateTime, step: Period): Iterator[DateTime] = {
+    def dateRange(start: DateTime, end: DateTime, step: Period): Iterator[DateTime] = {
       Iterator.iterate(start)(_.plus(step)).takeWhile(!_.isAfter(end))
     }
   }

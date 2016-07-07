@@ -10,7 +10,7 @@ package scrubjay {
    * ExpandedNodeList 
    * 
    * Requirements: 
-   *  1. An input DataSource to derive from
+   *  1. A single DataSource to derive from
    *  2. The column "Node List" in that DataSource
    *  3. The units "ID List" for that column
    *
@@ -22,16 +22,15 @@ package scrubjay {
   object expandedNodeList {
 
     class ExpandedNodeList(metaOntology: MetaOntology,
-                           datasources: DataSource*) extends DerivedDataSource(metaOntology, datasources:_*) {
+                           ds: DataSource) extends DerivedDataSource(metaOntology) {
 
-      // Derivation-specific variables for reuse
-      val ds = datasources(0)
-      val nodelist_meta_entry = MetaEntry(metaOntology.VALUE_NODE_LIST, metaOntology.UNITS_ID_LIST)
-      val node_meta_entry = MetaEntry(metaOntology.VALUE_NODE, metaOntology.UNITS_ID)
+      // Meta entries used in this derivation
+      final val nodelist_meta_entry = MetaEntry(metaOntology.VALUE_NODE_LIST, metaOntology.UNITS_ID_LIST)
+      final val node_meta_entry = MetaEntry(metaOntology.VALUE_NODE, metaOntology.UNITS_ID)
 
-      // Required input attributes and derived output attributes
-      val requiredMetaEntries = List(List(nodelist_meta_entry))
-      val metaMap: MetaMap = (datasources.map(_.metaMap).reduce(_ ++ _) ++ Map(node_meta_entry -> "node")) - nodelist_meta_entry
+      // Implementations of abstract members
+      val defined: Boolean = ds.containsMeta(List(nodelist_meta_entry))
+      val metaMap: MetaMap = (ds.metaMap ++ Map(node_meta_entry -> "node")) - nodelist_meta_entry
 
       // rdd derivation defined here
       lazy val rdd: RDD[DataRow] = {

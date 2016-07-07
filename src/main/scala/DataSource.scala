@@ -20,24 +20,18 @@ package scrubjay {
     abstract class DataSource(val metaOntology: MetaOntology) extends Serializable {
       val metaMap: MetaMap
       val rdd: RDD[DataRow]
+
+      def containsMeta(meta: List[MetaEntry]): Boolean = {
+        meta.forall(metaMap contains _)
+      }
     }
 
     abstract class OriginalDataSource(metaOntology: MetaOntology,
                                       val metaMap: MetaMap) extends DataSource(metaOntology)
 
-    abstract class DerivedDataSource(metaOntology: MetaOntology,
-                                     val datasources: DataSource*) extends DataSource(metaOntology) {
+    abstract class DerivedDataSource(metaOntology: MetaOntology) extends DataSource(metaOntology) {
 
-      val requiredMetaEntries: List[List[MetaEntry]]
-
-      lazy val defined: Boolean = {
-        // Check that each datasource contains all required meta entries
-        datasources.zip(requiredMetaEntries).forall({ 
-          case (ds, reqs) => reqs.forall(req => {
-            ds.metaMap contains req
-          })
-        })
-      }
+      val defined: Boolean
     }
   }
 }
