@@ -8,9 +8,9 @@ import org.apache.spark.sql.SQLContext
 import com.datastax.spark.connector._
 
 // ScrubJay
-import scrubjay.util._
+import gov.llnl.scrubjay.util._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   case class CassandraConnection(
     val hostname: String = "localhost", 

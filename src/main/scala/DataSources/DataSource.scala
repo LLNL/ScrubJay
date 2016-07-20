@@ -1,4 +1,4 @@
-import scrubjay._
+import gov.llnl.scrubjay._
 
 // Scala
 import scala.collection.immutable.Map
@@ -7,7 +7,7 @@ import scala.collection.immutable.Map
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   object datasource {
 

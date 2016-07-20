@@ -1,13 +1,13 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scrubjay.datasource._
+import gov.llnl.scrubjay.datasource._
 
 import java.io.File
 
 import com.github.tototoshi.csv._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   object csvDataSource {
 

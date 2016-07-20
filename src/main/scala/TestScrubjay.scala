@@ -1,12 +1,12 @@
 import scala.util.Random
 import scala.collection.immutable.Map
 
-import scrubjay._
-import scrubjay.localDataSource._
-import scrubjay.expandedNodeList._
-import scrubjay.naturalJoin._
-import scrubjay.datasource._
-import scrubjay.cassandraDataSource._
+import gov.llnl.scrubjay._
+import gov.llnl.scrubjay.localDataSource._
+import gov.llnl.scrubjay.expandedNodeList._
+import gov.llnl.scrubjay.naturalJoin._
+import gov.llnl.scrubjay.datasource._
+import gov.llnl.scrubjay.cassandraDataSource._
 
 import com.datastax.spark.connector._
 

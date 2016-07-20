@@ -1,10 +1,10 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scrubjay._
-import scrubjay.datasource._
+import gov.llnl.scrubjay._
+import gov.llnl.scrubjay.datasource._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   /*
    * ExpandedNodeList 

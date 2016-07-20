@@ -1,9 +1,9 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scrubjay.datasource._
+import gov.llnl.scrubjay.datasource._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   object localDataSource {
     class LocalDataSource(metaOntology: MetaOntology,

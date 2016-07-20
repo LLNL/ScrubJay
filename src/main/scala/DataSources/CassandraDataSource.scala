@@ -13,10 +13,10 @@ import com.datastax.spark.connector._
 import com.datastax.spark.connector.rdd._
 import com.datastax.spark.connector.cql.CassandraConnector
 
-// ScrubJay
-import scrubjay.datasource._
+// gov.llnl.scrubjay
+import gov.llnl.scrubjay.datasource._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   object cassandraDataSource {
 

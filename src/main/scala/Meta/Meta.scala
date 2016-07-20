@@ -1,8 +1,8 @@
 import collection.immutable.HashSet
 
-import scrubjay.datasource._
+import gov.llnl.scrubjay.datasource._
 
-package scrubjay {
+package gov.llnl.scrubjay {
 
   abstract class MetaOntologyQueryable extends Serializable {
 
