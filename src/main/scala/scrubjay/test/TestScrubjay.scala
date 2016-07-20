@@ -1,15 +1,18 @@
+import scrubjay._
+
+import scrubjay.derivation._
+import scrubjay.derivation.ExpandedNodeList._
+import scrubjay.derivation.NaturalJoin._
+
+import scrubjay.datasource._
+import scrubjay.datasource.CassandraDataSource._
+import scrubjay.datasource.CSVDataSource._
+import scrubjay.datasource.LocalDataSource._
+
 import scala.util.Random
 import scala.collection.immutable.Map
 
-import gov.llnl.scrubjay._
-import gov.llnl.scrubjay.localDataSource._
-import gov.llnl.scrubjay.expandedNodeList._
-import gov.llnl.scrubjay.naturalJoin._
-import gov.llnl.scrubjay.datasource._
-import gov.llnl.scrubjay.cassandraDataSource._
-
 import com.datastax.spark.connector._
-
 
 object TestScrubJay {
 

@@ -1,6 +1,6 @@
 import com.github.nscala_time.time.Imports._
 
-package gov.llnl.scrubjay {
+package scrubjay {
 
   object util {
 
