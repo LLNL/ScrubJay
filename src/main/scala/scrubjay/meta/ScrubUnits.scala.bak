@@ -1,0 +1,121 @@
+package scrubjay.meta
+
+import scala.language.implicitConversions
+
+object main {
+  // ScrubUnit
+  abstract class ScrubUnit[T](v: T) {
+    def getVal: T = v
+  }
+
+  // Categorical data
+  case class ID(v: Any) extends ScrubUnit(v)
+
+  // Parent class for quantities
+  abstract class AbstractQuantity(v: Double) extends ScrubUnit(v)
+
+  // Unit composites
+  case class Per[A <: AbstractQuantity, B <: AbstractQuantity](v: Double) extends AbstractQuantity(v)
+
+  // Unit traits
+  trait SumAble[A <: SumAble[A]] extends AbstractQuantity {
+    def +(other: A): A
+  }
+  trait PerAble[A <: PerAble[A]] extends AbstractQuantity {
+    def /[T <: AbstractQuantity](other: T) = Per[A, T](getVal / other.getVal)
+  }
+
+  // Canonical units
+  case class Seconds(v: Double) extends AbstractQuantity(v) with SumAble[Seconds] with PerAble[Seconds] {
+    def +(other: Seconds) = copy(v = v + other.v)
+  }
+  case class Miles(v: Double) extends AbstractQuantity(v) with SumAble[Miles] with PerAble[Miles] {
+    def +(other: Miles) = copy(v = v + other.v)
+  }
+
+  // Implicit methods for built-in types
+  implicit class DoubleSugar(d: Double) {
+    def seconds: Seconds = Seconds(d)
+    def miles: Miles = Miles(d)
+  }
+  implicit class StringSugar(s: String) {
+    def seconds: Seconds = s.toDouble.seconds
+    def miles: Miles = s.toDouble.miles
+  }
+
+  // Explicit conversions
+  def stringToSeconds(s: String): Seconds = Seconds(s.toDouble)
+  def stringToMiles(s: String): Miles = Miles(s.toDouble)
+
+  // Implicit conversions
+  implicit def implicitStringToSeconds(s: String): Seconds = stringToSeconds(s)
+  implicit def implicitStringToMiles(s: String): Miles = stringToMiles(s)
+
+  // Type class for ScrubUnit conversion
+  sealed trait ScrubUnitConverter[T <: ScrubUnit[_]] {
+    def convert: Any => T
+  }
+  implicit val SecondsConverter = new ScrubUnitConverter[Seconds] {
+    def convert: Any => Seconds = (a: Any) => a match {
+      case s: String => stringToSeconds(s)
+      case n: Number => Seconds(n.doubleValue())
+      case _ => throw new UnsupportedOperationException(s"Cannot convert $a to Seconds")
+    }
+  }
+  implicit val MilesConverter = new ScrubUnitConverter[Miles] {
+    def convert: Any => Miles = (a: Any) => a match {
+      case s: String => stringToMiles(s)
+      case n: Number => Miles(n.doubleValue())
+      case _ => throw new UnsupportedOperationException(s"Cannot convert $a to Miles")
+    }
+  }
+
+  // Function to determine converter for a given units string
+  def converterFor(units: String): ScrubUnitConverter[_] = {
+    units match {
+      case "seconds" => implicitly[ScrubUnitConverter[Seconds]]
+      case "miles" => implicitly[ScrubUnitConverter[Miles]]
+    }
+  }
+
+  // **** MAIN ****
+  def main(args: Array[String]): Unit = {
+
+    println((5.miles + 6.miles) / 200.seconds)
+    println("234.2".miles)
+    println(converterFor("seconds").convert("55.2"))
+    println(converterFor("seconds").convert(55.2))
+
+    case class MetaEntry(dimension: String, meaning: String, domain: String, units: String)
+
+    case class AnnotatedData(meta: Map[String, MetaEntry], data: Seq[Map[String, Any]]) {
+      def realize = {
+        data.map(row => row.map{case (k, v) => (k, converterFor(meta(k).units).convert(v))})
+      }
+      def deriveColumn(name: String, derivation: Map[String, Any] => Any) = {
+        realize.map(row => row + (name -> derivation(row)))
+      }
+    }
+
+    val meta = Map(
+      "DIST" -> MetaEntry("space", "distance", "quantity", "miles"),
+      "TIME" -> MetaEntry("time", "duration", "quantity", "seconds"))
+
+    val data = Seq(
+      Map("DIST" -> 123, "TIME" -> "55.23"),
+      Map("DIST" -> "456", "TIME" -> 62.33))
+
+    val annotatedData = AnnotatedData(meta, data)
+
+    annotatedData.realize.foreach(println)
+
+    def deriveMilesPerHour(row: Map[String, Any]) = {
+      (row("DIST"), row("TIME")) match {
+        case (d: Miles, t: Seconds) => d/t
+      }
+    }
+
+    annotatedData.deriveColumn("mph", deriveMilesPerHour).foreach(println)
+  }
+}
+

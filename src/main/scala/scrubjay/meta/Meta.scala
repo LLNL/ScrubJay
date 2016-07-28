@@ -2,14 +2,24 @@ package scrubjay.meta
 
 import collection.immutable.HashSet
 
-import scrubjay.datasource._
+abstract class MetaDescriptor(title: String, description: String) extends Serializable
+
+case class MetaMeaning(title: String, description: String) extends MetaDescriptor(title, description)
+case class MetaDimension(title: String, description: String) extends MetaDescriptor(title, description)
+case class MetaDomain(title: String, description: String) extends MetaDescriptor(title, description)
+case class MetaUnits(title: String, description: String) extends MetaDescriptor(title, description)
+
+case class MetaEntry(meaning: MetaMeaning, 
+                     dimension: MetaDimension, 
+                     domain: MetaDomain, 
+                     units: MetaUnits) extends Serializable
 
 abstract class MetaOntologyQueryable extends Serializable {
 
   var ontologyMap: Map[Int,MetaDescriptor] = Map.empty
 
-  def addDefinition(meta_desc: MetaDescriptor): MetaDescriptor = {
-    ontologyMap = ontologyMap ++ Map(meta_desc.hashCode -> meta_desc)
+  def addDefinition(metaDescriptor: MetaDescriptor): MetaDescriptor = {
+    ontologyMap = ontologyMap ++ Map(metaDescriptor.hashCode -> meta_desc)
     meta_desc
   }
 

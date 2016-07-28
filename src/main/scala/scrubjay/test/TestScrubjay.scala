@@ -1,13 +1,15 @@
 import scrubjay._
 
+import scrubjay.meta._
+
 import scrubjay.derivation._
-import scrubjay.derivation.ExpandedNodeList._
 import scrubjay.derivation.NaturalJoin._
+//import scrubjay.derivation.ExpandedNodeList._
 
 import scrubjay.datasource._
-import scrubjay.datasource.CassandraDataSource._
-import scrubjay.datasource.CSVDataSource._
 import scrubjay.datasource.LocalDataSource._
+//import scrubjay.datasource.CassandraDataSource._
+//import scrubjay.datasource.CSVDataSource._
 
 import scala.util.Random
 import scala.collection.immutable.Map
@@ -20,13 +22,13 @@ object TestScrubJay {
 
     val testData = Array(
       Map("jobid"     -> 123, 
-          "nodelist"  -> List(1,2,3)),
+          "node"      -> 1),
       Map("jobid"     -> 456, 
-          "nodelist"  -> List(4,5,6)))
+          "node"      -> 4))
 
     val testMeta = Map(
-      (MetaEntry(sjs.metaOntology.VALUE_JOB_ID,     sjs.metaOntology.UNITS_ID)      -> "jobid"),
-      (MetaEntry(sjs.metaOntology.VALUE_NODE_LIST,  sjs.metaOntology.UNITS_ID_LIST) -> "nodelist"))
+      (MetaEntry(sjs.metaOntology.VALUE_JOB_ID, sjs.metaOntology.UNITS_ID) -> "jobid"),
+      (MetaEntry(sjs.metaOntology.VALUE_NODE, sjs.metaOntology.UNITS_ID) -> "node"))
 
     sjs.createLocalDataSource(testMeta, testData)
   }
@@ -54,6 +56,7 @@ object TestScrubJay {
     sjs.createLocalDataSource(testMeta, testData)
   }
 
+  /*
   def createCassandraJobQueue(sjs: ScrubJaySession): DataSource = {
 
     val jobQueueMeta = Map(
@@ -81,6 +84,7 @@ object TestScrubJay {
     sjs.createCassandraDataSource(cabLayoutMeta, "cab_dat_2015_08_05", "cab_layout")
 
   }
+  */
 
   def main(args: Array[String]) {
 
@@ -91,11 +95,13 @@ object TestScrubJay {
       cassandra_connection = Some(CassandraConnection(hostname = "sonar10")))
 
     // Create DataSources
-    val jobQueue = if (local) createLocalJobQueue(sjs) else createCassandraJobQueue(sjs)
-    val cabLayout = if (local) createLocalCabLayout(sjs) else createCassandraCabLayout(sjs)
+    val jobQueue = createLocalJobQueue(sjs)
+    val cabLayout = createLocalCabLayout(sjs)
 
-    val jobQueueExpanded = sjs.deriveExpandedNodeList(jobQueue)
+    val jobQueueJoined = sjs.deriveNaturalJoin(jobQueue, cabLayout)
+    jobQueueJoined.rdd.foreach(println)
 
+    /*
     val jobQueueRackInfo = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)
 
     if (jobQueueRackInfo.defined) {
@@ -104,5 +110,6 @@ object TestScrubJay {
     else {
       println("UNDEFINED")
     }
+    */
   }
 }

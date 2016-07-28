@@ -1,4 +1,4 @@
 package scrubjay
 
-package object scrubjay.util {
+package object util {
 }
