@@ -91,8 +91,8 @@ object TestScrubJay {
     // Change the following to test locally or using Cassandra
     val local = false
 
-    val sjs = new ScrubJaySession(
-      cassandra_connection = Some(CassandraConnection(hostname = "sonar10")))
+    val sjs = new ScrubJaySession()
+      //cassandra_connection = Some(CassandraConnection(hostname = "sonar10")))
 
     // Create DataSources
     val jobQueue = createLocalJobQueue(sjs)

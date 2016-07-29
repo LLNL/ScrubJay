@@ -2,9 +2,9 @@ name := "ScrubJay"
 
 version := "1.0"
 
-scalaVersion := "2.10.5"
+scalaVersion := "2.11.6"
 
-val sparkVersion = "1.6.1"
+val sparkVersion = "1.6.2"
 val hadoopVersion = "2.6.2"
 val cassandraVersion = "3.4.0"
 val sparkCassandraConnectorVersion = "1.6.0"
