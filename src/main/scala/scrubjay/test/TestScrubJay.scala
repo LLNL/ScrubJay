@@ -21,14 +21,22 @@ object TestScrubJay {
   def createLocalJobQueue(sjs: ScrubJaySession): DataSource = {
 
     val testData = Array(
-      Map("jobid"     -> 123, 
-          "node"      -> 1),
-      Map("jobid"     -> 456, 
-          "node"      -> 4))
+      Map(
+        "jobid"     -> 123,
+        "nodelist"  -> List(1,2,3),
+        "elapsed"   -> 23
+      ),
+      Map(
+        "jobid"     -> 456,
+        "nodelist"  -> List(4,5,6),
+        "elapsed"   -> 45
+      ))
 
     val testMeta = Map(
-      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "job",
-      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "node")
+      "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "unknown", "identifier"),
+      "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "unknown", "list<identifier>"),
+      "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds")
+    )
 
     sjs.createLocalDataSource(testMeta, testData)
   }
@@ -50,8 +58,9 @@ object TestScrubJay {
           "rack"     -> 2))
 
     val testMeta = Map(
-      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "node",
-      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "rack")
+      "node" -> MetaEntry.metaEntryFromStringTuple("node", "unknown", "identifier"),
+      "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "unknown", "identifier")
+    )
 
     sjs.createLocalDataSource(testMeta, testData)
   }
@@ -98,8 +107,20 @@ object TestScrubJay {
     val jobQueue = createLocalJobQueue(sjs)
     val cabLayout = createLocalCabLayout(sjs)
 
+    println("********* jobQueue *********")
+    jobQueue.rdd.foreach(println)
+
+    println("********* cabLayout *********")
+    cabLayout.rdd.foreach(println)
+
     val jobQueueJoined = sjs.deriveNaturalJoin(jobQueue, cabLayout)
-    jobQueueJoined.rdd.foreach(println)
+
+    println("********* jobQueueJoined *********")
+    if (jobQueueJoined.defined)
+      jobQueueJoined.rdd.foreach(println)
+    else
+      println("undefined join!")
+
 
     /*
     val jobQueueRackInfo = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)

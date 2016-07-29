@@ -23,24 +23,24 @@ class NaturalJoin(metaOntology: MetaBase,
                   ds2: DataSource) extends DerivedDataSource(metaOntology) {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  val commonColumns = ds1.metaMap.keySet.intersect(ds2.metaMap.keySet)
+  val commonMetaColumns = ds1.metaMap.values.toSet.intersect(ds2.metaMap.values.toSet)
 
   // Implementations of abstract members
-  val defined: Boolean = commonColumns.nonEmpty
+  val defined: Boolean = commonMetaColumns.nonEmpty
   val metaMap: MetaMap = ds2.metaMap ++ ds1.metaMap
 
   // rdd derivation defined here
   lazy val rdd: RDD[DataRow] = {
 
     // going to filter out redundant columns from ds2
-    val ds2columnsToFilter = ds2.metaMap.filter{case (k,v) => commonColumns.contains(k)}.values.toSet
+    val ds2ColumnsToFilter = ds2.metaMap.filter{case (k, v) => commonMetaColumns.contains(v)}.keySet
 
-    val krdd1 = ds1.rdd.keyBy(row => 
-        for (col <- commonColumns) yield row(ds1.metaMap(col)))
+    val krdd1 = ds1.rdd.keyBy(row =>
+        for (me <- commonMetaColumns) yield row(ds1.columnForMeta(me).get))
     val krdd2 = ds2.rdd.keyBy(row =>
-        for (col <- commonColumns) yield row(ds2.metaMap(col)))
+        for (me <- commonMetaColumns) yield row(ds2.columnForMeta(me).get))
       // filter redundant columns from ds2
-      .mapValues(row => row.filterNot{case (k,v) => ds2columnsToFilter.contains(k)}) 
+      .mapValues(row => row.filterNot{case (k,v) => ds2ColumnsToFilter.contains(k)})
 
     // remove keys created for join
     krdd1.join(krdd2).map{case (k, (v1, v2)) => v1 ++ v2}

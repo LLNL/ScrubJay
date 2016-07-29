@@ -4,7 +4,6 @@ import scrubjay.units._
 
 import scala.language.implicitConversions
 import scala.reflect._
-import scala.reflect.ClassTag
 
 class MetaBase(mb: Map[String, MetaMeaning] = Map.empty,
                db: Map[String, MetaDimension] = Map.empty,
@@ -27,6 +26,8 @@ object MetaBase {
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
   final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
   final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
+  final val MEANING_NODE = META_BASE.addMeaning(MetaMeaning("node", "A single node in an HPC cluster"))
+  final val MEANING_RACK = META_BASE.addMeaning(MetaMeaning("rack", "A rack (containing nodes) in an HPC cluster"))
 
   final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", classTag[NoDimension]))
   final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension", classTag[Time]))
@@ -49,13 +50,7 @@ object MetaBase {
 
   implicit val stringToMetaUnitConverter = new StringToMetaConverter[MetaUnits] {
     override def convert(s: String): MetaUnits =
-      META_BASE.unitsBase.getOrElse(s, UNITS_IDENTIFIER)
-  }
-
-  implicit val stringToTaggedConverter = new StringToMetaConverter[TaggedMeta] {
-    override def convert(s: String): TaggedMeta =
-      //TODO: No nulls!
-      collectionClassTag[MetaUnits](s).orNull
+      metaUnitsFromString(s)
   }
 
   implicit def stringToMeaning(s: String): MetaMeaning = {
@@ -70,25 +65,24 @@ object MetaBase {
     implicitly[StringToMetaConverter[MetaUnits]].convert(s)
   }
 
-  implicit def stringToTagged(s: String): TaggedMeta = {
-    implicitly[StringToMetaConverter[TaggedMeta]].convert(s)
-  }
-
-  def collectionClassTag[M <: TaggedMeta](s: String)(implicit converter: StringToMetaConverter[M]): Option[MetaCollection] = {
-    val compositePattern = """(.*)<(.*)>""".r
-    if (s.matches(compositePattern.toString)) {
-      val compositePattern(composite, childrenToken) = s
-      val childrenTokens = childrenToken.split(",")
-      val children = childrenTokens.map(converter.convert)
-      composite match {
-        //TODO: Decouple collections from here
-        case "list" => Some(MetaCollection("list", "A list of...", classTag[List[_]], children:_*))
-        case "rate" => Some(MetaCollection("rate", "A rate of...", classTag[(_,_)], children:_*))
+  def metaUnitsFromString(s: String): MetaUnits = {
+    META_BASE.unitsBase.getOrElse(s, {
+      val compositePattern = """(.*)<(.*)>""".r
+      if (s.matches(compositePattern.toString)) {
+        val compositePattern(composite, childrenToken) = s
+        val childrenTokens = childrenToken.split(",")
+        val children = childrenTokens.map(metaUnitsFromString).toList
+        composite match {
+          //TODO: Decouple collections from here
+          case "list" => MetaUnits("list", "A list of...", classTag[UnitList[_]], children)
+          case "rate" => MetaUnits("rate", "A rate of...", classTag[(_, _)], children)
+          case _ => UNITS_IDENTIFIER
+        }
       }
-    }
-    else {
-      None
-    }
+      else {
+        UNITS_IDENTIFIER
+      }
+    })
   }
 
 }

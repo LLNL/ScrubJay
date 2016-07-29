@@ -1,6 +1,7 @@
 package scrubjay
 
 import scrubjay.meta._
+import scrubjay.meta.MetaBase.META_BASE
 
 // Spark
 import org.apache.spark.SparkContext
@@ -37,5 +38,5 @@ class ScrubJaySession(
 
   val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
   val sqlContext = new SQLContext(sc)
-  val metaOntology = new MetaBase
+  val metaOntology = META_BASE
 }

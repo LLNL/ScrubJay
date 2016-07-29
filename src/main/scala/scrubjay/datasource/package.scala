@@ -1,8 +1,10 @@
 package scrubjay
 
 import scrubjay.meta._
+import scrubjay.units._
 
 package object datasource {
-  type DataRow = Map[String, Any]
-  type MetaMap = Map[MetaEntry, String]
+  type RawDataRow = Map[String, Any]
+  type DataRow = Map[String, Units[_]]
+  type MetaMap = Map[String, MetaEntry]
 }

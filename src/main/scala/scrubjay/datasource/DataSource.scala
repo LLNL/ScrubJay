@@ -2,19 +2,23 @@ package scrubjay.datasource
 
 import scrubjay.meta._
 
-// Scala
-import scala.collection.immutable.Map
-
 // Spark
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
   val metaMap: MetaMap
   val rdd: RDD[DataRow]
 
+  def metaForColumn(column: String): Option[MetaEntry] = {
+    metaMap.get(column)
+  }
+
+  def columnForMeta(metaEntry: MetaEntry): Option[String] = {
+    metaMap.map(_.swap).get(metaEntry)
+  }
+
   def containsMeta(meta: List[MetaEntry]): Boolean = {
-    meta.forall(metaMap.contains)
+    meta.forall(metaMap.values.toSet.contains)
   }
 }
 
