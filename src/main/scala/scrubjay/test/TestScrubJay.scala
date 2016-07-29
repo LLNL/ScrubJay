@@ -27,8 +27,8 @@ object TestScrubJay {
           "node"      -> 4))
 
     val testMeta = Map(
-      (MetaEntry(sjs.metaOntology.VALUE_JOB_ID, sjs.metaOntology.UNITS_ID) -> "jobid"),
-      (MetaEntry(sjs.metaOntology.VALUE_NODE, sjs.metaOntology.UNITS_ID) -> "node"))
+      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "job",
+      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "node")
 
     sjs.createLocalDataSource(testMeta, testData)
   }
@@ -50,8 +50,8 @@ object TestScrubJay {
           "rack"     -> 2))
 
     val testMeta = Map(
-      (MetaEntry(sjs.metaOntology.VALUE_NODE, sjs.metaOntology.UNITS_ID) -> "node"),
-      (MetaEntry(sjs.metaOntology.VALUE_RACK, sjs.metaOntology.UNITS_ID) -> "rack"))
+      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "node",
+      MetaEntry.metaEntryFromStringTuple("identity", "unknown", "identifier") -> "rack")
 
     sjs.createLocalDataSource(testMeta, testData)
   }

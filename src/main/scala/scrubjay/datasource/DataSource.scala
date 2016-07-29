@@ -9,19 +9,19 @@ import scala.collection.immutable.Map
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-abstract class DataSource(val metaOntology: MetaOntology) extends Serializable {
+abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
   val metaMap: MetaMap
   val rdd: RDD[DataRow]
 
   def containsMeta(meta: List[MetaEntry]): Boolean = {
-    meta.forall(metaMap contains _)
+    meta.forall(metaMap.contains)
   }
 }
 
-abstract class OriginalDataSource(metaOntology: MetaOntology,
+abstract class OriginalDataSource(metaOntology: MetaBase,
                                   val metaMap: MetaMap) extends DataSource(metaOntology)
 
-abstract class DerivedDataSource(metaOntology: MetaOntology) extends DataSource(metaOntology) {
+abstract class DerivedDataSource(metaOntology: MetaBase) extends DataSource(metaOntology) {
 
   val defined: Boolean
 }

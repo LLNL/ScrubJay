@@ -18,7 +18,7 @@ import org.apache.spark.rdd.RDD
  *  The inner join of the two datasources, based on their common columns
  */
 
-class NaturalJoin(metaOntology: MetaOntology,
+class NaturalJoin(metaOntology: MetaBase,
                   ds1: DataSource,
                   ds2: DataSource) extends DerivedDataSource(metaOntology) {
 
@@ -26,7 +26,7 @@ class NaturalJoin(metaOntology: MetaOntology,
   val commonColumns = ds1.metaMap.keySet.intersect(ds2.metaMap.keySet)
 
   // Implementations of abstract members
-  val defined: Boolean = !commonColumns.isEmpty
+  val defined: Boolean = commonColumns.nonEmpty
   val metaMap: MetaMap = ds2.metaMap ++ ds1.metaMap
 
   // rdd derivation defined here

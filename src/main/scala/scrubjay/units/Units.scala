@@ -1,8 +1,9 @@
 package scrubjay.units
 
 import scala.reflect._
+import scala.reflect.ClassTag
 
-abstract class Units[T <: Units[T]] extends Serializable {
+abstract class Units[T <: Units[T] : ClassTag] extends Serializable {
   def getClassTag = classTag[T]
 }
 

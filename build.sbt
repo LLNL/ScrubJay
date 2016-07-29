@@ -2,7 +2,9 @@ name := "ScrubJay"
 
 version := "1.0"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.10.6"
+
+scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
 val sparkVersion = "1.6.2"
 val hadoopVersion = "2.6.2"

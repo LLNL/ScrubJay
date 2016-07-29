@@ -6,7 +6,7 @@ import scrubjay.meta._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-class LocalDataSource(metaOntology: MetaOntology,
+class LocalDataSource(metaOntology: MetaBase,
                       metaMap: MetaMap,
                       rddGiven: RDD[DataRow]) extends OriginalDataSource(metaOntology, metaMap) {
   lazy val rdd = rddGiven

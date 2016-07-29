@@ -12,9 +12,9 @@ import org.apache.spark.sql.SQLContext
 import com.datastax.spark.connector._
 
 case class CassandraConnection(
-  val hostname: String = "localhost", 
-  val username: String = "cassandra", 
-  val password: String = "cassandra") {
+  hostname: String = "localhost",
+  username: String = "cassandra",
+  password: String = "cassandra") {
     val spark_conf_fields = Array(
       ("spark.cassandra.connection.host", hostname),
       ("spark.cassandra.auth.username", username),
@@ -37,5 +37,5 @@ class ScrubJaySession(
 
   val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
   val sqlContext = new SQLContext(sc)
-  val metaOntology = new MetaOntology
+  val metaOntology = new MetaBase
 }
