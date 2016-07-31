@@ -16,7 +16,7 @@ abstract class MetaDescriptor
 }
 
 case class MetaMeaning(t: String, d: String) extends MetaDescriptor(t, d)
-case class MetaDimension(t: String, d: String, ct: ClassTag[_], c: List[MetaDescriptor] = List.empty) extends MetaDescriptor(t, d, ct, c)
+case class MetaDimension(t: String, d: String, ct: ClassTag[_] = classTag[Any], c: List[MetaDescriptor] = List.empty) extends MetaDescriptor(t, d, ct, c)
 case class MetaUnits(t: String, d: String, ct: ClassTag[_], c: List[MetaDescriptor] = List.empty) extends MetaDescriptor(t, d, ct, c)
 
 case class MetaEntry(meaning: MetaMeaning,

@@ -4,7 +4,7 @@ import scrubjay.meta._
 
 import scrubjay.derivation._
 import scrubjay.derivation.NaturalJoin._
-//import scrubjay.derivation.ExpandedNodeList._
+import scrubjay.derivation.ExpandList._
 
 import scrubjay.datasource._
 import scrubjay.datasource.LocalDataSource._
@@ -33,8 +33,8 @@ object TestScrubJay {
       ))
 
     val testMeta = Map(
-      "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "unknown", "identifier"),
-      "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "unknown", "list<identifier>"),
+      "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "job", "identifier"),
+      "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "node", "list<identifier>"),
       "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds")
     )
 
@@ -58,8 +58,8 @@ object TestScrubJay {
           "rack"     -> 2))
 
     val testMeta = Map(
-      "node" -> MetaEntry.metaEntryFromStringTuple("node", "unknown", "identifier"),
-      "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "unknown", "identifier")
+      "node" -> MetaEntry.metaEntryFromStringTuple("node", "node", "identifier"),
+      "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "rack", "identifier")
     )
 
     sjs.createLocalDataSource(testMeta, testData)
@@ -113,13 +113,21 @@ object TestScrubJay {
     println("********* cabLayout *********")
     cabLayout.rdd.foreach(println)
 
-    val jobQueueJoined = sjs.deriveNaturalJoin(jobQueue, cabLayout)
+    val jobQueueExpanded = sjs.deriveExpandedNodeList(jobQueue, List("nodelist"))
 
-    println("********* jobQueueJoined *********")
+    println("********* jobQueueExpanded *********")
+    if (jobQueueExpanded.defined)
+      jobQueueExpanded.rdd.foreach(println)
+    else
+      println("undefined!")
+
+    val jobQueueJoined = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)
+
+    println("********* jobQueueExpandedJoined *********")
     if (jobQueueJoined.defined)
       jobQueueJoined.rdd.foreach(println)
     else
-      println("undefined join!")
+      println("undefined!")
 
 
     /*

@@ -14,4 +14,8 @@ object util {
   def dateRange(start: DateTime, end: DateTime, step: Period): Iterator[DateTime] = {
     Iterator.iterate(start)(_.plus(step)).takeWhile(!_.isAfter(end))
   }
+
+  implicit class Crossable[X](xs: Traversable[X]) {
+    def cross[Y](ys: Traversable[Y]) = for { x <- xs; y <- ys } yield (x, y)
+  }
 }

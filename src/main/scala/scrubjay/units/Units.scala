@@ -27,6 +27,7 @@ object Units {
     case _ => throw new RuntimeException(s"Cannot cast $a to Double!")
   }
 
+  // TODO: MetaMap as broadcast value
   def keyRaw2KeyUnits(ik: String, iv: Any, it: ClassTag[_], mm: MetaMap): (String, Units[_]) = (ik, iv, it) match {
     // Canonical units
     case (k, v, t) if t == classTag[Identifier] => (k, Identifier(v))
