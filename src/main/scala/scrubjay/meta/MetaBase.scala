@@ -27,12 +27,10 @@ object MetaBase {
   final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
   final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
 
+  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down"))
+  final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension"))
   final val DIMENSION_NODE = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster"))
   final val DIMENSION_RACK = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster"))
-
-  // TODO: do dimensions need classTags?? (probably not)
-  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", classTag[NoDimension]))
-  final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension", classTag[Time]))
 
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
   final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "Quantity of seconds", classTag[Seconds]))
