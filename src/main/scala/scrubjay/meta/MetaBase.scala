@@ -1,10 +1,8 @@
 package scrubjay.meta
 
 import scrubjay.meta.GlobalMetaBase._
-import scrubjay.units._
 
 import scala.language.implicitConversions
-import scala.reflect._
 
 class MetaBase(mb: Map[String, MetaMeaning] = Map.empty,
                db: Map[String, MetaDimension] = Map.empty,

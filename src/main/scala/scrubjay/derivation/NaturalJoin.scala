@@ -2,7 +2,6 @@ package scrubjay.derivation
 
 import scrubjay._
 import scrubjay.meta._
-import scrubjay.meta.MetaBase._
 import scrubjay.meta.GlobalMetaBase._
 import scrubjay.datasource._
 
@@ -41,18 +40,20 @@ class NaturalJoin(metaOntology: MetaBase,
   val defined: Boolean = commonDimensions.nonEmpty && commonDimensions.forall(ds1Dimensions(_)._2.units == UNITS_IDENTIFIER)
   val metaEntryMap: MetaMap = ds2.metaEntryMap ++ ds1.metaEntryMap
 
-  // rdd derivation defined here
+  // RDD derivation defined here
   lazy val rdd: RDD[DataRow] = {
 
-    // going to filter out redundant columns from ds2
+    // Get key columns for each datasource
     val d1Columns = commonDimensions.map(d => d1Map.columnForDimension(d))
     val d2Columns = commonDimensions.map(d => d2Map.columnForDimension(d))
 
+    // Create key
     val keyedRDD1 = ds1.rdd.keyBy(row => d1Columns.map(row))
     val keyedRDD2 = ds2.rdd.keyBy(row => d2Columns.map(row))
+      // Remove keys from values
       .map{case (rk, rv) => (rk, rv.filterNot{case (k, v) => d2Columns.contains(k)})}
 
-    // remove keys created for join
+    // Join
     keyedRDD1.join(keyedRDD2).map{case (k, (v1, v2)) => v1 ++ v2}
   }
 }
