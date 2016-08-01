@@ -2,7 +2,6 @@ package scrubjay.units
 
 import scrubjay.datasource._
 import scrubjay.meta._
-import scrubjay.units.Identifier._
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -25,9 +24,8 @@ object Units {
     classTag[UnitsList[_]] -> UnitsList.converter
   )
 
-  def raw2Units(iv: Any, mu: MetaDescriptor): Units[_] = (iv, mu.tag) match {
-    case (v, t) if allClassTags.contains(t) => allClassTags(t).convert(v, mu)
-    case (v, t) => throw new RuntimeException("No known converter for " + t)
+  def raw2Units(v: Any, mu: MetaDescriptor): Units[_] = {
+    allClassTags.getOrElse(mu.tag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
   }
 
   def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaMap: MetaMap): RDD[DataRow] = {
