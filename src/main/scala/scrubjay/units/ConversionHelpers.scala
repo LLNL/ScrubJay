@@ -11,5 +11,4 @@ object ConversionHelpers {
     case _ => throw new RuntimeException(s"Cannot cast $a to Double!")
   }
 
-
 }
