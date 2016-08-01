@@ -8,7 +8,7 @@ abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
   val metaEntryMap: MetaMap
   val rdd: RDD[DataRow]
 
-  val reverseMetaEntryMap = metaEntryMap.map(_.swap)
+  def reverseMetaEntryMap = metaEntryMap.map(_.swap)
 
   def dimensions: Set[MetaDimension] = metaEntryMap.values.map(_.dimension).toSet
 
