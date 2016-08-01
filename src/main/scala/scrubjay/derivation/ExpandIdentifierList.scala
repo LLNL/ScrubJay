@@ -25,7 +25,7 @@ class ExpandIdentifierList(metaOntology: MetaBase,
                            columns: List[String]) extends DerivedDataSource(metaOntology) {
 
   // Implementations of abstract members
-  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == classTag[UnitList[_]])
+  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == classTag[UnitsList[_]])
   val metaEntryMap: MetaMap = ds.metaEntryMap.map {
     case (c, m) if columns.contains(c) =>
       (c + "_expanded", m.copy(units = m.units.children.head.asInstanceOf[MetaUnits]))
@@ -47,7 +47,7 @@ class ExpandIdentifierList(metaOntology: MetaBase,
       val vals =
         row.filter{case (k, v) => cols.contains(k)}
         .map{
-          case (k, ul: UnitList[_]) => ul.v.map{case u: Units[_] => (k + "_expanded", u)}
+          case (k, ul: UnitsList[_]) => ul.v.map{case u: Units[_] => (k + "_expanded", u)}
           case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
         }
         .toList

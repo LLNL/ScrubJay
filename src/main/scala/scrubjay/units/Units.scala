@@ -1,8 +1,8 @@
 package scrubjay.units
 
 import scrubjay.datasource._
-
 import org.apache.spark.SparkContext
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 
 import scala.language.implicitConversions
@@ -15,8 +15,9 @@ abstract class Units[T <: Units[T] : ClassTag] extends Serializable {
 
 case class Identifier(v: Any) extends Units[Identifier]
 case class Seconds(v: Double) extends Units[Seconds]
+// TODO: Timestamp here
 
-case class UnitList[T](v: List[T]) extends Units[UnitList[T]]
+case class UnitsList[T](v: List[T]) extends Units[UnitsList[T]]
 
 object Units {
 
@@ -27,15 +28,14 @@ object Units {
     case _ => throw new RuntimeException(s"Cannot cast $a to Double!")
   }
 
-  // TODO: MetaMap as broadcast value
-  def keyRaw2KeyUnits(ik: String, iv: Any, it: ClassTag[_], mm: MetaMap): (String, Units[_]) = (ik, iv, it) match {
+  def keyRaw2KeyUnits(ik: String, iv: Any, it: ClassTag[_], mm: Broadcast[MetaMap]): (String, Units[_]) = (ik, iv, it) match {
     // Canonical units
     case (k, v, t) if t == classTag[Identifier] => (k, Identifier(v))
     case (k, v, t) if t == classTag[Seconds] => (k, Seconds(v))
 
     // Collection units
-    case (k, v, t) if t == classTag[UnitList[_]] => v match {
-      case l: List[_] => (k, UnitList(l.map(iv1 => keyRaw2KeyUnits(k, iv1, mm(k).units.children.head.tag, mm)._2)))
+    case (k, v, t) if t == classTag[UnitsList[_]] => v match {
+      case l: List[_] => (k, UnitsList(l.map(iv1 => keyRaw2KeyUnits(k, iv1, mm.value(k).units.children.head.tag, mm)._2)))
     }
 
     // Error
@@ -43,6 +43,7 @@ object Units {
   }
 
   def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaMap: MetaMap): RDD[DataRow] = {
-    rawRDD.map(row => row.map{case (k, v) => (k, v, metaMap(k).units.tag)}.map{case (k, v, t) => keyRaw2KeyUnits(k, v, t, metaMap)}.toMap)
+    val broadcastMetaMap = sc.broadcast(metaMap)
+    rawRDD.map(row => row.map{case (k, v) => (k, v, broadcastMetaMap.value(k).units.tag)}.map{case (k, v, t) => keyRaw2KeyUnits(k, v, t, broadcastMetaMap)}.toMap)
   }
 }

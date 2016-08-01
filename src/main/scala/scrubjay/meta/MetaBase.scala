@@ -35,6 +35,8 @@ object MetaBase {
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
   final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "Quantity of seconds", classTag[Seconds]))
 
+  final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", classTag[UnitsList[_]]))
+
   trait StringToMetaConverter[M <: MetaDescriptor] {
     def convert(s: String): M
   }
@@ -71,13 +73,8 @@ object MetaBase {
       if (s.matches(compositePattern.toString)) {
         val compositePattern(composite, childrenToken) = s
         val childrenTokens = childrenToken.split(",")
-        val children = childrenTokens.map(metaUnitsFromString).toList
-        composite match {
-          //TODO: Decouple collections from here
-          case "list" => MetaUnits("list", "A list of...", classTag[UnitList[_]], children)
-          case "rate" => MetaUnits("rate", "A rate of...", classTag[(_, _)], children)
-          case _ => UNITS_IDENTIFIER
-        }
+        val compositeChildren = childrenTokens.map(metaUnitsFromString).toList
+        metaUnitsFromString(composite).copy(c = compositeChildren)
       }
       else {
         UNITS_IDENTIFIER
