@@ -1,16 +1,10 @@
 package scrubjay
 
-import scrubjay.meta._
 import scrubjay.meta.MetaBase.META_BASE
 
-// Spark
 import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SQLContext
-
-// Datastax
-import com.datastax.spark.connector._
 
 case class CassandraConnection(
   hostname: String = "localhost",
@@ -24,7 +18,6 @@ case class CassandraConnection(
 }
 
 class ScrubJaySession(
-  //meta_file: String,
   spark_master: String = "local[*]",
   cassandra_connection: Option[CassandraConnection] = None) {
 

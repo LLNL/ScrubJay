@@ -4,30 +4,25 @@ import scrubjay._
 import scrubjay.meta._
 import scrubjay.units._
 import scrubjay.datasource._
-import scrubjay.util._
 
 import scala.reflect._
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scala.collection.immutable.Iterable
-
 /*
- * ExpandedNodeList 
- * 
+ * ExpandedIdentifierList
+ *
  * Requirements: 
  *  1. A single DataSource to derive from
- *  2. The column "Node List" in that DataSource
- *  3. The units "ID List" for that column
+ *  2. A set of user-specified columns, all of which are UnitList[Identifier[_]]
  *
  * Derivation:
- *  For every row with a node list <a1, a2, nodelist [1,2,3]>, creates
- *  a new row with identical attributes <a1, a2, 1>, <a1, a2, 2>, etc ...
+ *  For every row with a list of identifiers <a1, a2, identifiers [i1, i2, i3]>,
+ *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExpandList(metaOntology: MetaBase,
-                 ds: DataSource,
-                 columns: List[String]) extends DerivedDataSource(metaOntology) {
+class ExpandIdentifierList(metaOntology: MetaBase,
+                           ds: DataSource,
+                           columns: List[String]) extends DerivedDataSource(metaOntology) {
 
   // Implementations of abstract members
   val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == classTag[UnitList[_]])
@@ -40,6 +35,7 @@ class ExpandList(metaOntology: MetaBase,
   // rdd derivation defined here
   lazy val rdd: RDD[DataRow] = {
 
+    // For multiple expansion columns, expand into the cartesian product
     def cartesianProduct[T](xss: List[List[T]]): List[List[T]] = xss match {
       case Nil => List(Nil)
       case h :: t => for(xh <- h; xt <- cartesianProduct(t)) yield xh :: xt
@@ -69,10 +65,10 @@ class ExpandList(metaOntology: MetaBase,
   }
 }
 
-object ExpandList {
+object ExpandIdentifierList {
   implicit class ScrubJaySession_ExpandedNodeList(sjs: ScrubJaySession) {
-    def deriveExpandedNodeList(ds: DataSource, cols: List[String]): ExpandList = {
-      new ExpandList(sjs.metaOntology, ds, cols)
+    def deriveExpandedNodeList(ds: DataSource, cols: List[String]): ExpandIdentifierList = {
+      new ExpandIdentifierList(sjs.metaOntology, ds, cols)
     }
   }
 }

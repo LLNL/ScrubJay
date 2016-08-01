@@ -1,22 +1,19 @@
+package scrubjay.test
+
 import scrubjay._
 
 import scrubjay.meta._
 
-import scrubjay.derivation._
 import scrubjay.derivation.NaturalJoin._
-import scrubjay.derivation.ExpandList._
+import scrubjay.derivation.ExpandIdentifierList._
 
 import scrubjay.datasource._
 import scrubjay.datasource.LocalDataSource._
-//import scrubjay.datasource.CassandraDataSource._
-//import scrubjay.datasource.CSVDataSource._
 
-import scala.util.Random
 import scala.collection.immutable.Map
 
-import com.datastax.spark.connector._
 
-object TestScrubJay {
+object TestLocal {
 
   def createLocalJobQueue(sjs: ScrubJaySession): DataSource = {
 

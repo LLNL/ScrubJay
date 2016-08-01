@@ -1,11 +1,10 @@
 package scrubjay.derivation
 
-import java.io.Serializable
-
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.meta.MetaBase._
 import scrubjay.datasource._
+
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
@@ -17,7 +16,7 @@ import org.apache.spark.rdd.RDD
  *  2. Some columns in common between the two (based on their meta entries)
  *
  * Derivation:
- *  The inner join of the two datasources, based on their common columns
+ *  The inner join of the two dataSources, based on their common columns
  */
 
 
@@ -46,16 +45,15 @@ class NaturalJoin(metaOntology: MetaBase,
   lazy val rdd: RDD[DataRow] = {
 
     // going to filter out redundant columns from ds2
-    val ds2ColumnsToFilter = ds2.metaEntryMap.filter{case (k, v) => commonDimensions.contains(v.dimension)}.keySet
     val d1Columns = commonDimensions.map(d => d1Map.columnForDimension(d))
     val d2Columns = commonDimensions.map(d => d2Map.columnForDimension(d))
 
-    val krdd1 = ds1.rdd.keyBy(row => d1Columns.map(row))
-    val krdd2 = ds2.rdd.keyBy(row => d2Columns.map(row))
+    val keyedRDD1 = ds1.rdd.keyBy(row => d1Columns.map(row))
+    val keyedRDD2 = ds2.rdd.keyBy(row => d2Columns.map(row))
       .map{case (rk, rv) => (rk, rv.filterNot{case (k, v) => d2Columns.contains(k)})}
 
     // remove keys created for join
-    krdd1.join(krdd2).map{case (k, (v1, v2)) => v1 ++ v2}
+    keyedRDD1.join(keyedRDD2).map{case (k, (v1, v2)) => v1 ++ v2}
   }
 }
 
