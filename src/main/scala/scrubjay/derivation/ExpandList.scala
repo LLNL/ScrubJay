@@ -49,14 +49,17 @@ class ExpandList(metaOntology: MetaBase,
     def derivation(row: DataRow, cols: List[String]): Seq[DataRow] = {
 
       val vals =
-        row.filterKeys(cols.contains)
-        .map{case (k, ul: UnitList[_]) => ul.v.map{case u: Units[_] => (k + "_expanded", u)}}
+        row.filter{case (k, v) => cols.contains(k)}
+        .map{
+          case (k, ul: UnitList[_]) => ul.v.map{case u: Units[_] => (k + "_expanded", u)}
+          case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
+        }
         .toList
 
       val combinations = cartesianProduct(vals)
 
       for (combination <- combinations) yield {
-        (row ++ Map(combination:_*)).filterKeys(!cols.contains(_))
+        (row ++ Map(combination:_*)).filterNot{case (k, v) => cols.contains(k)}
       }
     }
 

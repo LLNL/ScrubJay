@@ -52,10 +52,7 @@ class NaturalJoin(metaOntology: MetaBase,
 
     val krdd1 = ds1.rdd.keyBy(row => d1Columns.map(row))
     val krdd2 = ds2.rdd.keyBy(row => d2Columns.map(row))
-      .mapValues(row => row.filterKeys(!d2Columns.contains(_)))
-    //val krdd2 = ds2.rdd.keyBy(row => commonDimensions.map(d => row(d2Map.columnForDimension(d))))
-      // filter redundant columns from ds2
-      //.mapValues(row => row.filterNot{case (k,v) => ds2ColumnsToFilter.contains(k)})
+      .map{case (rk, rv) => (rk, rv.filterNot{case (k, v) => d2Columns.contains(k)})}
 
     // remove keys created for join
     krdd1.join(krdd2).map{case (k, (v1, v2)) => v1 ++ v2}
