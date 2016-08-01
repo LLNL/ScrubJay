@@ -1,5 +1,6 @@
 package scrubjay.meta
 
+import scrubjay.meta.GlobalMetaBase._
 import scrubjay.units._
 
 import scala.language.implicitConversions
@@ -20,23 +21,23 @@ class MetaBase(mb: Map[String, MetaMeaning] = Map.empty,
 
 object MetaBase {
 
-  final val META_BASE: MetaBase = new MetaBase
+  // Recursive meta units parser
+  def metaUnitsFromString(s: String): MetaUnits = {
+    META_BASE.unitsBase.getOrElse(s, {
+      val compositePattern = """(.*)<(.*)>""".r
+      if (s.matches(compositePattern.toString)) {
+        val compositePattern(composite, childrenToken) = s
+        val childrenTokens = childrenToken.split(",")
+        val compositeChildren = childrenTokens.map(metaUnitsFromString).toList
+        metaUnitsFromString(composite).copy(c = compositeChildren)
+      }
+      else {
+        UNITS_UNKNOWN
+      }
+    })
+  }
 
-  final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
-  final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
-  final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
-  final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
-
-  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down"))
-  final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension"))
-  final val DIMENSION_NODE = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster"))
-  final val DIMENSION_RACK = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster"))
-
-  final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
-  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "Quantity of seconds", classTag[Seconds]))
-
-  final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", classTag[UnitsList[_]]))
-
+  // Type class for implicit conversions
   trait StringToMetaConverter[M <: MetaDescriptor] {
     def convert(s: String): M
   }
@@ -55,6 +56,7 @@ object MetaBase {
       metaUnitsFromString(s)
   }
 
+  // Implicit conversions
   implicit def stringToMeaning(s: String): MetaMeaning = {
     implicitly[StringToMetaConverter[MetaMeaning]].convert(s)
   }
@@ -65,21 +67,6 @@ object MetaBase {
 
   implicit def stringToUnits(s: String): MetaUnits = {
     implicitly[StringToMetaConverter[MetaUnits]].convert(s)
-  }
-
-  def metaUnitsFromString(s: String): MetaUnits = {
-    META_BASE.unitsBase.getOrElse(s, {
-      val compositePattern = """(.*)<(.*)>""".r
-      if (s.matches(compositePattern.toString)) {
-        val compositePattern(composite, childrenToken) = s
-        val childrenTokens = childrenToken.split(",")
-        val compositeChildren = childrenTokens.map(metaUnitsFromString).toList
-        metaUnitsFromString(composite).copy(c = compositeChildren)
-      }
-      else {
-        UNITS_IDENTIFIER
-      }
-    })
   }
 
 }

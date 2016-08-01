@@ -3,6 +3,7 @@ package scrubjay.derivation
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.meta.MetaBase._
+import scrubjay.meta.GlobalMetaBase._
 import scrubjay.datasource._
 
 import org.apache.spark.SparkContext
@@ -18,7 +19,6 @@ import org.apache.spark.rdd.RDD
  * Derivation:
  *  The inner join of the two dataSources, based on their common columns
  */
-
 
 class NaturalJoin(metaOntology: MetaBase,
                   ds1: DataSource,

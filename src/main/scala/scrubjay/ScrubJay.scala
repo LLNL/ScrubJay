@@ -1,10 +1,9 @@
 package scrubjay
 
-import scrubjay.meta.MetaBase.META_BASE
-
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SQLContext
+import scrubjay.meta.GlobalMetaBase
 
 case class CassandraConnection(
   hostname: String = "localhost",
@@ -31,5 +30,5 @@ class ScrubJaySession(
 
   val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
   val sqlContext = new SQLContext(sc)
-  val metaOntology = META_BASE
+  val metaOntology = GlobalMetaBase.META_BASE
 }

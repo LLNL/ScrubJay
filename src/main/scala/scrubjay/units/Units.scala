@@ -18,6 +18,7 @@ case class Seconds(v: Double) extends Units[Seconds]
 // TODO: Timestamp here
 
 case class UnitsList[T](v: List[T]) extends Units[UnitsList[T]]
+// TODO: Rate here
 
 object Units {
 
