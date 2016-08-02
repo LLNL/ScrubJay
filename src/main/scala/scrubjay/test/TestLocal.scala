@@ -12,6 +12,7 @@ import scrubjay.datasource.LocalDataSource._
 
 import scala.collection.immutable.Map
 
+// TODO: Proper testing
 
 object TestLocal {
 
@@ -21,7 +22,7 @@ object TestLocal {
       Map(
         "jobid"     -> "123",
         "nodelist"  -> "1,2,3",
-        "elapsed"   -> 23
+        "elapsed"   -> "23"
       ),
       Map(
         "jobid"     -> 456,
@@ -62,43 +63,11 @@ object TestLocal {
     sjs.createLocalDataSource(testMeta, testData)
   }
 
-  /*
-  def createCassandraJobQueue(sjs: ScrubJaySession): DataSource = {
-
-    val jobQueueMeta = Map(
-      (MetaEntry(sjs.metaOntology.VALUE_JOB_ID,     sjs.metaOntology.UNITS_ID)        -> "job_id"),
-      (MetaEntry(sjs.metaOntology.VALUE_START_TIME, sjs.metaOntology.UNITS_TIMESTAMP) -> "start_time"),
-      (MetaEntry(sjs.metaOntology.VALUE_DURATION,   sjs.metaOntology.UNITS_SECONDS)   -> "elapsed_time"),
-      (MetaEntry(sjs.metaOntology.VALUE_JOB_NAME,   sjs.metaOntology.UNITS_ID)        -> "job_name"),
-      (MetaEntry(sjs.metaOntology.VALUE_NODE_LIST,  sjs.metaOntology.UNITS_ID_LIST)   -> "node_list"),
-      (MetaEntry(sjs.metaOntology.VALUE_NUM_NODES,  sjs.metaOntology.UNITS_QUANTITY)  -> "num_nodes"),
-      (MetaEntry(sjs.metaOntology.VALUE_PARTITION,  sjs.metaOntology.UNITS_ID)        -> "partition"),
-      (MetaEntry(sjs.metaOntology.VALUE_STATE,      sjs.metaOntology.UNITS_ID)        -> "state"),
-      (MetaEntry(sjs.metaOntology.VALUE_USER_NAME,  sjs.metaOntology.UNITS_ID)        -> "user_name"))
-
-    sjs.createCassandraDataSource(jobQueueMeta, "cab_dat_2015_08_05", "job_queue")
-  }
-
-  def createCassandraCabLayout(sjs: ScrubJaySession): DataSource = {
-
-    val cabLayoutMeta = Map(
-      (MetaEntry(sjs.metaOntology.VALUE_NODE,        sjs.metaOntology.UNITS_ID) -> "node"),
-      (MetaEntry(sjs.metaOntology.VALUE_RACK,        sjs.metaOntology.UNITS_ID) -> "rack"),
-      (MetaEntry(sjs.metaOntology.VALUE_RACK_ROW,    sjs.metaOntology.UNITS_ID) -> "height"),
-      (MetaEntry(sjs.metaOntology.VALUE_RACK_COLUMN, sjs.metaOntology.UNITS_ID) -> "row"))
-
-    sjs.createCassandraDataSource(cabLayoutMeta, "cab_dat_2015_08_05", "cab_layout")
-
-  }
-  */
-
   def main(args: Array[String]) {
 
-    // Change the following to test locally or using Cassandra
-    val local = false
+    // TODO: Query "(SUM duration) PER (rack)"
 
     val sjs = new ScrubJaySession()
-      //cassandra_connection = Some(CassandraConnection(hostname = "sonar10")))
 
     // Create DataSources
     val jobQueue = createLocalJobQueue(sjs)
@@ -126,16 +95,5 @@ object TestLocal {
     else
       println("undefined!")
 
-
-    /*
-    val jobQueueRackInfo = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)
-
-    if (jobQueueRackInfo.defined) {
-      jobQueueRackInfo.rdd.foreach(println)
-    }
-    else {
-      println("UNDEFINED")
-    }
-    */
   }
 }
