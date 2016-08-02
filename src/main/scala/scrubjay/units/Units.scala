@@ -21,7 +21,8 @@ object Units {
 
   var allClassTags: Map[ClassTag[_], UnitsConverter[_]] = Map(
     classTag[Identifier] -> Identifier.converter,
-    classTag[UnitsList[_]] -> UnitsList.converter
+    classTag[UnitsList[_]] -> UnitsList.converter,
+    classTag[Seconds] -> Seconds.converter
   )
 
   def raw2Units(v: Any, mu: MetaDescriptor): Units[_] = {

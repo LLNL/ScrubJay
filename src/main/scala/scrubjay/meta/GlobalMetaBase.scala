@@ -27,6 +27,7 @@ object GlobalMetaBase {
 
   // Units
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
+  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A categorical identifier", classTag[Seconds]))
 
   // Composite Units
   final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", classTag[UnitsList[_]]))
