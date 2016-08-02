@@ -7,8 +7,6 @@ import scrubjay.units._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scala.reflect._
-
 class LocalDataSource(metaOntology: MetaBase,
                       metaMap: MetaMap,
                       rddGiven: RDD[RawDataRow],

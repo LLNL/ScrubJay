@@ -8,10 +8,12 @@ object GlobalMetaBase {
 
   final val META_BASE: MetaBase = new MetaBase
 
-  // Unknowns
+  // Unknowns - REQUIRED
   final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down"))
   final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
   final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", classTag[Identifier]))
+
+  // TODO: Make this come from a source (e.g. table), and think about how to encode/decode units...
 
   // Meanings
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))

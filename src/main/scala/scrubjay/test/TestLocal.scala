@@ -19,8 +19,8 @@ object TestLocal {
 
     val testData = Array(
       Map(
-        "jobid"     -> 123,
-        "nodelist"  -> List(1,2,3),
+        "jobid"     -> "123",
+        "nodelist"  -> "1,2,3",
         "elapsed"   -> 23
       ),
       Map(
