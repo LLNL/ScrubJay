@@ -1,8 +1,7 @@
 package scrubjay.datasource
 
-import scrubjay.meta._
-
 import org.apache.spark.rdd.RDD
+import scrubjay.meta._
 
 abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
   val metaEntryMap: MetaMap

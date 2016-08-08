@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scrubjay-newest.iml" filepath="$PROJECT_DIR$/.idea/modules/scrubjay-newest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scrubjay-newest-build.iml" filepath="$PROJECT_DIR$/.idea/modules/scrubjay-newest-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scrubjay.iml" filepath="$PROJECT_DIR$/.idea/modules/scrubjay.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scrubjay-build.iml" filepath="$PROJECT_DIR$/.idea/modules/scrubjay-build.iml" />
     </modules>
   </component>
 </project>

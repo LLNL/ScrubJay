@@ -12,11 +12,10 @@ val cassandraVersion = "3.4.0"
 val sparkCassandraConnectorVersion = "1.6.0"
 
 // Spark
-libraryDependencies += "org.apache.spark" % "spark-core_2.10"   % sparkVersion
-libraryDependencies += "org.apache.spark" % "spark-sql_2.10"    % sparkVersion
-libraryDependencies += "org.apache.spark" % "spark-sql_2.10"    % sparkVersion
-libraryDependencies += "org.apache.spark" % "spark-mllib_2.10"  % sparkVersion
-libraryDependencies += "com.datastax.spark" % "spark-cassandra-connector_2.10" % sparkCassandraConnectorVersion
+libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion
+libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
+libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
+libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkCassandraConnectorVersion
 
 // Hadoop
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion
@@ -26,7 +25,9 @@ libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 
 // META-INF discarding for uberjar
+/*
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case x => MergeStrategy.first
 }
+*/

@@ -1,14 +1,9 @@
-package scrubjay.test
-
 import scrubjay._
-
-import scrubjay.meta._
-
-import scrubjay.derivation.NaturalJoin._
-import scrubjay.derivation.ExpandIdentifierList._
-
-import scrubjay.datasource._
 import scrubjay.datasource.LocalDataSource._
+import scrubjay.datasource._
+import scrubjay.derivation.ExpandIdentifierList._
+import scrubjay.derivation.NaturalJoin._
+import scrubjay.meta._
 
 import scala.collection.immutable.Map
 

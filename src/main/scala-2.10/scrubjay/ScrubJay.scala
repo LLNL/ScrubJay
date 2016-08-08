@@ -1,7 +1,6 @@
 package scrubjay
 
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SQLContext
 import scrubjay.meta.GlobalMetaBase
 

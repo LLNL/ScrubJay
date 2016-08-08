@@ -1,11 +1,9 @@
 package scrubjay.meta
 
-import MetaBase._
-
-import scala.reflect._
-import scala.reflect.ClassTag
+import scrubjay.meta.MetaBase._
 
 import scala.language.existentials
+import scala.reflect.{ClassTag, _}
 
 abstract class MetaDescriptor
 (val title: String,

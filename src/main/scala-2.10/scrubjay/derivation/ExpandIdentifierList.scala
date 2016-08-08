@@ -1,12 +1,12 @@
 package scrubjay.derivation
 
+import org.apache.spark.rdd.RDD
 import scrubjay._
+import scrubjay.datasource._
 import scrubjay.meta._
 import scrubjay.units._
-import scrubjay.datasource._
 
 import scala.reflect._
-import org.apache.spark.rdd.RDD
 
 /*
  * ExpandedIdentifierList

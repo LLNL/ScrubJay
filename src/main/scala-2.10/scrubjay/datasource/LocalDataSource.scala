@@ -1,11 +1,10 @@
 package scrubjay.datasource
 
+import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.units._
-
-import org.apache.spark.SparkContext
-import org.apache.spark.rdd.RDD
 
 class LocalDataSource(metaOntology: MetaBase,
                       metaMap: MetaMap,

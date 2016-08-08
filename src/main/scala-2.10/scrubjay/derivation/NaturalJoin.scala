@@ -1,12 +1,11 @@
 package scrubjay.derivation
 
-import scrubjay._
-import scrubjay.meta._
-import scrubjay.meta.GlobalMetaBase._
-import scrubjay.datasource._
-
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import scrubjay._
+import scrubjay.datasource._
+import scrubjay.meta.GlobalMetaBase._
+import scrubjay.meta._
 
 /*
  * NaturalJoin 
