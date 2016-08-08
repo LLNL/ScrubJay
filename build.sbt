@@ -28,9 +28,6 @@ libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"
 libraryDependencies += "oscar" %% "oscar-cp" % "3.1.0"
 
-// Override scala versions
-ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-
 // META-INF discarding for uberjar
 /*
 assemblyMergeStrategy in assembly := {
