@@ -2,90 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="099c160f-ed6a-42ef-82b4-6518d6eab400" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_jhlabs_filters_2_0_235_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__dom4j_dom4j_1_6_1_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__jaxen_jaxen_1_1_beta_8_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__jdom_jdom_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__jtidy_jtidy_4aug2000r7_dev_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__junit_junit_3_8_1_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__net_sf_ezmorph_ezmorph_0_8_1_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__net_sf_json_lib_json_lib_0_9_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_jfree_jcommon_1_0_23_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_jfree_jfreechart_1_0_19_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_modules_scala_parser_combinators_2_11_1_0_4_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_modules_scala_xml_2_11_1_0_5_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_reflect_2_11_8_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_swinglabs_swing_worker_1_1_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_swinglabs_swingx_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_swinglabs_swingx_ws_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__oscar_oscar_algo_2_11_3_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__oscar_oscar_cp_2_11_3_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__oscar_oscar_util_2_11_3_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__oscar_oscar_visual_2_11_3_1_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__rome_rome_0_8_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__xalan_xalan_2_7_0_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__xerces_xercesImpl_2_8_1_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__xerces_xmlParserAPIs_2_6_2_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__xom_xom_1_1_jar.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_reflect_2_10_5_jar.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalamacros_quasiquotes_2_10_2_0_0_jar.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/ScrubJay.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/datasource/CSVDataSource.scala.bak" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/datasource/CassandraDataSource.scala.bak" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/datasource/DataSource.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/datasource/LocalDataSource.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/datasource/package.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/derivation/ExpandIdentifierList.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/derivation/ExpandedTimeRange.scala.bak" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/derivation/NaturalJoin.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/derivation/package.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/meta/GlobalMetaBase.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/meta/MetaBase.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/meta/MetaEntry.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/meta/package.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/package.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/ConversionHelpers.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/Identifier.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/Seconds.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/Units.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/UnitsList.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/units/package.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/util/Util.scala" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala-2.10/scrubjay/util/package.scala" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_datastax_spark_spark_cassandra_connector_2_10_1_6_0_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_datastax_spark_spark_cassandra_connector_2_11_1_6_0_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_fasterxml_jackson_module_jackson_module_scala_2_10_2_4_4_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_fasterxml_jackson_module_jackson_module_scala_2_11_2_4_4_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_github_nscala_time_nscala_time_2_10_2_12_0_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_github_nscala_time_nscala_time_2_11_2_12_0_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_github_tototoshi_scala_csv_2_10_1_3_3_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_github_tototoshi_scala_csv_2_11_1_3_3_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_twitter_chill_2_10_0_5_0_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_twitter_chill_2_11_0_5_0_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_actor_2_10_2_3_11_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_actor_2_11_2_3_11_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_remote_2_10_2_3_11_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_remote_2_11_2_3_11_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_slf4j_2_10_2_3_11_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__com_typesafe_akka_akka_slf4j_2_11_2_3_11_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_catalyst_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_catalyst_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_core_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_core_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_graphx_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_unsafe_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_launcher_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_launcher_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_mllib_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_mllib_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_network_common_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_network_common_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_network_shuffle_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_network_shuffle_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_sql_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_sql_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_streaming_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_streaming_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_unsafe_2_10_1_6_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_apache_spark_spark_graphx_2_11_1_6_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_ast_2_10_3_2_10_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_ast_2_11_3_2_10_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_core_2_10_3_2_10_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_core_2_11_3_2_10_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_jackson_2_10_3_2_10_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_json4s_json4s_jackson_2_11_3_2_10_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_compiler_2_10_0_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_compiler_2_11_8_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_library_2_10_6_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scala_library_2_11_8_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scalap_2_10_0_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scala_lang_scalap_2_11_0_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalanlp_breeze_2_10_0_11_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalanlp_breeze_2_11_0_11_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalanlp_breeze_macros_2_10_0_11_2_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_scalanlp_breeze_macros_2_11_0_11_2_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_spire_math_spire_2_10_0_7_4_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_spire_math_spire_2_11_0_7_4_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/SBT__org_spire_math_spire_macros_2_10_0_7_4_jar.xml" afterPath="$PROJECT_DIR$/.idea/libraries/SBT__org_spire_math_spire_macros_2_11_0_7_4_jar.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/test/scala-2.10/TestLocal.scala" afterPath="$PROJECT_DIR$/src/test/scala/TestLocal.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/scrubjay-build.iml" afterPath="$PROJECT_DIR$/.idea/modules/scrubjay-build.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/scrubjay.iml" afterPath="$PROJECT_DIR$/.idea/modules/scrubjay.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/sbt.xml" afterPath="$PROJECT_DIR$/.idea/sbt.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.sbt" afterPath="$PROJECT_DIR$/build.sbt" />
     </list>
     <ignored path="scrubjay.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -809,7 +726,14 @@
       <option name="project" value="LOCAL" />
       <updated>1470682947975</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Further cleanup, removed Units self-awareness">
+      <created>1470685580459</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1470685580459</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -860,8 +784,8 @@
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Cleaned up project structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up project structure" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="Further cleanup, removed Units self-awareness" />
+    <option name="LAST_COMMIT_MESSAGE" value="Further cleanup, removed Units self-awareness" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
