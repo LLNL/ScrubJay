@@ -2,7 +2,7 @@ name := "ScrubJay"
 
 version := "1.0"
 
-scalaVersion := "2.10.6"
+scalaVersion := "2.11.8"
 
 scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
@@ -23,6 +23,13 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion
 // Misc
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
+
+// OscaR
+resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"
+libraryDependencies += "oscar" %% "oscar-cp" % "3.1.0"
+
+// Override scala versions
+ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // META-INF discarding for uberjar
 /*
