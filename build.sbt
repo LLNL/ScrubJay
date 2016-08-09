@@ -21,6 +21,7 @@ libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % spa
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion
 
 // Misc
+libraryDependencies += "log4j" % "log4j" % "1.2.17"
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 
@@ -28,10 +29,13 @@ libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"
 libraryDependencies += "oscar" %% "oscar-cp" % "3.1.0"
 
-// META-INF discarding for uberjar
-/*
+// Merge strategy for fat jars
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x => MergeStrategy.first
+  case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
+  case "application.conf"                            => MergeStrategy.concat
+  case "unwanted.txt"                                => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
 }
-*/
