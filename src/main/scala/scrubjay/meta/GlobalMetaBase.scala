@@ -18,6 +18,7 @@ object GlobalMetaBase {
   // Meanings
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
   final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
+  final val MEANING_END = META_BASE.addMeaning(MetaMeaning("end", "The end of something"))
   final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
 
   // Dimensions
@@ -28,6 +29,7 @@ object GlobalMetaBase {
   // Units
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
   final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A categorical identifier", classTag[Seconds]))
+  final val UNITS_DATETIMESTAMP = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", classTag[DateTimeStamp]))
 
   // Composite Units
   final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", classTag[UnitsList[_]]))

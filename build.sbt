@@ -26,6 +26,7 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
+libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0" excludeAll ExclusionRule(organization = "javax.servlet")
 
 // OscaR
 resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"

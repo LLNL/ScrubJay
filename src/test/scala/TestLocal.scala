@@ -17,18 +17,24 @@ object TestLocal {
       Map(
         "jobid"     -> "123",
         "nodelist"  -> "1,2,3",
-        "elapsed"   -> "23"
+        "elapsed"   -> "23",
+        "start"     -> "2016-08-11T3:30:00+0000",
+        "end"       -> "2016-08-11T3:30:23+0000"
       ),
       Map(
         "jobid"     -> 456,
         "nodelist"  -> List(4,5,6),
-        "elapsed"   -> 45
+        "elapsed"   -> 45,
+        "start"     -> "2016-08-11T3:30:20+0000",
+        "end"       -> "2016-08-11T3:31:05+0000"
       ))
 
     val testMeta = Map(
       "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "job", "identifier"),
       "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "node", "list<identifier>"),
-      "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds")
+      "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds"),
+      "start" -> MetaEntry.metaEntryFromStringTuple("start", "time", "datetimestamp"),
+      "end" -> MetaEntry.metaEntryFromStringTuple("end", "time", "datetimestamp")
     )
 
     sjs.createLocalDataSource(testMeta, testData)

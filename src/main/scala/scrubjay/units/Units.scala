@@ -1,9 +1,10 @@
 package scrubjay.units
 
+import scrubjay.meta._
+import scrubjay.datasource._
+
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import scrubjay.datasource._
-import scrubjay.meta._
 
 import scala.reflect.{ClassTag, _}
 
@@ -20,7 +21,8 @@ object Units {
   var allClassTags: Map[ClassTag[_], UnitsConverter[_]] = Map(
     classTag[Identifier] -> Identifier.converter,
     classTag[UnitsList[_]] -> UnitsList.converter,
-    classTag[Seconds] -> Seconds.converter
+    classTag[Seconds] -> Seconds.converter,
+    classTag[DateTimeStamp] -> DateTimeStamp.converter
   )
 
   def raw2Units(v: Any, mu: MetaDescriptor): Units = {
