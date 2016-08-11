@@ -15,7 +15,9 @@ val sparkCassandraConnectorVersion = "1.6.0"
 libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
-libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkCassandraConnectorVersion
+
+// Cassandra
+libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkCassandraConnectorVersion excludeAll ExclusionRule(organization = "javax.servlet")
 
 // Hadoop
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion
