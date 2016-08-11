@@ -29,6 +29,9 @@ libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.3"
 resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"
 libraryDependencies += "oscar" %% "oscar-cp" % "3.1.0"
 
+// Fix dependency relocation for xml-apis
+libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
+
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
