@@ -1,6 +1,7 @@
 import scrubjay._
 import scrubjay.datasource.LocalDataSource._
 import scrubjay.datasource._
+import scrubjay.derivation.DeriveTimeSpan._
 import scrubjay.derivation.ExpandIdentifierList._
 import scrubjay.derivation.NaturalJoin._
 import scrubjay.meta._
@@ -28,11 +29,11 @@ object TestLocal {
       ))
 
     val testMeta = Map(
-      "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "job", "identifier"),
-      "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "node", "list<identifier>"),
-      "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds"),
-      "start" -> MetaEntry.metaEntryFromStringTuple("start", "time", "datetimestamp"),
-      "end" -> MetaEntry.metaEntryFromStringTuple("end", "time", "datetimestamp")
+      "jobid" -> MetaEntry.fromStringTuple("job", "job", "identifier"),
+      "nodelist" -> MetaEntry.fromStringTuple("node", "node", "list<identifier>"),
+      "elapsed" -> MetaEntry.fromStringTuple("duration", "time", "seconds"),
+      "start" -> MetaEntry.fromStringTuple("start", "time", "datetimestamp"),
+      "end" -> MetaEntry.fromStringTuple("end", "time", "datetimestamp")
     )
 
     sjs.createLocalDataSource(testMeta, testData)
@@ -55,8 +56,8 @@ object TestLocal {
           "rack"     -> 2))
 
     val testMeta = Map(
-      "node" -> MetaEntry.metaEntryFromStringTuple("node", "node", "identifier"),
-      "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "rack", "identifier")
+      "node" -> MetaEntry.fromStringTuple("node", "node", "identifier"),
+      "rack" -> MetaEntry.fromStringTuple("rack", "rack", "identifier")
     )
 
     sjs.createLocalDataSource(testMeta, testData)
@@ -78,17 +79,22 @@ object TestLocal {
     println("********* cabLayout *********")
     cabLayout.rdd.foreach(println)
 
-    val jobQueueExpanded = sjs.deriveExpandedNodeList(jobQueue, List("nodelist"))
+    println("********* jobQueueWithSpan *********")
+    val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
+    if (jobQueueSpan.defined)
+      jobQueueSpan.rdd.foreach(println)
+    else
+      println("undefined!")
 
     println("********* jobQueueExpanded *********")
+    val jobQueueExpanded = sjs.deriveExpandedNodeList(jobQueueSpan, List("nodelist"))
     if (jobQueueExpanded.defined)
       jobQueueExpanded.rdd.foreach(println)
     else
       println("undefined!")
 
-    val jobQueueJoined = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)
-
     println("********* jobQueueExpandedJoined *********")
+    val jobQueueJoined = sjs.deriveNaturalJoin(jobQueueExpanded, cabLayout)
     if (jobQueueJoined.defined)
       jobQueueJoined.rdd.foreach(println)
     else

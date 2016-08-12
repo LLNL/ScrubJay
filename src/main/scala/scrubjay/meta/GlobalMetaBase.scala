@@ -19,7 +19,8 @@ object GlobalMetaBase {
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
   final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
   final val MEANING_END = META_BASE.addMeaning(MetaMeaning("end", "The end of something"))
-  final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
+  final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A quantity of time"))
+  final val MEANING_SPAN = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
 
   // Dimensions
   final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension"))
