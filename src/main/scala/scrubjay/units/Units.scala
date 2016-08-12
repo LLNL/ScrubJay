@@ -22,7 +22,8 @@ object Units {
     classTag[Identifier] -> Identifier.converter,
     classTag[UnitsList[_]] -> UnitsList.converter,
     classTag[Seconds] -> Seconds.converter,
-    classTag[DateTimeStamp] -> DateTimeStamp.converter
+    classTag[DateTimeStamp] -> DateTimeStamp.converter,
+    classTag[DateTimeSpan] -> DateTimeSpan.converter
   )
 
   def raw2Units(v: Any, mu: MetaDescriptor): Units = {

@@ -1,10 +1,12 @@
 package scrubjay.derivation
 
-import org.apache.spark.rdd.RDD
 import scrubjay._
 import scrubjay.datasource._
 import scrubjay.meta._
+import scrubjay.meta.GlobalMetaBase._
 import scrubjay.units._
+
+import org.apache.spark.rdd.RDD
 
 import scala.reflect._
 
@@ -25,7 +27,7 @@ class ExpandIdentifierList(metaOntology: MetaBase,
                            columns: List[String]) extends DerivedDataSource(metaOntology) {
 
   // Implementations of abstract members
-  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == classTag[UnitsList[_]])
+  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units == UNITS_COMPOSITE_LIST)
   val metaEntryMap: MetaMap = ds.metaEntryMap.map {
     case (c, m) if columns.contains(c) =>
       (c + "_expanded", m.copy(units = m.units.children.head.asInstanceOf[MetaUnits]))
