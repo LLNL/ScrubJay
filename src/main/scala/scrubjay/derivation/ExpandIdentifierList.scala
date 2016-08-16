@@ -8,8 +8,6 @@ import scrubjay.units._
 
 import org.apache.spark.rdd.RDD
 
-import scala.reflect._
-
 /*
  * ExpandedIdentifierList
  *
@@ -27,7 +25,7 @@ class ExpandIdentifierList(metaOntology: MetaBase,
                            columns: List[String]) extends DerivedDataSource(metaOntology) {
 
   // Implementations of abstract members
-  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units == UNITS_COMPOSITE_LIST)
+  val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == UNITS_COMPOSITE_LIST.tag)
   val metaEntryMap: MetaMap = ds.metaEntryMap.map {
     case (c, m) if columns.contains(c) =>
       (c + "_expanded", m.copy(units = m.units.children.head.asInstanceOf[MetaUnits]))

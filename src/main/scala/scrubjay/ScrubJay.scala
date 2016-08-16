@@ -4,8 +4,6 @@ import scrubjay.meta.GlobalMetaBase
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-import org.apache.log4j.{Level, Logger}
-
 case class CassandraConnection(
   hostname: String = "localhost",
   username: String = "cassandra",
