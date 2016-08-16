@@ -1,31 +1,24 @@
 import scrubjay._
-import scrubjay.datasource.LocalDataSource._
+import scrubjay.datasource.CSVDataSource._
 import scrubjay.datasource._
 import scrubjay.derivation.ExpandIdentifierList._
 import scrubjay.derivation.NaturalJoin._
 import scrubjay.meta._
 
-// TODO: Proper testing
+import java.io._
 
-object TestLocal {
+object TestCSV {
 
-  def createLocalJobQueue(sjs: ScrubJaySession): DataSource = {
+  def createCSVJobQueue(sjs: ScrubJaySession): DataSource = {
 
-    val testData = Array(
-      Map(
-        "jobid"     -> "123",
-        "nodelist"  -> "1,2,3",
-        "elapsed"   -> "23",
-        "start"     -> "2016-08-11T3:30:00+0000",
-        "end"       -> "2016-08-11T3:30:23+0000"
-      ),
-      Map(
-        "jobid"     -> 456,
-        "nodelist"  -> List(4,5,6),
-        "elapsed"   -> 45,
-        "start"     -> "2016-08-11T3:30:20+0000",
-        "end"       -> "2016-08-11T3:31:05+0000"
-      ))
+    val testDataFileName = "jobqueue.csv"
+    val fileWriter = new PrintWriter(new FileOutputStream(testDataFileName, false))
+
+    fileWriter.println("jobid, nodelist, elapsed, start, end")
+    fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:30:23+0000")
+    fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
+
+    fileWriter.close()
 
     val testMeta = Map(
       "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "job", "identifier"),
@@ -35,31 +28,30 @@ object TestLocal {
       "end" -> MetaEntry.metaEntryFromStringTuple("end", "time", "datetimestamp")
     )
 
-    sjs.createLocalDataSource(testMeta, testData)
+    sjs.createCSVDataSource(testMeta, testDataFileName)
   }
 
-  def createLocalCabLayout(sjs: ScrubJaySession): DataSource = {
+  def createCSVCabLayout(sjs: ScrubJaySession): DataSource = {
 
-    val testData = Array(
-      Map("node"     -> 1, 
-          "rack"     -> 1),
-      Map("node"     -> 2, 
-          "rack"     -> 1),
-      Map("node"     -> 3, 
-          "rack"     -> 1),
-      Map("node"     -> 4, 
-          "rack"     -> 2),
-      Map("node"     -> 5, 
-          "rack"     -> 2),
-      Map("node"     -> 6, 
-          "rack"     -> 2))
+    val testDataFileName = "cablayout.csv"
+    val fileWriter = new PrintWriter(new FileOutputStream(testDataFileName, false))
+
+    fileWriter.println("node, rack")
+    fileWriter.println("1,1")
+    fileWriter.println("2,1")
+    fileWriter.println("3,1")
+    fileWriter.println("4,2")
+    fileWriter.println("5,2")
+    fileWriter.println("6,2")
+
+    fileWriter.close()
 
     val testMeta = Map(
       "node" -> MetaEntry.metaEntryFromStringTuple("node", "node", "identifier"),
       "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "rack", "identifier")
     )
 
-    sjs.createLocalDataSource(testMeta, testData)
+    sjs.createCSVDataSource(testMeta, testDataFileName)
   }
 
   def main(args: Array[String]) {
@@ -69,8 +61,8 @@ object TestLocal {
     val sjs = new ScrubJaySession()
 
     // Create DataSources
-    val jobQueue = createLocalJobQueue(sjs)
-    val cabLayout = createLocalCabLayout(sjs)
+    val jobQueue = createCSVJobQueue(sjs)
+    val cabLayout = createCSVCabLayout(sjs)
 
     println("********* jobQueue *********")
     jobQueue.rdd.foreach(println)
@@ -97,3 +89,4 @@ object TestLocal {
     sjs.sc.stop()
   }
 }
+
