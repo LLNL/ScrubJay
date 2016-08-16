@@ -96,5 +96,6 @@ object TestLocal {
     else
       println("undefined!")
 
+    sjs.sc.stop()
   }
 }

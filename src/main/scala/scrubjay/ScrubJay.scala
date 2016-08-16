@@ -3,7 +3,6 @@ package scrubjay
 import scrubjay.meta.GlobalMetaBase
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.SQLContext
 
 import org.apache.log4j.{Level, Logger}
 
@@ -31,6 +30,8 @@ class ScrubJaySession(
     case (field, value) => sparkConf.set(field, value)})
 
   val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
-  val sqlContext = new SQLContext(sc)
+  sc.setLogLevel("WARN")
+  //val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+
   val metaOntology = GlobalMetaBase.META_BASE
 }
