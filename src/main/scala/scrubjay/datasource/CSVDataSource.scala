@@ -2,28 +2,26 @@ package scrubjay.datasource
 
 import scrubjay._
 import scrubjay.meta._
+import scrubjay.units._
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import java.io.File
-
 import com.github.tototoshi.csv._
 
-class CSVDataSource(sc: SparkContext,
-                    metaOntology: MetaOntology,
+class CSVDataSource(metaOntology: MetaBase,
                     metaMap: MetaMap,
-                    filename: String) 
+                    filename: String,
+                    sc: SparkContext)
     extends OriginalDataSource(metaOntology, metaMap) {
   val reader = CSVReader.open(filename)
-  val rdd: RDD[DataRow] = sc.parallelize(reader.allWithHeaders)
+  val rdd: RDD[DataRow] = Units.rawRDDToUnitsRDD(sc, sc.parallelize(reader.allWithHeaders), metaMap)
 }
 
 object CSVDataSource {
-  // ScrubJaySession method to create a CSVDataSource
   implicit class ScrubJaySession_CSVDataSource(sjs: ScrubJaySession) {
     def createCSVDataSource(metaMap: MetaMap, filename: String): CSVDataSource = {
-      new CSVDataSource(sjs.sc, sjs.metaOntology, metaMap, filename)
+      new CSVDataSource(sjs.metaOntology, metaMap, filename, sjs.sc)
     }
   }
 }
