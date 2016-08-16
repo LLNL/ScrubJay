@@ -21,11 +21,11 @@ object TestCSV {
     fileWriter.close()
 
     val testMeta = Map(
-      "jobid" -> MetaEntry.metaEntryFromStringTuple("job", "job", "identifier"),
-      "nodelist" -> MetaEntry.metaEntryFromStringTuple("node", "node", "list<identifier>"),
-      "elapsed" -> MetaEntry.metaEntryFromStringTuple("duration", "time", "seconds"),
-      "start" -> MetaEntry.metaEntryFromStringTuple("start", "time", "datetimestamp"),
-      "end" -> MetaEntry.metaEntryFromStringTuple("end", "time", "datetimestamp")
+      "jobid" -> MetaEntry.fromStringTuple("job", "job", "identifier"),
+      "nodelist" -> MetaEntry.fromStringTuple("node", "node", "list<identifier>"),
+      "elapsed" -> MetaEntry.fromStringTuple("duration", "time", "seconds"),
+      "start" -> MetaEntry.fromStringTuple("start", "time", "datetimestamp"),
+      "end" -> MetaEntry.fromStringTuple("end", "time", "datetimestamp")
     )
 
     sjs.createCSVDataSource(testMeta, testDataFileName)
@@ -47,8 +47,8 @@ object TestCSV {
     fileWriter.close()
 
     val testMeta = Map(
-      "node" -> MetaEntry.metaEntryFromStringTuple("node", "node", "identifier"),
-      "rack" -> MetaEntry.metaEntryFromStringTuple("rack", "rack", "identifier")
+      "node" -> MetaEntry.fromStringTuple("node", "node", "identifier"),
+      "rack" -> MetaEntry.fromStringTuple("rack", "rack", "identifier")
     )
 
     sjs.createCSVDataSource(testMeta, testDataFileName)
