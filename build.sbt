@@ -37,6 +37,9 @@ libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 // Fix dependency relocation for xml-apis
 libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
 
+// Disable parallel tests since each uses spark
+parallelExecution in test := false
+
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard

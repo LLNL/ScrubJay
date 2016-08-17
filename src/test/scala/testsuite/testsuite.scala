@@ -1,8 +1,23 @@
 import scrubjay.units._
+import scrubjay.meta._
 
 import com.github.nscala_time.time.Imports._
 
-package object scrubjay {
+package object testsuite {
+
+  val jobQueueMeta = Map(
+      "jobid" -> MetaEntry.fromStringTuple("job", "job", "identifier"),
+      "nodelist" -> MetaEntry.fromStringTuple("node", "node", "list<identifier>"),
+      "elapsed" -> MetaEntry.fromStringTuple("duration", "time", "seconds"),
+      "start" -> MetaEntry.fromStringTuple("start", "time", "datetimestamp"),
+      "end" -> MetaEntry.fromStringTuple("end", "time", "datetimestamp")
+    )
+
+  val cabLayoutMeta = Map(
+    "node" -> MetaEntry.fromStringTuple("node", "node", "identifier"),
+    "rack" -> MetaEntry.fromStringTuple("rack", "rack", "identifier")
+  )
+
   val trueJobQueue = Set(
     Map(
       "jobid" -> Identifier("456"),
