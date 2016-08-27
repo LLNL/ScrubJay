@@ -1,10 +1,15 @@
 package scrubjay.units
 
 import scrubjay.meta._
+import scrubjay.util._
 
 import com.github.nscala_time.time.Imports._
 
-case class DateTimeSpan(v: Interval) extends Units
+case class DateTimeSpan(v: Interval) extends Units {
+  def explode: Seq[DateTimeStamp] = {
+    Util.dateRange(v.start, v.end, 1.seconds).map(DateTimeStamp(_)).toSeq
+  }
+}
 
 object DateTimeSpan {
   val converter = new UnitsConverter[DateTimeSpan] {
