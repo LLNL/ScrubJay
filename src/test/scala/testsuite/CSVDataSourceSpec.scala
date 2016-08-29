@@ -11,38 +11,50 @@ import java.io._
 
 import org.scalatest._
 
+
 object CSVDataSourceSpec {
 
   def createCSVJobQueue(sjs: ScrubJaySession): DataSource = {
 
-    val testDataFileName = "jobqueue.csv"
-    val fileWriter = new PrintWriter(new FileOutputStream(testDataFileName, false))
+    val fileName = "jobqueue.csv"
+    val file = new File(fileName)
 
-    fileWriter.println("jobid, nodelist, elapsed, start, end")
-    fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:30:23+0000")
-    fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
+    try {
+      val fileWriter = new PrintWriter(file)
 
-    fileWriter.close()
+      fileWriter.println("jobid, nodelist, elapsed, start, end")
+      fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:30:23+0000")
+      fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
+      fileWriter.close()
 
-    sjs.createCSVDataSource(jobQueueMeta, testDataFileName)
+      sjs.createCSVDataSource(jobQueueMeta, fileName)
+    }
+    finally {
+      file.delete()
+    }
   }
 
   def createCSVCabLayout(sjs: ScrubJaySession): DataSource = {
 
-    val testDataFileName = "cablayout.csv"
-    val fileWriter = new PrintWriter(new FileOutputStream(testDataFileName, false))
+    val fileName = "cablayout.csv"
+    val file = new File(fileName)
 
-    fileWriter.println("node, rack")
-    fileWriter.println("1,1")
-    fileWriter.println("2,1")
-    fileWriter.println("3,1")
-    fileWriter.println("4,2")
-    fileWriter.println("5,2")
-    fileWriter.println("6,2")
+    try {
+      val fileWriter = new PrintWriter(file)
+      fileWriter.println("node, rack")
+      fileWriter.println("1,1")
+      fileWriter.println("2,1")
+      fileWriter.println("3,1")
+      fileWriter.println("4,2")
+      fileWriter.println("5,2")
+      fileWriter.println("6,2")
+      fileWriter.close()
 
-    fileWriter.close()
-
-    sjs.createCSVDataSource(cabLayoutMeta, testDataFileName)
+      sjs.createCSVDataSource(cabLayoutMeta, fileName)
+    }
+    finally {
+      file.delete()
+    }
   }
 }
 
