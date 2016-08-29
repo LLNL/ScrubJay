@@ -9,33 +9,33 @@ import scrubjay.units._
 import org.apache.spark.rdd.RDD
 
 /*
- * ExpandedIdentifierList
+ * ExplodeList
  *
  * Requirements: 
  *  1. A single DataSource to derive from
- *  2. A set of user-specified columns, all of which are UnitList[Identifier[_]]
+ *  2. A set of user-specified columns, all of which are UnitList[_]
  *
  * Derivation:
- *  For every row with a list of identifiers <a1, a2, identifiers [i1, i2, i3]>,
+ *  For every row with a list <a1, a2, list=[i1, i2, i3]>,
  *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExpandIdentifierList(metaOntology: MetaBase,
-                           ds: DataSource,
-                           columns: List[String]) extends DerivedDataSource(metaOntology) {
+class ExplodeList(metaOntology: MetaBase,
+                  ds: DataSource,
+                  columns: List[String]) extends DerivedDataSource(metaOntology) {
 
   // Implementations of abstract members
   val defined: Boolean = columns.map(ds.metaEntryMap(_)).forall(_.units.tag == UNITS_COMPOSITE_LIST.tag)
   val metaEntryMap: MetaMap = ds.metaEntryMap.map {
     case (c, m) if columns.contains(c) =>
-      (c + "_expanded", m.copy(units = m.units.children.head.asInstanceOf[MetaUnits]))
+      (c + "_exploded", m.copy(units = m.units.children.head.asInstanceOf[MetaUnits]))
     case x => x
   }
 
   // rdd derivation defined here
   lazy val rdd: RDD[DataRow] = {
 
-    // For multiple expansion columns, expand into the cartesian product
+    // For multiple expansion columns, explode into the cartesian product
     def cartesianProduct[T](xss: List[List[T]]): List[List[T]] = xss match {
       case Nil => List(Nil)
       case h :: t => for(xh <- h; xt <- cartesianProduct(t)) yield xh :: xt
@@ -47,7 +47,7 @@ class ExpandIdentifierList(metaOntology: MetaBase,
       val vals =
         row.filter{case (k, v) => cols.contains(k)}
         .map{
-          case (k, ul: UnitsList[_]) => ul.v.map{case u: Units => (k + "_expanded", u)}
+          case (k, ul: UnitsList[_]) => ul.v.map{case u: Units => (k + "_exploded", u)}
           case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
         }
         .toList
@@ -65,10 +65,10 @@ class ExpandIdentifierList(metaOntology: MetaBase,
   }
 }
 
-object ExpandIdentifierList {
-  implicit class ScrubJaySession_ExpandedNodeList(sjs: ScrubJaySession) {
-    def deriveExpandedNodeList(ds: DataSource, cols: List[String]): ExpandIdentifierList = {
-      new ExpandIdentifierList(sjs.metaOntology, ds, cols)
+object ExplodeList {
+  implicit class ScrubJaySession_ExplodeList(sjs: ScrubJaySession) {
+    def deriveExplodedList(ds: DataSource, cols: List[String]): ExplodeList = {
+      new ExplodeList(sjs.metaOntology, ds, cols)
     }
   }
 }
