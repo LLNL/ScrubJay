@@ -69,42 +69,42 @@ package object testsuite {
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
-      "nodelist_expanded" -> Identifier("4")),
+      "nodelist_exploded" -> Identifier("4")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
-      "nodelist_expanded" -> Identifier("5")),
+      "nodelist_exploded" -> Identifier("5")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
-      "nodelist_expanded" -> Identifier("6")),
+      "nodelist_exploded" -> Identifier("6")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
-      "nodelist_expanded" -> Identifier("1")),
+      "nodelist_exploded" -> Identifier("1")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
-      "nodelist_expanded" -> Identifier("2")),
+      "nodelist_exploded" -> Identifier("2")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
-      "nodelist_expanded" -> Identifier("3"))
+      "nodelist_exploded" -> Identifier("3"))
   )
 
   val trueJobQueueSpanExpandedJoined = Set(
@@ -115,7 +115,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
-      "nodelist_expanded" -> Identifier("4")),
+      "nodelist_exploded" -> Identifier("4")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
       "jobid" -> Identifier("456"),
@@ -123,7 +123,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
-      "nodelist_expanded" -> Identifier("5")),
+      "nodelist_exploded" -> Identifier("5")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
       "jobid" -> Identifier("456"),
@@ -131,7 +131,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
-      "nodelist_expanded" -> Identifier("6")),
+      "nodelist_exploded" -> Identifier("6")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
@@ -139,7 +139,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
-      "nodelist_expanded" -> Identifier("1")),
+      "nodelist_exploded" -> Identifier("1")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
@@ -147,7 +147,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
-      "nodelist_expanded" -> Identifier("2")),
+      "nodelist_exploded" -> Identifier("2")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
       "jobid" -> Identifier("123"),
@@ -155,6 +155,6 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
-      "nodelist_expanded" -> Identifier("3"))
+      "nodelist_exploded" -> Identifier("3"))
   )
 }

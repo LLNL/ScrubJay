@@ -4,7 +4,7 @@ import scrubjay._
 import scrubjay.datasource.CSVDataSource._
 import scrubjay.datasource._
 import scrubjay.derivation.DeriveTimeSpan._
-import scrubjay.derivation.ExpandIdentifierList._
+import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
 
 import java.io._
@@ -100,7 +100,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Expanded node list
-      val jobQueueSpanExpanded = sjs.deriveExpandedNodeList(jobQueueSpan, List("nodelist"))
+      val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
 
       describe("Job queue with derived time span AND expanded node list") {
         it("should be defined") {
