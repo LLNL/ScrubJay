@@ -18,18 +18,21 @@ class CassandraDataSource(metaOntology: MetaBase,
                           select: Option[String] = None,
                           where: Option[String] = None) extends OriginalDataSource(metaOntology, metaMap)  {
 
-  lazy val rdd: RDD[DataRow] = {
-    val cassandraRdd = {
-      if (select.isDefined && where.isDefined)
-        sc.cassandraTable(keyspace, table).select(select.get).where(where.get)
-      else if (select.isDefined && !where.isDefined)
-        sc.cassandraTable(keyspace, table).select(select.get)
-      else if (!select.isDefined && where.isDefined)
-        sc.cassandraTable(keyspace, table).where(where.get)
-      else
-        sc.cassandraTable(keyspace, table)
-    }
+  val cassandraRdd = {
+    if (select.isDefined && where.isDefined)
+      sc.cassandraTable(keyspace, table).select(select.get).where(where.get)
+    else if (select.isDefined && !where.isDefined)
+      sc.cassandraTable(keyspace, table).select(select.get)
+    else if (!select.isDefined && where.isDefined)
+      sc.cassandraTable(keyspace, table).where(where.get)
+    else
+      sc.cassandraTable(keyspace, table)
+  }
 
+  override var metaEntryMap = cassandraRdd.selectedColumnRefs.map(_.toString)
+    .map(col => col -> metaMap.getOrElse(col, MetaEntry.fromStringTuple("unknown", "unknown", "identifier"))).toMap
+
+  lazy val rdd: RDD[DataRow] = {
     Units.rawRDDToUnitsRDD(sc, cassandraRdd.map(_.toMap), metaMap)
   }
 }
