@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import scrubjay.meta._
 
 abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
-  var metaEntryMap: MetaMap
+  val metaEntryMap: MetaMap
   val rdd: RDD[DataRow]
 
   def reverseMetaEntryMap = metaEntryMap.map(_.swap)
@@ -17,7 +17,7 @@ abstract class DataSource(val metaOntology: MetaBase) extends Serializable {
 }
 
 abstract class OriginalDataSource(metaOntology: MetaBase,
-                                  var metaEntryMap: MetaMap) extends DataSource(metaOntology)
+                                  val metaEntryMap: MetaMap) extends DataSource(metaOntology)
 
 abstract class DerivedDataSource(metaOntology: MetaBase) extends DataSource(metaOntology) {
   val defined: Boolean

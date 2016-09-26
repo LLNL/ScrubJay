@@ -29,7 +29,7 @@ class CassandraDataSource(metaOntology: MetaBase,
       sc.cassandraTable(keyspace, table)
   }
 
-  override var metaEntryMap = cassandraRdd.selectedColumnRefs.map(_.toString)
+  override val metaEntryMap = cassandraRdd.selectedColumnRefs.map(_.toString)
     .map(col => col -> metaMap.getOrElse(col, MetaEntry.fromStringTuple("unknown", "unknown", "identifier"))).toMap
 
   lazy val rdd: RDD[DataRow] = {
