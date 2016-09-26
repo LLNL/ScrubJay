@@ -98,9 +98,9 @@ object CassandraDataSource {
   }
 
   implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
-    def createCassandraDataSource(metaMap: MetaMap, 
-                                  keyspace: String, 
+    def createCassandraDataSource(keyspace: String,
                                   table: String,
+                                  metaMap: MetaMap = Map[String, MetaEntry]().empty,
                                   select: Option[String] = None,
                                   where: Option[String] = None): CassandraDataSource = {
       new CassandraDataSource(sjs.metaOntology, metaMap, keyspace, table, sjs.sc, select, where)
