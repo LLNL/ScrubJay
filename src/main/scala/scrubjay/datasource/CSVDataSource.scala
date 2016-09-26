@@ -3,12 +3,11 @@ package scrubjay.datasource
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.units._
-
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-
 import au.com.bytecode.opencsv.CSVReader
-import java.io.FileReader
+import java.io.{BufferedWriter, IOException, FileReader, FileWriter}
+
 import scala.collection.JavaConversions._
 
 class CSVDataSource(metaOntology: MetaBase,
@@ -30,6 +29,22 @@ object CSVDataSource {
   implicit class ScrubJaySession_CSVDataSource(sjs: ScrubJaySession) {
     def createCSVDataSource(metaMap: MetaMap, filename: String): CSVDataSource = {
       new CSVDataSource(sjs.metaOntology, metaMap, filename, sjs.sc)
+    }
+  }
+
+  implicit class DataSource_saveAsCSV(ds: DataSource)   {
+    def saveAsCSVDataSource(fileName: String): Unit =  {
+      val header = ds.metaEntryMap.keys.toSeq
+      val csvRdd = ds.rdd.map(row => header.map("\"" + row.getOrElse(_, "null").toString + "\"").mkString(","))
+      val bw = new BufferedWriter(new FileWriter(fileName))
+
+      bw.write(header.map("\"" + _ + "\"").mkString(","))
+      bw.newLine()
+      csvRdd.collect.foreach({ rowString =>
+        bw.write(rowString)
+        bw.newLine()
+      })
+      bw.close()
     }
   }
 }

@@ -14,10 +14,23 @@ class CassandraDataSource(metaOntology: MetaBase,
                           metaMap: MetaMap,
                           keyspace: String,
                           table: String,
-                          sc: SparkContext) extends OriginalDataSource(metaOntology, metaMap)  {
+                          sc: SparkContext,
+                          select: Option[String] = None,
+                          where: Option[String] = None) extends OriginalDataSource(metaOntology, metaMap)  {
 
   lazy val rdd: RDD[DataRow] = {
-    Units.rawRDDToUnitsRDD(sc, sc.cassandraTable(keyspace, table).map(_.toMap), metaMap)
+    val cassandraRdd = {
+      if (select.isDefined && where.isDefined)
+        sc.cassandraTable(keyspace, table).select(select.get).where(where.get)
+      else if (select.isDefined && !where.isDefined)
+        sc.cassandraTable(keyspace, table).select(select.get)
+      else if (!select.isDefined && where.isDefined)
+        sc.cassandraTable(keyspace, table).where(where.get)
+      else
+        sc.cassandraTable(keyspace, table)
+    }
+
+    Units.rawRDDToUnitsRDD(sc, cassandraRdd.map(_.toMap), metaMap)
   }
 }
 
@@ -33,7 +46,7 @@ object CassandraDataSource {
     case _: BigInt     => "varint"
 
     // Cassandra "collections"
-    case l: List[_]  => "list<" + InferCassandraTypeString(l(0)) + ">"
+    case l: List[_]  => "list<" + InferCassandraTypeString(l.head) + ">"
     case s: Set[_]   => "set<"  + InferCassandraTypeString(s.head) + ">"
     case m: Map[_,_] => "map<"  + InferCassandraTypeString(m.head._1) + "," + InferCassandraTypeString(m.head._2) + ">"
 
@@ -85,8 +98,12 @@ object CassandraDataSource {
   }
 
   implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
-    def createCassandraDataSource(metaMap: MetaMap, keyspace: String, table: String): CassandraDataSource = {
-      new CassandraDataSource(sjs.metaOntology, metaMap, keyspace, table, sjs.sc)
+    def createCassandraDataSource(metaMap: MetaMap, 
+                                  keyspace: String, 
+                                  table: String,
+                                  select: Option[String] = None,
+                                  where: Option[String] = None): CassandraDataSource = {
+      new CassandraDataSource(sjs.metaOntology, metaMap, keyspace, table, sjs.sc, select, where)
     }
   }
 }
