@@ -6,6 +6,7 @@ import scrubjay.util._
 import com.github.nscala_time.time.Imports._
 
 case class DateTimeSpan(v: Interval) extends Units {
+  val raw = v
   def explode: Seq[DateTimeStamp] = {
     Util.dateRange(v.start, v.end, 1.seconds).map(DateTimeStamp(_)).toSeq
   }

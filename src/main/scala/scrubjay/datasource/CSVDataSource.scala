@@ -33,12 +33,12 @@ object CSVDataSource {
   }
 
   implicit class DataSource_saveAsCSV(ds: DataSource)   {
-    def saveAsCSVDataSource(fileName: String): Unit =  {
+    def saveAsCSVDataSource(fileName: String, wrapperChar: String = "\"", delimiter: String = ",", noneString: String = "null"): Unit =  {
       val header = ds.metaEntryMap.keys.toSeq
-      val csvRdd = ds.rdd.map(row => header.map("\"" + row.getOrElse(_, "null").toString + "\"").mkString(","))
+      val csvRdd = ds.rdd.map(row => header.map(wrapperChar + row.getOrElse(_, Identifier(noneString)).raw.toString + wrapperChar).mkString(delimiter))
       val bw = new BufferedWriter(new FileWriter(fileName))
 
-      bw.write(header.map("\"" + _ + "\"").mkString(","))
+      bw.write(header.map(wrapperChar + _ + wrapperChar).mkString(delimiter))
       bw.newLine()
       csvRdd.collect.foreach({ rowString =>
         bw.write(rowString)

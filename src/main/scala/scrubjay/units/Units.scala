@@ -10,6 +10,7 @@ import scala.reflect.{ClassTag, _}
 
 abstract class Units/*[T <: Units[T] : ClassTag]*/ extends Serializable {
   //def getClassTag = classTag[T]
+  val raw: Any
 }
 
 abstract class UnitsConverter[T] {

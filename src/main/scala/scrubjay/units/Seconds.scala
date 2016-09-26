@@ -3,7 +3,9 @@ package scrubjay.units
 import scrubjay.meta.MetaDescriptor
 import scrubjay.units.ConversionHelpers._
 
-case class Seconds(v: Double) extends Units
+case class Seconds(v: Double) extends Units {
+  val raw = v
+}
 
 object Seconds {
 

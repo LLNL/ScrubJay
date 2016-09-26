@@ -3,7 +3,9 @@ package scrubjay.units
 import scrubjay.meta._
 import scrubjay.units.Units._
 
-case class UnitsList[T](v: List[T]) extends Units
+case class UnitsList[T](v: List[T]) extends Units {
+  val raw = v
+}
 
 object UnitsList {
 

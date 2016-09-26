@@ -4,7 +4,9 @@ import scrubjay.meta._
 
 import com.github.nscala_time.time.Imports._
 
-case class DateTimeStamp(v: DateTime) extends Units
+case class DateTimeStamp(v: DateTime) extends Units {
+  val raw = v
+}
 
 object DateTimeStamp {
   val converter = new UnitsConverter[DateTimeStamp] {

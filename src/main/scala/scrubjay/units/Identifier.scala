@@ -2,7 +2,9 @@ package scrubjay.units
 
 import scrubjay.meta._
 
-case class Identifier(v: String) extends Units
+case class Identifier(v: String) extends Units {
+  val raw = v
+}
 
 object Identifier {
 
