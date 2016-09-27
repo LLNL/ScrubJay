@@ -17,7 +17,8 @@ case class CassandraConnection(
 
 class ScrubJaySession(
   spark_master: String = "local[*]",
-  cassandra_connection: Option[CassandraConnection] = None) {
+  cassandra_connection: Option[CassandraConnection] = None,
+  conf_options: Map[String, String] = Map[String, String]().empty) {
 
   val sparkConf = new SparkConf(true)
     .set("spark.app.id", "ScrubJayAppID")
@@ -26,6 +27,8 @@ class ScrubJaySession(
   //   if parameter is specified (map doesn't run for None values)
   cassandra_connection.map(_.spark_conf_fields.map{
     case (field, value) => sparkConf.set(field, value)})
+
+  conf_options.foreach{case (k, v) => sparkConf.set(k, v)}
 
   val sc = new SparkContext(spark_master, "ScrubJay", sparkConf)
   sc.setLogLevel("WARN")

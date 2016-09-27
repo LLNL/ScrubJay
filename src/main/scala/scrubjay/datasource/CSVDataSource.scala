@@ -40,7 +40,7 @@ object CSVDataSource {
 
       bw.write(header.map(wrapperChar + _ + wrapperChar).mkString(delimiter))
       bw.newLine()
-      csvRdd.collect.foreach({ rowString =>
+      csvRdd.toLocalIterator.foreach(rowString => {
         bw.write(rowString)
         bw.newLine()
       })
