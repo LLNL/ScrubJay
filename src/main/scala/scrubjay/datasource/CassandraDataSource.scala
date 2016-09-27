@@ -3,12 +3,11 @@ package scrubjay.datasource
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.units.Units
-
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
+import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
 class CassandraDataSource(metaOntology: MetaBase,
                           metaMap: MetaMap,
@@ -18,15 +17,11 @@ class CassandraDataSource(metaOntology: MetaBase,
                           select: Option[String] = None,
                           where: Option[String] = None) extends OriginalDataSource(metaOntology, metaMap)  {
 
-  val cassandraRdd = {
-    if (select.isDefined && where.isDefined)
-      sc.cassandraTable(keyspace, table).select(select.get).where(where.get)
-    else if (select.isDefined && !where.isDefined)
-      sc.cassandraTable(keyspace, table).select(select.get)
-    else if (!select.isDefined && where.isDefined)
-      sc.cassandraTable(keyspace, table).where(where.get)
-    else
-      sc.cassandraTable(keyspace, table)
+  val cassandraRdd: CassandraTableScanRDD[CassandraRow] = {
+    val cassRdd = sc.cassandraTable(keyspace, table)
+    val cassRddSelected = select.fold(cassRdd)(cassRdd.select(_))
+    val cassRddSelectWhere = where.fold(cassRddSelected)(cassRddSelected.where(_))
+    cassRddSelectWhere
   }
 
   override val metaEntryMap = cassandraRdd.selectedColumnRefs.map(_.toString)
