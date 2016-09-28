@@ -23,8 +23,8 @@ class NaturalJoin(ds1: DataSource,
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
 
-  val ds1IDDimensions = ds1.metaSource.metaEntryMap.filter{case (k, me) => me.units == UNITS_IDENTIFIER}.map{case (k, me) => (me.dimension, (k, me))}
-  val ds2IDDimensions = ds2.metaSource.metaEntryMap.filter{case (k, me) => me.units == UNITS_IDENTIFIER}.map{case (k, me) => (me.dimension, (k, me))}
+  val ds1IDDimensions = ds1.metaSource.filterEntries(_.units == UNITS_IDENTIFIER).map{case (k, me) => (me.dimension, (k, me))}
+  val ds2IDDimensions = ds2.metaSource.filterEntries(_.units == UNITS_IDENTIFIER).map{case (k, me) => (me.dimension, (k, me))}
   val commonDimensions = ds1.dimensions.intersect(ds2.dimensions)
 
   case class dimMap(map: Map[MetaDimension, (String, MetaEntry)]) extends Serializable {

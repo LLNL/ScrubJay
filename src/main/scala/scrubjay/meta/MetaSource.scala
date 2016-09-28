@@ -1,7 +1,13 @@
 package scrubjay.meta
 
 class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
+
   val columns: Seq[String] = metaEntryMap.keys.toSeq
+
+  def filterEntries(cond: MetaEntry => Boolean): MetaEntryMap = {
+    metaEntryMap.filter{case (k, me) => cond(me)}
+  }
+
   def withMetaEntries(newMetaEntryMap: MetaEntryMap, overwrite: Boolean = false): MetaSource = {
     if (overwrite) {
       new MetaSource(metaEntryMap ++ newMetaEntryMap)
@@ -11,6 +17,7 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
       new MetaSource(metaEntryMap ++ newEntries)
     }
   }
+
   def withColumns(newColumns: Seq[String], overwrite: Boolean = false): MetaSource = {
     if (overwrite) {
       new MetaSource(metaEntryMap ++ newColumns.map(_ -> UNKNOWN_META_ENTRY))
@@ -21,6 +28,7 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
       new MetaSource(knownEntries ++ newEntries.map(_ -> UNKNOWN_META_ENTRY))
     }
   }
+
   def withoutColumns(oldColumns: Seq[String]): MetaSource = {
     new MetaSource(metaEntryMap.filter{case (k, v) => oldColumns.contains(k)})
   }
