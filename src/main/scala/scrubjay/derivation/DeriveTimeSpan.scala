@@ -12,13 +12,17 @@ import org.apache.spark.rdd.RDD
 class DeriveTimeSpan(metaOntology: MetaBase,
                      ds: DataSource) extends DerivedDataSource(metaOntology) {
 
+  def addSpanToRow(startColumn: String, endColumn: String)(row: DataRow): DataRow = {
+    (row(startColumn), row(endColumn)) match {
+      case (s: DateTimeStamp, e: DateTimeStamp) => row ++ Map("span" -> DateTimeSpan(s.v to e.v))
+    }
+  }
+
   def spanFromStartEnd(start: Option[String], end: Option[String]): Option[DataRow => DataRow] = {
-    if (start.isDefined && end.isDefined)
-      Some((r: DataRow) => (r(start.get), r(end.get)) match {
-        case (s: DateTimeStamp, e: DateTimeStamp) => r ++ Map("span" -> DateTimeSpan(s.v to e.v))
-      })
-    else
-      None
+    (start, end) match {
+      case (Some(s), Some(e)) => Some(addSpanToRow(s, e)(_))
+      case _ => None
+    }
   }
 
   val allSpans = Seq(
