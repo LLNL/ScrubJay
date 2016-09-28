@@ -9,7 +9,6 @@ import scrubjay.derivation.NaturalJoin._
 import scrubjay.meta.MetaSource
 
 import org.scalatest._
-import org.scalactic._
 import org.scalactic.source.Position
 
 import java.io._
@@ -69,29 +68,36 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     sjs.sc.stop()
   }
 
-  describe("Creation") {
+  describe("CSVDataSource") {
 
-    // Create DataSources
     val jobQueue = CSVDataSourceSpec.createCSVJobQueue(sjs)
-
-    describe("CSV sourced job queue data") {
-      it("should match ground truth") {
-        assert(jobQueue.rdd.collect.toSet == trueJobQueue)
-      }
-    }
-
     val cabLayout = CSVDataSourceSpec.createCSVCabLayout(sjs)
 
-    describe("Locally generated cab layout data") {
-      it("should match ground truth") {
-        assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+    describe("Creation") {
+
+      // Create DataSources
+
+      describe("CSV sourced job queue data") {
+        it("should match ground truth") {
+          assert(jobQueue.rdd.collect.toSet == trueJobQueue)
+        }
+      }
+
+
+      describe("Locally generated cab layout data") {
+        it("should match ground truth") {
+          assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+        }
       }
     }
+
+    val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
+    val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
+    val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
 
     describe("Derivations") {
 
       // Time span
-      val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -103,7 +109,6 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Expanded node list
-      val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
 
       describe("Job queue with derived time span AND expanded node list") {
         it("should be defined") {
@@ -115,7 +120,6 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Joined with cab layout
-      val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
 
       describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
         it("should be defined") {

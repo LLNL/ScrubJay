@@ -57,63 +57,66 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     sjs.sc.stop()
   }
 
-  val jobQueue = LocalDataSourceSpec.createLocalJobQueue(sjs)
-  val cabLayout = LocalDataSourceSpec.createLocalCabLayout(sjs)
+  describe("LocalDataSource") {
 
-  describe("Creation") {
+    val jobQueue = LocalDataSourceSpec.createLocalJobQueue(sjs)
+    val cabLayout = LocalDataSourceSpec.createLocalCabLayout(sjs)
 
-    // Create local data sources
+    describe("Creation") {
 
-    describe("Locally generated job queue data") {
-      it("should match ground truth") {
-        assert(jobQueue.rdd.collect.toSet == trueJobQueue)
+      // Create local data sources
+
+      describe("Locally generated job queue data") {
+        it("should match ground truth") {
+          assert(jobQueue.rdd.collect.toSet == trueJobQueue)
+        }
+      }
+
+
+      describe("Locally generated cab layout data") {
+        it("should match ground truth") {
+          assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+        }
       }
     }
 
+    val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
+    val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
+    val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
 
-    describe("Locally generated cab layout data") {
-      it("should match ground truth") {
-        assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+    describe("Derivations") {
+
+      // Time span
+
+      describe("Job queue with derived time span") {
+        it("should be defined") {
+          assert(jobQueueSpan.defined)
+        }
+        it("should match ground truth") {
+          assert(jobQueueSpan.rdd.collect.toSet == trueJobQueueSpan)
+        }
       }
-    }
-  }
 
-  val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
-  val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-  val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
+      // Expanded node list
 
-  describe("Derivations") {
-
-    // Time span
-
-    describe("Job queue with derived time span") {
-      it("should be defined") {
-        assert(jobQueueSpan.defined)
+      describe("Job queue with derived time span AND expanded node list") {
+        it("should be defined") {
+          assert(jobQueueSpanExpanded.defined)
+        }
+        it("should match ground truth") {
+          assert(jobQueueSpanExpanded.rdd.collect.toSet == trueJobQueueSpanExpanded)
+        }
       }
-      it("should match ground truth") {
-        assert(jobQueueSpan.rdd.collect.toSet == trueJobQueueSpan)
-      }
-    }
 
-    // Expanded node list
+      // Joined with cab layout
 
-    describe("Job queue with derived time span AND expanded node list") {
-      it("should be defined") {
-        assert(jobQueueSpanExpanded.defined)
-      }
-      it("should match ground truth") {
-        assert(jobQueueSpanExpanded.rdd.collect.toSet == trueJobQueueSpanExpanded)
-      }
-    }
-
-    // Joined with cab layout
-
-    describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
-      it("should be defined") {
-        assert(jobQueueSpanExpandedJoined.defined)
-      }
-      it("should match ground truth") {
-        assert(jobQueueSpanExpandedJoined.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
+      describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
+        it("should be defined") {
+          assert(jobQueueSpanExpandedJoined.defined)
+        }
+        it("should match ground truth") {
+          assert(jobQueueSpanExpandedJoined.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
+        }
       }
     }
   }
