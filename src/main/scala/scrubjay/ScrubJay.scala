@@ -34,5 +34,5 @@ class ScrubJaySession(
   sc.setLogLevel("WARN")
   //val sqlContext = new org.apache.spark.sql.SQLContext(sc)
 
-  val metaOntology = GlobalMetaBase.META_BASE
+  val metaBase = GlobalMetaBase.META_BASE
 }

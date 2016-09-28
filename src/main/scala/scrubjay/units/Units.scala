@@ -1,8 +1,9 @@
 package scrubjay.units
 
+import java.io.Serializable
+
 import scrubjay.meta._
 import scrubjay.datasource._
-
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
@@ -31,9 +32,9 @@ object Units {
     allClassTags.getOrElse(mu.tag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
   }
 
-  def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaMap: MetaMap): RDD[DataRow] = {
+  def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaEntryMap: MetaEntryMap): RDD[DataRow] = {
     val unknownMetaEntry = MetaEntry.fromStringTuple("unknown", "unknown", "identifier")
-    val broadcastMetaMap = sc.broadcast(metaMap)
+    val broadcastMetaMap = sc.broadcast(metaEntryMap)
     rawRDD.map(row => row.map{case (k, v) => (k, raw2Units(v, broadcastMetaMap.value.getOrElse(k, unknownMetaEntry).units))}.toMap)
   }
 }

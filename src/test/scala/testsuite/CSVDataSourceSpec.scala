@@ -6,10 +6,13 @@ import scrubjay.datasource._
 import scrubjay.derivation.DeriveTimeSpan._
 import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
-
-import java.io._
+import scrubjay.meta.MetaSource
 
 import org.scalatest._
+import org.scalactic._
+import org.scalactic.source.Position
+
+import java.io._
 
 
 object CSVDataSourceSpec {
@@ -27,7 +30,7 @@ object CSVDataSourceSpec {
       fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
       fileWriter.close()
 
-      sjs.createCSVDataSource(jobQueueMeta, fileName)
+      sjs.createCSVDataSource(fileName, new MetaSource(jobQueueMeta))
     }
     finally {
       file.delete()
@@ -50,7 +53,7 @@ object CSVDataSourceSpec {
       fileWriter.println("6,2")
       fileWriter.close()
 
-      sjs.createCSVDataSource(cabLayoutMeta, fileName)
+      sjs.createCSVDataSource(fileName, new MetaSource(cabLayoutMeta))
     }
     finally {
       file.delete()

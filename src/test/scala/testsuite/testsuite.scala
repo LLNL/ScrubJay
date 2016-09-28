@@ -69,6 +69,7 @@ package object testsuite {
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("4")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
@@ -76,6 +77,7 @@ package object testsuite {
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("5")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
@@ -83,6 +85,7 @@ package object testsuite {
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("6")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -90,6 +93,7 @@ package object testsuite {
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("1")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -97,6 +101,7 @@ package object testsuite {
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("2")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -104,6 +109,7 @@ package object testsuite {
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("3"))
   )
 
@@ -115,6 +121,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("4")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
@@ -123,6 +130,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("5")),
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:20.000Z") to DateTime.parse("2016-08-11T03:31:05.000Z")),
@@ -131,6 +139,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:05.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:20.000Z")),
       "rack" -> Identifier("2"),
+      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6"))),
       "nodelist_exploded" -> Identifier("6")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -139,6 +148,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("1")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -147,6 +157,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("2")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:30:23.000Z")),
@@ -155,6 +166,7 @@ package object testsuite {
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:23.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
       "rack" -> Identifier("1"),
+      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3"))),
       "nodelist_exploded" -> Identifier("3"))
   )
 }

@@ -9,13 +9,13 @@ import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
-class CassandraDataSource(metaOntology: MetaBase,
-                          metaMap: MetaMap,
+class CassandraDataSource(sc: SparkContext,
                           keyspace: String,
                           table: String,
-                          sc: SparkContext,
+                          providedMetaSource: MetaSource,
+                          val metaBase: MetaBase,
                           select: Option[String] = None,
-                          where: Option[String] = None) extends OriginalDataSource(metaOntology, metaMap)  {
+                          where: Option[String] = None) extends OriginalDataSource  {
 
   val cassandraRdd: CassandraTableScanRDD[CassandraRow] = {
     val cassRdd = sc.cassandraTable(keyspace, table)
@@ -24,11 +24,10 @@ class CassandraDataSource(metaOntology: MetaBase,
     cassRddSelectWhere
   }
 
-  override val metaEntryMap = cassandraRdd.selectedColumnRefs.map(_.toString)
-    .map(col => col -> metaMap.getOrElse(col, MetaEntry.fromStringTuple("unknown", "unknown", "identifier"))).toMap
+  val metaSource = providedMetaSource.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
 
   lazy val rdd: RDD[DataRow] = {
-    Units.rawRDDToUnitsRDD(sc, cassandraRdd.map(_.toMap), metaMap)
+    Units.rawRDDToUnitsRDD(sc, cassandraRdd.map(_.toMap), metaSource.metaEntryMap)
   }
 }
 
@@ -98,10 +97,10 @@ object CassandraDataSource {
   implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
     def createCassandraDataSource(keyspace: String,
                                   table: String,
-                                  metaMap: MetaMap = Map[String, MetaEntry]().empty,
+                                  metaSource: MetaSource = new EmptyMetaSource,
                                   select: Option[String] = None,
                                   where: Option[String] = None): CassandraDataSource = {
-      new CassandraDataSource(sjs.metaOntology, metaMap, keyspace, table, sjs.sc, select, where)
+      new CassandraDataSource(sjs.sc, keyspace, table, metaSource, sjs.metaBase, select, where)
     }
   }
 }

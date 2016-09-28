@@ -6,17 +6,22 @@ import scrubjay._
 import scrubjay.meta._
 import scrubjay.units._
 
-class LocalDataSource(metaOntology: MetaBase,
-                      metaMap: MetaMap,
-                      rddGiven: RDD[RawDataRow],
-                      sc: SparkContext) extends OriginalDataSource(metaOntology, metaMap) {
-  lazy val rdd: RDD[DataRow] = Units.rawRDDToUnitsRDD(sc, rddGiven, metaMap)
+class LocalDataSource(sc: SparkContext,
+                      columns: Seq[String],
+                      data: Seq[RawDataRow],
+                      providedMetaSource: MetaSource,
+                      val metaBase: MetaBase)
+  extends OriginalDataSource
+{
+  val metaSource = providedMetaSource.withColumns(columns)
+  val rawRdd = sc.parallelize(data)
+  lazy val rdd: RDD[DataRow] = Units.rawRDDToUnitsRDD(sc, rawRdd, metaSource.metaEntryMap)
 }
 
 object LocalDataSource {
   implicit class ScrubJaySession_LocalDataSource(sjs: ScrubJaySession) {
-    def createLocalDataSource(metaMap: MetaMap, data: Seq[RawDataRow]): LocalDataSource = {
-      new LocalDataSource(sjs.metaOntology, metaMap, sjs.sc.parallelize(data), sjs.sc)
+    def createLocalDataSource(columns: Seq[String], data: Seq[RawDataRow], metaSource: MetaSource): LocalDataSource = {
+      new LocalDataSource(sjs.sc, columns, data, metaSource, sjs.metaBase)
     }
   }
 }

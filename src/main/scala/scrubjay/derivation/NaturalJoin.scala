@@ -1,6 +1,5 @@
 package scrubjay.derivation
 
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import scrubjay._
 import scrubjay.datasource._
@@ -18,26 +17,26 @@ import scrubjay.meta._
  *  The inner join of the two dataSources, based on their common columns
  */
 
-class NaturalJoin(metaOntology: MetaBase,
-                  ds1: DataSource,
+class NaturalJoin(ds1: DataSource,
                   ds2: DataSource,
-                  sc: SparkContext) extends DerivedDataSource(metaOntology) {
+                  val metaBase: MetaBase) extends DerivedDataSource {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  val commonDimensions = ds1.dimensions intersect ds2.dimensions
-  val ds1Dimensions = ds1.metaEntryMap.map{case (k, me) => (me.dimension, (k, me))}
-  val ds2Dimensions = ds2.metaEntryMap.map{case (k, me) => (me.dimension, (k, me))}
+
+  val ds1IDDimensions = ds1.metaSource.metaEntryMap.filter{case (k, me) => me.units == UNITS_IDENTIFIER}.map{case (k, me) => (me.dimension, (k, me))}
+  val ds2IDDimensions = ds2.metaSource.metaEntryMap.filter{case (k, me) => me.units == UNITS_IDENTIFIER}.map{case (k, me) => (me.dimension, (k, me))}
+  val commonDimensions = ds1.dimensions.intersect(ds2.dimensions)
 
   case class dimMap(map: Map[MetaDimension, (String, MetaEntry)]) extends Serializable {
     def columnForDimension(d: MetaDimension) = map(d)._1
     def metaEntryForDimension(d: MetaDimension) = map(d)._2
   }
-  val d1Map = dimMap(ds1Dimensions)
-  val d2Map = dimMap(ds2Dimensions)
+  val d1Map = dimMap(ds1IDDimensions)
+  val d2Map = dimMap(ds2IDDimensions)
 
   // Implementations of abstract members
-  val defined: Boolean = commonDimensions.nonEmpty && commonDimensions.forall(ds1Dimensions(_)._2.units == UNITS_IDENTIFIER)
-  val metaEntryMap: MetaMap = ds2.metaEntryMap ++ ds1.metaEntryMap
+  val defined: Boolean = commonDimensions.nonEmpty
+  val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
 
   // RDD derivation defined here
   lazy val rdd: RDD[DataRow] = {
@@ -60,7 +59,7 @@ class NaturalJoin(metaOntology: MetaBase,
 object NaturalJoin {
   implicit class ScrubJaySession_NaturalJoin(sjs: ScrubJaySession) {
     def deriveNaturalJoin(ds1: DataSource, ds2: DataSource): NaturalJoin = {
-      new NaturalJoin(sjs.metaOntology, ds1, ds2, sjs.sc)
+      new NaturalJoin(ds1, ds2, sjs.metaBase)
     }
   }
 }
