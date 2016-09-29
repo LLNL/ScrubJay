@@ -6,7 +6,9 @@ import scrubjay.datasource._
 import scrubjay.derivation.DeriveTimeSpan._
 import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
-import scrubjay.meta.MetaSource
+
+import scrubjay.meta._
+import scrubjay.meta.CSVMetaSource._
 
 import org.scalatest._
 import org.scalactic.source.Position
@@ -16,7 +18,50 @@ import java.io._
 
 object CSVDataSourceSpec {
 
-  def createCSVJobQueue(sjs: ScrubJaySession): DataSource = {
+  def createJobQueueCSVMetaSource: MetaSource = {
+
+    val fileName = "jobqueuemeta.csv"
+    val file = new File(fileName)
+
+    try {
+      val fileWriter = new PrintWriter(file)
+
+      fileWriter.println("column, meaning, dimension, units")
+      fileWriter.println("jobid, job, job, identifier")
+      fileWriter.println("nodelist, node, node, list<identifier>")
+      fileWriter.println("elapsed, duration, time, seconds")
+      fileWriter.println("start, start, time, datetimestamp")
+      fileWriter.println("end, end, time, datetimestamp")
+      fileWriter.close()
+
+      createCSVMetaSource(fileName)
+    }
+    finally {
+      file.delete()
+    }
+  }
+
+  def createCabLayoutCSVMetaSource: MetaSource = {
+
+    val fileName = "cablayoutmeta.csv"
+    val file = new File(fileName)
+
+    try {
+      val fileWriter = new PrintWriter(file)
+
+      fileWriter.println("column, meaning, dimension, units")
+      fileWriter.println("node, node, node, identifier")
+      fileWriter.println("rack, rack, rack, identifier")
+      fileWriter.close()
+
+      createCSVMetaSource(fileName)
+    }
+    finally {
+      file.delete()
+    }
+  }
+
+  def createJobQueueCSVDataSource(sjs: ScrubJaySession): DataSource = {
 
     val fileName = "jobqueue.csv"
     val file = new File(fileName)
@@ -29,14 +74,14 @@ object CSVDataSourceSpec {
       fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
       fileWriter.close()
 
-      sjs.createCSVDataSource(fileName, new MetaSource(jobQueueMeta))
+      sjs.createCSVDataSource(fileName, createJobQueueCSVMetaSource)
     }
     finally {
       file.delete()
     }
   }
 
-  def createCSVCabLayout(sjs: ScrubJaySession): DataSource = {
+  def createCabLayoutCSVDataSource(sjs: ScrubJaySession): DataSource = {
 
     val fileName = "cablayout.csv"
     val file = new File(fileName)
@@ -52,12 +97,14 @@ object CSVDataSourceSpec {
       fileWriter.println("6,2")
       fileWriter.close()
 
-      sjs.createCSVDataSource(fileName, new MetaSource(cabLayoutMeta))
+      sjs.createCSVDataSource(fileName, createCabLayoutCSVMetaSource)
     }
     finally {
       file.delete()
     }
   }
+
+
 }
 
 class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
@@ -70,8 +117,8 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
   describe("CSVDataSource") {
 
-    val jobQueue = CSVDataSourceSpec.createCSVJobQueue(sjs)
-    val cabLayout = CSVDataSourceSpec.createCSVCabLayout(sjs)
+    val jobQueue = CSVDataSourceSpec.createJobQueueCSVDataSource(sjs)
+    val cabLayout = CSVDataSourceSpec.createCabLayoutCSVDataSource(sjs)
 
     describe("Creation") {
 

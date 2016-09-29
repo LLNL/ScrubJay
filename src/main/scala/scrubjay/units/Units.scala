@@ -33,8 +33,7 @@ object Units {
   }
 
   def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaEntryMap: MetaEntryMap): RDD[DataRow] = {
-    val unknownMetaEntry = MetaEntry.fromStringTuple("unknown", "unknown", "identifier")
     val broadcastMetaMap = sc.broadcast(metaEntryMap)
-    rawRDD.map(row => row.map{case (k, v) => (k, raw2Units(v, broadcastMetaMap.value.getOrElse(k, unknownMetaEntry).units))}.toMap)
+    rawRDD.map(row => row.map{case (k, v) => (k, raw2Units(v, broadcastMetaMap.value.getOrElse(k, UNKNOWN_META_ENTRY).units))}.toMap)
   }
 }
