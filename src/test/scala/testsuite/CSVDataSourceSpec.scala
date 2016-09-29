@@ -103,8 +103,6 @@ object CSVDataSourceSpec {
       file.delete()
     }
   }
-
-
 }
 
 class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
@@ -117,8 +115,8 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
   describe("CSVDataSource") {
 
-    val jobQueue = CSVDataSourceSpec.createJobQueueCSVDataSource(sjs)
-    val cabLayout = CSVDataSourceSpec.createCabLayoutCSVDataSource(sjs)
+    lazy val jobQueue = CSVDataSourceSpec.createJobQueueCSVDataSource(sjs)
+    lazy val cabLayout = CSVDataSourceSpec.createCabLayoutCSVDataSource(sjs)
 
     describe("Creation") {
 
@@ -138,9 +136,9 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
     }
 
-    val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
-    val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-    val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
+    lazy val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
+    lazy val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
+    lazy val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
 
     describe("Derivations") {
 

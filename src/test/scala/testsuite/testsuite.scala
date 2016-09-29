@@ -5,6 +5,45 @@ import com.github.nscala_time.time.Imports._
 
 package object testsuite {
 
+  val jobQueueColumns = Seq(
+    "jobid",
+    "nodelist",
+    "elapsed",
+    "start",
+    "end"
+  )
+
+  val cabLayoutColumns = Seq(
+    "node",
+    "rack"
+  )
+
+  val jobQueueRawData = Seq(
+     Map(
+       "jobid" -> "123",
+       "nodelist" -> "1,2,3",
+       "elapsed" -> "23",
+       "start" -> "2016-08-11T3:30:00+0000",
+       "end" -> "2016-08-11T3:30:23+0000"
+     ),
+     Map(
+       "jobid" -> 456,
+       "nodelist" -> List(4, 5, 6),
+       "elapsed" -> 45,
+       "start" -> "2016-08-11T3:30:20+0000",
+       "end" -> "2016-08-11T3:31:05+0000"
+     )
+  )
+
+  val cabLayoutRawData = Seq(
+    Map("node" -> 1, "rack" -> 1),
+    Map("node" -> 2, "rack" -> 1),
+    Map("node" -> 3, "rack" -> 1),
+    Map("node" -> 4, "rack" -> 2),
+    Map("node" -> 5, "rack" -> 2),
+    Map("node" -> 6, "rack" -> 2)
+  )
+
   val jobQueueMeta = Map(
       "jobid" -> MetaEntry.fromStringTuple("job", "job", "identifier"),
       "nodelist" -> MetaEntry.fromStringTuple("node", "node", "list<identifier>"),

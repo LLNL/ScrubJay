@@ -12,43 +12,6 @@ import org.scalatest._
 import org.scalactic.source.Position
 
 
-object LocalDataSourceSpec {
-
-  def createLocalJobQueue(sjs: ScrubJaySession): DataSource = {
-
-    val testData = Seq(
-      Map(
-        "jobid" -> "123",
-        "nodelist" -> "1,2,3",
-        "elapsed" -> "23",
-        "start" -> "2016-08-11T3:30:00+0000",
-        "end" -> "2016-08-11T3:30:23+0000"
-      ),
-      Map(
-        "jobid" -> 456,
-        "nodelist" -> List(4, 5, 6),
-        "elapsed" -> 45,
-        "start" -> "2016-08-11T3:30:20+0000",
-        "end" -> "2016-08-11T3:31:05+0000"
-      ))
-
-    sjs.createLocalDataSource(jobQueueMeta.keySet.toSeq, testData, new MetaSource(jobQueueMeta))
-  }
-
-  def createLocalCabLayout(sjs: ScrubJaySession): DataSource = {
-
-    val testData = Seq(
-      Map("node" -> 1, "rack" -> 1),
-      Map("node" -> 2, "rack" -> 1),
-      Map("node" -> 3, "rack" -> 1),
-      Map("node" -> 4, "rack" -> 2),
-      Map("node" -> 5, "rack" -> 2),
-      Map("node" -> 6, "rack" -> 2))
-
-    sjs.createLocalDataSource(cabLayoutMeta.keySet.toSeq, testData, new MetaSource(cabLayoutMeta))
-  }
-}
-
 class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
   val sjs: ScrubJaySession = new ScrubJaySession()
@@ -59,8 +22,8 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
   describe("LocalDataSource") {
 
-    val jobQueue = LocalDataSourceSpec.createLocalJobQueue(sjs)
-    val cabLayout = LocalDataSourceSpec.createLocalCabLayout(sjs)
+    lazy val jobQueue = sjs.createLocalDataSource(jobQueueMeta.keySet.toSeq, jobQueueRawData, new MetaSource(jobQueueMeta))
+    lazy val cabLayout = sjs.createLocalDataSource(cabLayoutMeta.keySet.toSeq, cabLayoutRawData, new MetaSource(cabLayoutMeta))
 
     describe("Creation") {
 
@@ -80,9 +43,9 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
     }
 
-    val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
-    val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-    val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
+    lazy val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
+    lazy val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
+    lazy val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
 
     describe("Derivations") {
 
