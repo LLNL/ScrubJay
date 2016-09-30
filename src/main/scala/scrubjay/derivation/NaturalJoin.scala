@@ -22,28 +22,33 @@ class NaturalJoin(ds1: DataSource,
                   val metaBase: MetaBase) extends DerivedDataSource {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
+  val ds1IDDimensions = ds1.metaSource
+    .filterEntries(me => me.units == UNITS_IDENTIFIER && me.dimension != DIMENSION_UNKNOWN)
+  val ds2IDDimensions = ds2.metaSource
+    .filterEntries(me => me.units == UNITS_IDENTIFIER && me.dimension != DIMENSION_UNKNOWN)
 
-  val ds1IDDimensions = ds1.metaSource.filterEntries(_.units == UNITS_IDENTIFIER).map{case (k, me) => (me.dimension, (k, me))}
-  val ds2IDDimensions = ds2.metaSource.filterEntries(_.units == UNITS_IDENTIFIER).map{case (k, me) => (me.dimension, (k, me))}
-  val commonDimensions = ds1.dimensions.intersect(ds2.dimensions)
+  val commonIDDimensions = ds1IDDimensions.values.toSet.intersect(ds2IDDimensions.values.toSet)
+
+  val ds1IDDimensionsKeyed = ds1IDDimensions.map{case (k, me) => (me.dimension, (k, me))}
+  val ds2IDDimensionsKeyed = ds2IDDimensions.map{case (k, me) => (me.dimension, (k, me))}
 
   case class dimMap(map: Map[MetaDimension, (String, MetaEntry)]) extends Serializable {
     def columnForDimension(d: MetaDimension) = map(d)._1
     def metaEntryForDimension(d: MetaDimension) = map(d)._2
   }
-  val d1Map = dimMap(ds1IDDimensions)
-  val d2Map = dimMap(ds2IDDimensions)
+  val d1Map = dimMap(ds1IDDimensionsKeyed)
+  val d2Map = dimMap(ds2IDDimensionsKeyed)
 
   // Implementations of abstract members
-  val defined: Boolean = commonDimensions.nonEmpty
+  val defined: Boolean = commonIDDimensions.nonEmpty
   val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
 
   // RDD derivation defined here
   lazy val rdd: RDD[DataRow] = {
 
     // Get key columns for each datasource
-    val d1Columns = commonDimensions.map(d => d1Map.columnForDimension(d))
-    val d2Columns = commonDimensions.map(d => d2Map.columnForDimension(d))
+    val d1Columns = commonIDDimensions.map(me => d1Map.columnForDimension(me.dimension))
+    val d2Columns = commonIDDimensions.map(me => d2Map.columnForDimension(me.dimension))
 
     // Create key
     val keyedRDD1 = ds1.rdd.keyBy(row => d1Columns.map(row))

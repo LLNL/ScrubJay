@@ -12,7 +12,7 @@ abstract class DataSource extends Serializable {
 
   def dimensions: Set[MetaDimension] = metaSource.metaEntryMap.values.map(_.dimension).toSet
 
-  def containsMeta(meta: List[MetaEntry]): Boolean = {
+  def containsMeta(meta: Set[MetaEntry]): Boolean = {
     meta.forall(metaSource.metaEntryMap.values.toSet.contains)
   }
 }
@@ -21,6 +21,7 @@ abstract class OriginalDataSource extends DataSource {
 
 }
 
+// TODO: Derivation as functions that return Option[] instances
 abstract class DerivedDataSource extends DataSource {
   val defined: Boolean
 }
