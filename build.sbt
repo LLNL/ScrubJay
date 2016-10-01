@@ -31,9 +31,8 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion exc
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
-// OscaR
-resolvers += "Oscar Releases" at "http://artifactory.info.ucl.ac.be/artifactory/libs-release/"
-libraryDependencies += "oscar" %% "oscar-cp" % "3.1.0"
+// Msgpack (serialization)
+libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
 // Misc
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
@@ -44,6 +43,9 @@ libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
 
 // Disable parallel tests since each uses spark
 parallelExecution in test := false
+
+// Force scalaVersion
+ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
