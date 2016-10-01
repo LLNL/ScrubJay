@@ -16,12 +16,3 @@ abstract class DataSource extends Serializable {
     meta.forall(metaSource.metaEntryMap.values.toSet.contains)
   }
 }
-
-abstract class OriginalDataSource extends DataSource {
-
-}
-
-// TODO: Derivation as functions that return Option[] instances
-abstract class DerivedDataSource extends DataSource {
-  val defined: Boolean
-}

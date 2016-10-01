@@ -10,9 +10,8 @@ class LocalDataSource(sc: SparkContext,
                       columns: Seq[String],
                       data: Seq[RawDataRow],
                       providedMetaSource: MetaSource,
-                      val metaBase: MetaBase)
-  extends OriginalDataSource
-{
+                      val metaBase: MetaBase) extends DataSource {
+
   val metaSource = providedMetaSource.withColumns(columns)
   val rawRdd = sc.parallelize(data)
   lazy val rdd: RDD[DataRow] = Units.rawRDDToUnitsRDD(sc, rawRdd, metaSource.metaEntryMap)

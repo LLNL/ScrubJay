@@ -14,7 +14,7 @@ class CSVDataSource(sc: SparkContext,
                     filename: String,
                     providedMetaSource: MetaSource = new EmptyMetaSource,
                     val metaBase: MetaBase)
-    extends OriginalDataSource {
+    extends DataSource {
 
   // TODO: make CSVs lazily evaluated
   val (header, data) = {

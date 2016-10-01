@@ -15,7 +15,7 @@ class CassandraDataSource(sc: SparkContext,
                           providedMetaSource: MetaSource,
                           val metaBase: MetaBase,
                           select: Option[String] = None,
-                          where: Option[String] = None) extends OriginalDataSource  {
+                          where: Option[String] = None) extends DataSource  {
 
   val cassandraRdd: CassandraTableScanRDD[CassandraRow] = {
     val cassRdd = sc.cassandraTable(keyspace, table)
