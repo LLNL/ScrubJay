@@ -10,12 +10,19 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
 class CassandraDataSource(sc: SparkContext,
-                          keyspace: String,
-                          table: String,
+                          val keyspace: String,
+                          val table: String,
                           providedMetaSource: MetaSource,
                           val metaBase: MetaBase,
                           select: Option[String] = None,
                           where: Option[String] = None) extends DataSource  {
+
+  def addSecondaryIndex(sc: SparkContext,
+                        column: String): Unit = {
+    CassandraConnector(sc.getConf).withSessionDo { session =>
+      session.execute(s"CREATE INDEX ON $keyspace $table ($column)")
+    }
+  }
 
   val cassandraRdd: CassandraTableScanRDD[CassandraRow] = {
     val cassRdd = sc.cassandraTable(keyspace, table)
