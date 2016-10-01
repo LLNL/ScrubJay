@@ -16,7 +16,8 @@ object QuerySpec {
 
   def createDataSources(sjs: ScrubJaySession): Set[DataSource] = {
     Set(
-      sjs.createLocalDataSource(cabLayoutColumns, cabLayoutRawData, createLocalMetaSource(cabLayoutMeta)),
+      sjs.createLocalDataSource(clusterLayoutColumns, clusterLayoutRawData, createLocalMetaSource(clusterLayoutMeta)),
+      sjs.createLocalDataSource(nodeDataColumns, nodeDataRawData, createLocalMetaSource(nodeDataMeta)),
       sjs.createLocalDataSource(jobQueueColumns, jobQueueRawData, createLocalMetaSource(jobQueueMeta))
     )
   }
@@ -28,7 +29,12 @@ object QuerySpec {
     )
   }
 
-  // TODO: multiple source query test
+  def createMultipleSourceQueryMetaEntries: Set[MetaEntry] = {
+    Set(
+      MetaEntry.fromStringTuple("rack", "rack", "identifier"),
+      MetaEntry.fromStringTuple("cumulative", "flops", "count")
+    )
+  }
 
 }
 
@@ -51,6 +57,20 @@ class QuerySpec extends FunSpec with BeforeAndAfterAll {
 
     it("should find the correct datasource") {
       assert(solutions.head.rdd.collect.toSet == trueJobQueue)
+    }
+  }
+
+  describe("Query with multiple datasources solution") {
+
+    lazy val query = new Query(sjs, QuerySpec.createDataSources(sjs), QuerySpec.createMultipleSourceQueryMetaEntries)
+    lazy val solutions = query.run.toList
+
+    it("should have a multiple solution") {
+      assert(solutions.length == 1)
+    }
+
+    it("should find the correct datasource") {
+      assert(solutions.head.rdd.collect.toSet == trueNodeDataJoinedWithClusterLayout)
     }
   }
 }

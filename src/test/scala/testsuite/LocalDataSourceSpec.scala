@@ -2,7 +2,6 @@ package testsuite
 
 import scrubjay._
 import scrubjay.datasource.LocalDataSource._
-import scrubjay.datasource._
 import scrubjay.derivation.DeriveTimeSpan._
 import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
@@ -23,7 +22,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
   describe("LocalDataSource") {
 
     lazy val jobQueue = sjs.createLocalDataSource(jobQueueMeta.keySet.toSeq, jobQueueRawData, new MetaSource(jobQueueMeta))
-    lazy val cabLayout = sjs.createLocalDataSource(cabLayoutMeta.keySet.toSeq, cabLayoutRawData, new MetaSource(cabLayoutMeta))
+    lazy val cabLayout = sjs.createLocalDataSource(clusterLayoutMeta.keySet.toSeq, clusterLayoutRawData, new MetaSource(clusterLayoutMeta))
 
     describe("Creation") {
 
@@ -45,7 +44,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
     lazy val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
     lazy val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-    lazy val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
+    lazy val jobQueueSpanExpandedJoined = deriveNaturalJoin(jobQueueSpanExpanded, cabLayout, sjs)
 
     describe("Derivations") {
 
@@ -75,10 +74,10 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
       describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
         it("should be defined") {
-          assert(jobQueueSpanExpandedJoined.defined)
+          assert(jobQueueSpanExpandedJoined.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExpandedJoined.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
+          assert(jobQueueSpanExpandedJoined.get.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
         }
       }
     }

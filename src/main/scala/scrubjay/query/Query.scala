@@ -31,10 +31,10 @@ class Query(val sjs: ScrubJaySession,
       val ds1 = args.getAs[DataSource](0)
       val ds2 = args.getAs[DataSource](1)
 
-      val joined = sjs.deriveNaturalJoin(ds1, ds2)
+      val joined: Option[DataSource] = deriveNaturalJoin(ds1, ds2, sjs)
 
-      if (joined.defined)
-        Some(joined)
+      if (joined.isDefined)
+        joined
       else
         None
     })
@@ -51,14 +51,29 @@ class Query(val sjs: ScrubJaySession,
         // Two elements, check joined pair
         case Seq(ds1, ds2) => joinedPair(Arguments(ds1, ds2))
 
-        // Check if head can join with any of tail, then whether tail is a joined set
+        // More than two elements...
         case head +: tail => {
 
-          val joined = tail.map(t => joinedPair(Arguments(head, t))).find(_.isDefined)
+          // Check if head can join with any of tail
+          val joinedOptionOption = tail.map(t => joinedPair(Arguments(head, t))).find(_.isDefined)
 
-          joined match {
-            case Some(x) => joinedPair(Arguments(x, joinedSet(Arguments(tail))))
-            case None => None
+          // If so, check if the tail is a joinableSet
+          if (joinedOptionOption.isDefined) {
+
+            val joined = joinedOptionOption.get.get
+            val joinedTail = joinedSet(Arguments(tail.toSet))
+
+            // If so, return the head joined with the joinedSet of the tail
+            if (joinedTail.isDefined) {
+              joinedPair(Arguments(joined, joinedTail))
+            }
+            else {
+              None
+            }
+
+          }
+          else {
+            None
           }
         }
       }

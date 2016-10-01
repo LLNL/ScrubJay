@@ -70,8 +70,8 @@ object CSVDataSourceSpec {
       val fileWriter = new PrintWriter(file)
 
       fileWriter.println("jobid, nodelist, elapsed, start, end")
-      fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:30:23+0000")
-      fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:20+0000, 2016-08-11T3:31:05+0000")
+      fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:31:00+0000")
+      fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:00+0000, 2016-08-11T3:32:00+0000")
       fileWriter.close()
 
       sjs.createCSVDataSource(fileName, createJobQueueCSVMetaSource)
@@ -138,7 +138,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
     lazy val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
     lazy val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-    lazy val jobQueueSpanExpandedJoined = sjs.deriveNaturalJoin(jobQueueSpanExpanded, cabLayout)
+    lazy val jobQueueSpanExpandedJoined = deriveNaturalJoin(jobQueueSpanExpanded, cabLayout, sjs)
 
     describe("Derivations") {
 
@@ -168,10 +168,10 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
       describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
         it("should be defined") {
-          assert(jobQueueSpanExpandedJoined.defined)
+          assert(jobQueueSpanExpandedJoined.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExpandedJoined.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
+          assert(jobQueueSpanExpandedJoined.get.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
         }
       }
     }

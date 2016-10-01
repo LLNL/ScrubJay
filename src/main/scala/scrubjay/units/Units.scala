@@ -7,8 +7,6 @@ import scrubjay.datasource._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-import scala.reflect.{ClassTag, _}
-
 abstract class Units/*[T <: Units[T] : ClassTag]*/ extends Serializable {
   //def getClassTag = classTag[T]
   val raw: Any
@@ -20,16 +18,8 @@ abstract class UnitsConverter[T] {
 
 object Units {
 
-  var allClassTags: Map[ClassTag[_], UnitsConverter[_]] = Map(
-    classTag[Identifier] -> Identifier.converter,
-    classTag[UnitsList[_]] -> UnitsList.converter,
-    classTag[Seconds] -> Seconds.converter,
-    classTag[DateTimeStamp] -> DateTimeStamp.converter,
-    classTag[DateTimeSpan] -> DateTimeSpan.converter
-  )
-
   def raw2Units(v: Any, mu: MetaDescriptor): Units = {
-    allClassTags.getOrElse(mu.tag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
+    converterForClassTag.getOrElse(mu.tag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
   }
 
   def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaEntryMap: MetaEntryMap): RDD[DataRow] = {
