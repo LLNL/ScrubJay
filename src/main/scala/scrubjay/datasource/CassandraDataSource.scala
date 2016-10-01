@@ -51,7 +51,7 @@ object CassandraDataSource {
   }
 
   // Get columns and datatypes from the data and add meta_data for each column
-  // FIXME: is it possible for the reduction to create None value entries, e.g. ("jobid" -> None )?
+  // FIXME: Determine schema from metaSource
   def DataSourceCassandraSchema(ds: DataSource): List[(String, String)] = {
     ds.rdd
       .reduce((m1, m2) => m1 ++ m2)
@@ -60,37 +60,48 @@ object CassandraDataSource {
   }
 
   // The CQL command to create a Cassandra table with the specified schema
-  def CreateCassandraDataTableCQL(keyspace: String, 
-                                  table: String, 
-                                  schema: List[(String, String)], 
-                                  primaryKey: String): String = {
+  def CreateCassandraTableCQL(keyspace: String,
+                              table: String,
+                              schema: List[(String, String)],
+                              primaryKeys: List[String],
+                              clusterKeys: List[String]): String = {
+
     val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
-    s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY ($primaryKey))" 
+    val primaryKeyString = primaryKeys.mkString(",")
+    val clusterKeyString = clusterKeys.mkString(",")
+
+    s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString), ($clusterKeyString)))"
   }
 
   implicit class DataSource_SaveToCassandra(ds: DataSource) {
-    def saveToCassandra(sc: SparkContext, keyspace: String, table: String) {
 
-      // FIXME: default primary key? clustering order? secondary keys?
-      
-      // Infer the schema from the DataSource
-      val schema = DataSourceCassandraSchema(ds)
-
-      // Choose a primary key (first column for now)
-      val primaryKey = schema.head._1
-      
-      // Generate CQL commands for creating/inserting meta information
-      val CQLcmd = CreateCassandraDataTableCQL(keyspace, table, schema, primaryKey)
-
-      // Run the generated CQL commands
-      CassandraConnector(sc.getConf).withSessionDo { session =>
-        println(CQLcmd)
-        //session.execute(CQLcmd)
-      }
+    def saveToExistingCassandraTable(sc: SparkContext,
+                                     keyspace: String,
+                                     table: String): Unit = {
 
       // Convert rows to CassandraRow instances and save to the table
       ds.rdd.map(CassandraRow.fromMap(_))
-        //.saveToCassandra(keyspace, table)
+        .saveToCassandra(keyspace, table)
+    }
+
+    def saveToNewCassandraTable(sc: SparkContext,
+                                keyspace: String,
+                                table: String,
+                                primaryKeys: List[String],
+                                clusterKeys: List[String]): Unit = {
+
+      // Infer the schema from the DataSource
+      val schema = DataSourceCassandraSchema(ds)
+
+      // Generate CQL commands for creating/inserting meta information
+      val CQLCommand = CreateCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
+
+      // Run the generated CQL commands
+      CassandraConnector(sc.getConf).withSessionDo { session =>
+        session.execute(CQLCommand)
+      }
+
+      saveToExistingCassandraTable(sc, keyspace, table)
     }
   }
 
