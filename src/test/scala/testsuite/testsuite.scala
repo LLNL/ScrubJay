@@ -142,7 +142,7 @@ package object testsuite {
     )
   )
 
-  val trueJobQueueSpanExpanded = Set(
+  val trueJobQueueSpanExploded = Set(
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
       "jobid" -> Identifier("456"),
@@ -193,7 +193,7 @@ package object testsuite {
       "nodelist_exploded" -> Identifier("3"))
   )
 
-  val trueJobQueueSpanExpandedJoined = Set(
+  val trueJobQueueSpanExplodedJoined = Set(
     Map(
       "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
       "jobid" -> Identifier("456"),

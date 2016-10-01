@@ -42,42 +42,41 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
     }
 
-    lazy val jobQueueSpan = sjs.deriveTimeSpan(jobQueue)
-    lazy val jobQueueSpanExpanded = sjs.deriveExplodedList(jobQueueSpan, List("nodelist"))
-    lazy val jobQueueSpanExpandedJoined = deriveNaturalJoin(jobQueueSpanExpanded, cabLayout, sjs)
-
     describe("Derivations") {
 
       // Time span
+      lazy val jobQueueSpan = deriveTimeSpan(jobQueue, sjs)
 
       describe("Job queue with derived time span") {
         it("should be defined") {
-          assert(jobQueueSpan.defined)
+          assert(jobQueueSpan.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpan.rdd.collect.toSet == trueJobQueueSpan)
+          assert(jobQueueSpan.get.rdd.collect.toSet == trueJobQueueSpan)
         }
       }
 
       // Expanded node list
+      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"), sjs)
 
-      describe("Job queue with derived time span AND expanded node list") {
+      describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {
-          assert(jobQueueSpanExpanded.defined)
+          assert(jobQueueSpanExploded.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExpanded.rdd.collect.toSet == trueJobQueueSpanExpanded)
+          assert(jobQueueSpanExploded.get.rdd.collect.toSet == trueJobQueueSpanExploded)
         }
       }
 
       // Joined with cab layout
+      lazy val jobQueueSpanExpandedJoined = deriveNaturalJoin(jobQueueSpanExploded.get, cabLayout, sjs)
 
-      describe("Job queue with derived time span AND expanded node list AND joined with cab layout") {
+      describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {
           assert(jobQueueSpanExpandedJoined.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExpandedJoined.get.rdd.collect.toSet == trueJobQueueSpanExpandedJoined)
+          assert(jobQueueSpanExpandedJoined.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoined)
         }
       }
     }
