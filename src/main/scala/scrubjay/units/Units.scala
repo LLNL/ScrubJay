@@ -7,19 +7,19 @@ import scrubjay.datasource._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-abstract class Units/*[T <: Units[T] : ClassTag]*/ extends Serializable {
-  //def getClassTag = classTag[T]
-  val raw: Any
-}
+import scala.reflect._
+import scala.reflect.runtime.universe._
+
+abstract class Units[T](val value: T)(implicit val tag: WeakTypeTag[T]) extends Serializable
 
 abstract class UnitsConverter[T] {
-  def convert(value: Any, metaUnits: MetaDescriptor = GlobalMetaBase.UNITS_UNKNOWN): Units
+  def convert(value: Any, metaUnits: MetaDescriptor = GlobalMetaBase.UNITS_UNKNOWN): Units[_]
 }
 
 object Units {
 
-  def raw2Units(v: Any, mu: MetaDescriptor): Units = {
-    converterForClassTag.getOrElse(mu.tag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
+  def raw2Units(v: Any, mu: MetaDescriptor): Units[_] = {
+    converterForClassTag.getOrElse(mu.classtag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
   }
 
   def rawRDDToUnitsRDD(sc: SparkContext, rawRDD: RDD[RawDataRow], metaEntryMap: MetaEntryMap): RDD[DataRow] = {

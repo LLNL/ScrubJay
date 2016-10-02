@@ -46,7 +46,7 @@ object CSVDataSource {
                             noneString: String = "null"): Unit = {
 
       val header = ds.metaSource.columns
-      val csvRdd = ds.rdd.map(row => header.map(wrapperChar + row.getOrElse(_, Identifier(noneString)).raw.toString + wrapperChar).mkString(delimiter))
+      val csvRdd = ds.rdd.map(row => header.map(wrapperChar + row.getOrElse(_, Identifier(noneString)).value.toString + wrapperChar).mkString(delimiter))
       val bw = new BufferedWriter(new FileWriter(fileName))
 
       // Possible TODO: optimize this by collecting a partition at a time

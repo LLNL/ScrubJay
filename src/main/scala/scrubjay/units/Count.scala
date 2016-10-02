@@ -3,9 +3,7 @@ package scrubjay.units
 import scrubjay.meta.MetaDescriptor
 import scrubjay.units.ConversionHelpers._
 
-case class Count(v: Int) extends Units {
-  val raw = v
-}
+case class Count(v: Int) extends Units(v)
 
 object Count {
 

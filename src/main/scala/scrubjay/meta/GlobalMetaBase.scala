@@ -3,6 +3,7 @@ package scrubjay.meta
 import scrubjay.units._
 
 import scala.reflect._
+import scala.reflect.runtime.universe._
 
 object GlobalMetaBase {
 

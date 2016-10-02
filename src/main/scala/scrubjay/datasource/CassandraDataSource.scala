@@ -9,6 +9,11 @@ import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
+import scala.reflect._
+import scala.reflect.runtime.universe.typeOf
+import scala.reflect.runtime.universe.WeakTypeTag
+import scala.reflect.ClassTag
+
 class CassandraDataSource(sc: SparkContext,
                           val keyspace: String,
                           val table: String,
@@ -41,33 +46,32 @@ class CassandraDataSource(sc: SparkContext,
 object CassandraDataSource {
 
   // Match Scala type to Cassandra type string
-  def InferCassandraTypeString(v: Any): String = v match {
-    case _: String     => "text"
-    case _: Int        => "int"
-    case _: Float      => "float"
-    case _: Double     => "double"
-    case _: BigDecimal => "decimal"
-    case _: BigInt     => "varint"
+   def inferCassandraTypeString[T](v: WeakTypeTag[T]): String = {
+     v.tpe match {
+       case t if t =:= typeOf[String] => "text"
+       case t if t =:= typeOf[Int] => "int"
+       case t if t =:= typeOf[Float] => "float"
+       case t if t =:= typeOf[Double] => "double"
+       case t if t =:= typeOf[Double] => "decimal"
+       case t if t =:= typeOf[BigInt] => "varint"
 
-    // Cassandra "collections"
-    case l: List[_]  => "list<" + InferCassandraTypeString(l.head) + ">"
-    case s: Set[_]   => "set<"  + InferCassandraTypeString(s.head) + ">"
-    case m: Map[_,_] => "map<"  + InferCassandraTypeString(m.head._1) + "," + InferCassandraTypeString(m.head._2) + ">"
+       // Cassandra collections
+       // case x if x == classTag[List[_]]  => "list<" + inferCassandraTypeString(l.head) + ">"
+       // case x if x == classTag[Set[_]]   => "set<"  + inferCassandraTypeString(s.head) + ">"
+       // case x if x == classTag[Map[_,_]] => "map<"  + inferCassandraTypeString(m.head._1) + "," + inferCassandraTypeString(m.head._2) + ">"
 
-    case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
-  }
+       case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
+     }
+   }
 
   // Get columns and datatypes from the data and add meta_data for each column
   // FIXME: Determine schema from metaSource
-  def DataSourceCassandraSchema(ds: DataSource): List[(String, String)] = {
-    ds.rdd
-      .reduce((m1, m2) => m1 ++ m2)
-      .mapValues(InferCassandraTypeString(_))
-      .toList
+  def cassandraSchemaForDataSource(ds: DataSource): List[(String, String)] = {
+    ds.metaSource.metaEntryMap.map{case (c, me) => (c, inferCassandraTypeString(me.units.weaktypetag))}.toList
   }
 
   // The CQL command to create a Cassandra table with the specified schema
-  def CreateCassandraTableCQL(keyspace: String,
+  def createCassandraTableCQL(keyspace: String,
                               table: String,
                               schema: List[(String, String)],
                               primaryKeys: List[String],
@@ -98,10 +102,10 @@ object CassandraDataSource {
                                 clusterKeys: List[String]): Unit = {
 
       // Infer the schema from the DataSource
-      val schema = DataSourceCassandraSchema(ds)
+      val schema = cassandraSchemaForDataSource(ds)
 
       // Generate CQL commands for creating/inserting meta information
-      val CQLCommand = CreateCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
+      val CQLCommand = createCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
 
       // Run the generated CQL commands
       CassandraConnector(sc.getConf).withSessionDo { session =>
