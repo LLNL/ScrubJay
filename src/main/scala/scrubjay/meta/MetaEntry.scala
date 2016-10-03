@@ -3,7 +3,8 @@ package scrubjay.meta
 import scrubjay.meta.MetaBase._
 
 import scala.language.existentials
-import scala.reflect.{ClassTag, _}
+
+import scala.reflect._
 
 abstract class MetaDescriptor extends Serializable {
 

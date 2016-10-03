@@ -10,17 +10,14 @@ import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 
 import scala.reflect._
-import scala.reflect.runtime.universe.typeOf
-import scala.reflect.runtime.universe.WeakTypeTag
-import scala.reflect.ClassTag
 
 class CassandraDataSource(sc: SparkContext,
                           val keyspace: String,
                           val table: String,
                           providedMetaSource: MetaSource,
                           val metaBase: MetaBase,
-                          select: Option[String] = None,
-                          where: Option[String] = None) extends DataSource  {
+                          selectColumns: Option[String] = None,
+                          whereConditions: Option[String] = None) extends DataSource  {
 
   def addSecondaryIndex(sc: SparkContext,
                         column: String): Unit = {
@@ -29,12 +26,31 @@ class CassandraDataSource(sc: SparkContext,
     }
   }
 
-  // TODO: Materialized view
+  def addMaterializedView(sc: SparkContext,
+                          name: String,
+                          primaryKeys: Seq[String],
+                          clusterKeys: Seq[String],
+                          selectColumns: Option[Seq[String]],
+                          whereConditions: Option[Seq[String]]): Unit = {
+
+    val selectClause = selectColumns.getOrElse(Seq("*")).mkString(", ")
+    val whereClause = whereConditions.getOrElse(Seq("1 = 1")).mkString(" AND ")
+
+    val CQLCommand =
+      s"CREATE MATERIALIZED VIEW $name" +
+      s" AS SELECT $selectClause" +
+      s" FROM $keyspace.$table" +
+      s" WHERE $whereClause"
+
+    CassandraConnector(sc.getConf).withSessionDo { session =>
+      session.execute(CQLCommand)
+    }
+  }
 
   val cassandraRdd: CassandraTableScanRDD[CassandraRow] = {
     val cassRdd = sc.cassandraTable(keyspace, table)
-    val cassRddSelected = select.fold(cassRdd)(cassRdd.select(_))
-    val cassRddSelectWhere = where.fold(cassRddSelected)(cassRddSelected.where(_))
+    val cassRddSelected = selectColumns.fold(cassRdd)(c => cassRdd.select(c.mkString(", ")))
+    val cassRddSelectWhere = whereConditions.fold(cassRddSelected)(c => cassRddSelected.where(c.mkString(" AND ")))
     cassRddSelectWhere
   }
 
