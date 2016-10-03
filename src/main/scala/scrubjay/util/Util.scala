@@ -10,8 +10,4 @@ object Util {
     println(s"Elapsed time: ${(t1-t0)/1000000000.0} seconds")
     result
   }
-
-  def dateRange(start: DateTime, end: DateTime, step: Period): Iterator[DateTime] = {
-    Iterator.iterate(start)(_.plus(step)).takeWhile(!_.isAfter(end))
-  }
 }

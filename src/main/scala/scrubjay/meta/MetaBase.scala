@@ -27,7 +27,7 @@ object MetaBase {
         val compositePattern(composite, childrenToken) = s
         val childrenTokens = childrenToken.split(",")
         val compositeChildren = childrenTokens.map(metaUnitsFromString).toList
-        metaUnitsFromString(composite).copy(c = compositeChildren)
+        metaUnitsFromString(composite).copy(unitsChildren = compositeChildren)
       }
       else {
         UNITS_UNKNOWN

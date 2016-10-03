@@ -42,7 +42,7 @@ object ExplodeList {
           val metaSource = ds.metaSource.withMetaEntries(
             columns.map(col => col + "_exploded" -> {
               val originalMetaEntry = ds.metaSource.metaEntryMap(col)
-              originalMetaEntry.copy(units = originalMetaEntry.units.children.head.asInstanceOf[MetaUnits])
+              originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head.asInstanceOf[MetaUnits])
             }).toMap)
 
           lazy val rdd: RDD[DataRow] = {

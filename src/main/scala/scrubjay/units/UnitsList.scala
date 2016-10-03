@@ -9,9 +9,9 @@ object UnitsList {
 
   // Implement converter
   val converter = new UnitsConverter[UnitsList[_]] {
-    override def convert(value: Any, metaUnits: MetaDescriptor): UnitsList[_] = value match {
-      case l: List[Any] => UnitsList(l.map(raw2Units(_, metaUnits.children.head)))
-      case s: String => UnitsList(s.split(",").map(raw2Units(_, metaUnits.children.head)).toList)
+    override def convert(value: Any, metaUnits: MetaUnits): UnitsList[_] = value match {
+      case l: List[Any] => UnitsList(l.map(raw2Units(_, metaUnits.unitsChildren.head)))
+      case s: String => UnitsList(s.split(",").map(raw2Units(_, metaUnits.unitsChildren.head)).toList)
       case v => throw new RuntimeException(s"No known converter from $v to UnitsList")
     }
   }

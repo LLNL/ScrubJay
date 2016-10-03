@@ -8,9 +8,9 @@ case class DateTimeStamp(v: DateTime) extends Units(v)
 
 object DateTimeStamp {
   val converter = new UnitsConverter[DateTimeStamp] {
-    override def convert(value: Any, metaUnits: MetaDescriptor): Units[_] = value match {
+    override def convert(value: Any, metaUnits: MetaUnits): Units[_] = value match {
       case s: String => DateTimeStamp(DateTime.parse(s))
-      case v => throw new RuntimeException(s"No known converter from $v to DateTimeStamp")
+      case v => throw new RuntimeException(s"Cannot convert $v to ${metaUnits.title}")
     }
   }
 }

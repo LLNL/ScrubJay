@@ -8,7 +8,7 @@ object Identifier {
 
   // Implement converter
   val converter = new UnitsConverter[Identifier] {
-    override def convert(value: Any, metaUnits: MetaDescriptor): Identifier = Identifier(value.toString)
+    override def convert(value: Any, metaUnits: MetaUnits): Identifier = Identifier(value.toString)
   }
 
 }

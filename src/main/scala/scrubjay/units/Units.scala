@@ -12,13 +12,10 @@ import scala.reflect.runtime.universe._
 
 abstract class Units[T](val value: T)(implicit val tag: WeakTypeTag[T]) extends Serializable
 
-abstract class UnitsConverter[T] {
-  def convert(value: Any, metaUnits: MetaDescriptor = GlobalMetaBase.UNITS_UNKNOWN): Units[_]
-}
 
 object Units {
 
-  def raw2Units(v: Any, mu: MetaDescriptor): Units[_] = {
+  def raw2Units(v: Any, mu: MetaUnits): Units[_] = {
     converterForClassTag.getOrElse(mu.classtag, throw new RuntimeException(s"No available converter for $v to $mu")).convert(v, mu)
   }
 
