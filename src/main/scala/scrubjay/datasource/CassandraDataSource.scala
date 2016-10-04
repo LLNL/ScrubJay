@@ -65,7 +65,7 @@ object CassandraDataSource {
 
   // Match Scala type to Cassandra type string
   def inferCassandraTypeString(metaUnits: MetaUnits): String = {
-    metaUnits.unitsTag.rawValueClass match {
+    metaUnits.unitsTag.rawValueClassTag match {
       case t if t == classTag[String] => "text"
       case t if t == classTag[Int] => "int"
       case t if t == classTag[Float] => "float"

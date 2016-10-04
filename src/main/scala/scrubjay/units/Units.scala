@@ -11,7 +11,6 @@ abstract class Units[+T] extends Serializable {
   val value: T
 }
 
-
 object Units {
 
   def raw2Units(v: Any, mu: MetaUnits): Units[_] = {

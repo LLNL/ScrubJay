@@ -32,8 +32,24 @@ object GlobalMetaBase {
   // *******************************************************************************
   // *
   // * To add new units to the knowledge base:
-  // *   1. Add a new class, e.g. SomeUnits that extends Units, in this directory, e.g. units/SomeUnits.scala
-  // *   FIXME: Here
+  // *
+  // *   1. Add a new class that extends Units and implements `value`
+  // *   2. Add a companion object for that class that extends UnitsTag and implements `rawValueClass` and `convert`
+  // *   3. Add a new entry to the GlobalMetaBase below
+  // *
+  // *   Example:
+  // *
+  // *      // units/SomeUnits.scala
+  // *      case class SomeUnits(value: Double) extends Units[Double]
+  // *
+  // *      object SomeUnits extends UnitsTag[SomeUnits] {
+  // *        val rawValueClass = classTag[Double] // must be same as type of `value`
+  // *        def convert(value: Any, metaUnits: MetaUnits) = new SomeUnits(value.toDouble)
+  // *      }
+  // *
+  // *
+  // *      // units/GlobalMetaBase.scala
+  // *      final val UNITS_SOME_UNITS = META_BASE.addUnits(MetaUnits("SomeUnits", "Some description", SomeUnits))
   // *
   // *******************************************************************************
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", Identifier))
