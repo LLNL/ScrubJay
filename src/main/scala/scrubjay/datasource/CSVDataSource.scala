@@ -16,19 +16,20 @@ class CSVDataSource(sc: SparkContext,
                     val metaBase: MetaBase)
     extends DataSource {
 
-  // TODO: make CSVs lazily evaluated
-  val (header, data) = {
+  val header = {
     val reader = new CSVReader(new FileReader(filename))
+    reader.readNext.map(_.trim)
+  }
 
-    val tmpHeader = reader.readNext.map(_.trim)
-    val tmpData = reader.readAll.map(row => tmpHeader.zip(row.map(_.trim)).toMap).toList
-
-    (tmpHeader, tmpData)
+  lazy val data = {
+    val reader = new CSVReader(new FileReader(filename))
+    reader.readNext // skip header
+    reader.readAll.map(row => header.zip(row.map(_.trim)).toMap).toList
   }
 
   val metaSource = providedMetaSource.withColumns(header)
 
-  val rawRdd: RDD[RawDataRow] = sc.parallelize(data)
+  lazy val rawRdd: RDD[RawDataRow] = sc.parallelize(data)
   lazy val rdd: RDD[DataRow] = Units.rawRDDToUnitsRDD(sc, rawRdd, metaSource.metaEntryMap)
 }
 

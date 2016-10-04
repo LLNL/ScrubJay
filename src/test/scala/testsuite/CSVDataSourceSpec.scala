@@ -2,12 +2,10 @@ package testsuite
 
 import scrubjay._
 import scrubjay.datasource.CSVDataSource._
-import scrubjay.datasource._
 import scrubjay.derivation.DeriveTimeSpan._
 import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
 
-import scrubjay.meta._
 import scrubjay.metasource.CSVMetaSource._
 
 import org.scalatest._
@@ -16,16 +14,18 @@ import org.scalactic.source.Position
 import java.io._
 
 
-object CSVDataSourceSpec {
+class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
-  def createJobQueueCSVMetaSource: MetaSource = {
+  val sjs: ScrubJaySession = new ScrubJaySession()
 
-    val fileName = "jobqueuemeta.csv"
-    val file = new File(fileName)
+  val jobQueueMetaFile = new File("jobqueuemeta.csv")
+  val clusterLayoutMetaFile = new File("clusterlayoutmeta.csv")
+  val jobQueueDataFile = new File("jobqueue.csv")
+  val clusterLayoutDataFile = new File("clusterlayout.csv")
 
-    try {
-      val fileWriter = new PrintWriter(file)
-
+  override protected def beforeAll(): Unit = {
+    {
+      val fileWriter = new PrintWriter(jobQueueMetaFile)
       fileWriter.println("column, meaning, dimension, units")
       fileWriter.println("jobid, job, job, identifier")
       fileWriter.println("nodelist, node, node, list<identifier>")
@@ -33,61 +33,26 @@ object CSVDataSourceSpec {
       fileWriter.println("start, start, time, datetimestamp")
       fileWriter.println("end, end, time, datetimestamp")
       fileWriter.close()
-
-      createCSVMetaSource(fileName)
     }
-    finally {
-      file.delete()
-    }
-  }
 
-  def createCabLayoutCSVMetaSource: MetaSource = {
-
-    val fileName = "cablayoutmeta.csv"
-    val file = new File(fileName)
-
-    try {
-      val fileWriter = new PrintWriter(file)
-
+    {
+      val fileWriter = new PrintWriter(clusterLayoutMetaFile)
       fileWriter.println("column, meaning, dimension, units")
       fileWriter.println("node, node, node, identifier")
       fileWriter.println("rack, rack, rack, identifier")
       fileWriter.close()
-
-      createCSVMetaSource(fileName)
     }
-    finally {
-      file.delete()
-    }
-  }
 
-  def createJobQueueCSVDataSource(sjs: ScrubJaySession): DataSource = {
-
-    val fileName = "jobqueue.csv"
-    val file = new File(fileName)
-
-    try {
-      val fileWriter = new PrintWriter(file)
-
+    {
+      val fileWriter = new PrintWriter(jobQueueDataFile)
       fileWriter.println("jobid, nodelist, elapsed, start, end")
       fileWriter.println("123, \"1,2,3\", 23, 2016-08-11T3:30:00+0000, 2016-08-11T3:31:00+0000")
       fileWriter.println("456, \"4,5,6\", 45, 2016-08-11T3:30:00+0000, 2016-08-11T3:32:00+0000")
       fileWriter.close()
-
-      sjs.createCSVDataSource(fileName, createJobQueueCSVMetaSource)
     }
-    finally {
-      file.delete()
-    }
-  }
 
-  def createCabLayoutCSVDataSource(sjs: ScrubJaySession): DataSource = {
-
-    val fileName = "cablayout.csv"
-    val file = new File(fileName)
-
-    try {
-      val fileWriter = new PrintWriter(file)
+    {
+      val fileWriter = new PrintWriter(clusterLayoutDataFile)
       fileWriter.println("node, rack")
       fileWriter.println("1,1")
       fileWriter.println("2,1")
@@ -96,27 +61,23 @@ object CSVDataSourceSpec {
       fileWriter.println("5,2")
       fileWriter.println("6,2")
       fileWriter.close()
-
-      sjs.createCSVDataSource(fileName, createCabLayoutCSVMetaSource)
-    }
-    finally {
-      file.delete()
     }
   }
-}
-
-class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
-
-  val sjs: ScrubJaySession = new ScrubJaySession()
 
   override protected def afterAll {
     sjs.sc.stop()
+    jobQueueDataFile.delete()
+    clusterLayoutDataFile.delete()
+    jobQueueMetaFile.delete()
+    clusterLayoutMetaFile.delete()
   }
 
   describe("CSVDataSource") {
 
-    lazy val jobQueue = CSVDataSourceSpec.createJobQueueCSVDataSource(sjs)
-    lazy val cabLayout = CSVDataSourceSpec.createCabLayoutCSVDataSource(sjs)
+    lazy val jobQueueMetaSource = createCSVMetaSource(jobQueueMetaFile.getName)
+    lazy val clusterLayoutMetaSource = createCSVMetaSource(clusterLayoutMetaFile.getName)
+    lazy val jobQueue = sjs.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
+    lazy val cabLayout = sjs.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
 
     describe("Creation") {
 
