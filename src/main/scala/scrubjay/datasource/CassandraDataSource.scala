@@ -64,24 +64,24 @@ class CassandraDataSource(sc: SparkContext,
 object CassandraDataSource {
 
   // Match Scala type to Cassandra type string
-   def inferCassandraTypeString[T](metaUnits: MetaUnits): String = {
-     metaUnits.classtag match {
-       case t if t == classTag[String] => "text"
-       case t if t == classTag[Int] => "int"
-       case t if t == classTag[Float] => "float"
-       case t if t == classTag[Double] => "double"
-       case t if t == classTag[Double] => "decimal"
-       case t if t == classTag[BigInt] => "varint"
+  def inferCassandraTypeString(metaUnits: MetaUnits): String = {
+    metaUnits.unitsTag.rawValueClass match {
+      case t if t == classTag[String] => "text"
+      case t if t == classTag[Int] => "int"
+      case t if t == classTag[Float] => "float"
+      case t if t == classTag[Double] => "double"
+      case t if t == classTag[Double] => "decimal"
+      case t if t == classTag[BigInt] => "varint"
 
-       // Cassandra collections
-       case t if t == classTag[List[_]]  => "list<" + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"
-       case t if t == classTag[Set[_]]   => "set<"  + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"
-       case t if t == classTag[Map[_,_]] => "map<"  + inferCassandraTypeString(metaUnits.unitsChildren.head) + "," +
-                                                      inferCassandraTypeString(metaUnits.unitsChildren(1)) + ">"
+      // Cassandra collections
+      case t if t == classTag[List[_]]  => "list<" + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"
+      case t if t == classTag[Set[_]]   => "set<"  + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"
+      case t if t == classTag[Map[_,_]] => "map<"  + inferCassandraTypeString(metaUnits.unitsChildren.head) + "," +
+                                                     inferCassandraTypeString(metaUnits.unitsChildren(1)) + ">"
 
-       case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
-     }
+     case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
    }
+ }
 
   // Get columns and datatypes from the data and add meta_data for each column
   def cassandraSchemaForDataSource(ds: DataSource): List[(String, String)] = {

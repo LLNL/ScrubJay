@@ -27,7 +27,7 @@ object ExplodeList {
                         sjs: ScrubJaySession): Option[DataSource] = {
 
     // Implementations of abstract members
-    val defined = columns.map(ds.metaSource.metaEntryMap(_)).forall(_.units.classtag == UNITS_COMPOSITE_LIST.classtag)
+    val defined = columns.map(ds.metaSource.metaEntryMap(_)).forall(_.units.unitsTag == UnitsList)
 
     if (!defined) {
       None
@@ -42,7 +42,7 @@ object ExplodeList {
           val metaSource = ds.metaSource.withMetaEntries(
             columns.map(col => col + "_exploded" -> {
               val originalMetaEntry = ds.metaSource.metaEntryMap(col)
-              originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head.asInstanceOf[MetaUnits])
+              originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
             }).toMap)
 
           lazy val rdd: RDD[DataRow] = {

@@ -12,7 +12,7 @@ object GlobalMetaBase {
   // Unknowns - REQUIRED
   final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down"))
   final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
-  final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", classTag[Identifier]))
+  final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", Identifier))
 
   // Meanings
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
@@ -30,15 +30,19 @@ object GlobalMetaBase {
 
   // Units
   // *******************************************************************************
-  // ** IMPORTANT: see units/package.scala for information on creating new units! **
+  // *
+  // * To add new units to the knowledge base:
+  // *   1. Add a new class, e.g. SomeUnits that extends Units, in this directory, e.g. units/SomeUnits.scala
+  // *   FIXME: Here
+  // *
   // *******************************************************************************
-  final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", classTag[Identifier]))
-  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A categorical identifier", classTag[Seconds]))
-  final val UNITS_DATETIMESTAMP = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", classTag[DateTimeStamp]))
-  final val UNITS_DATETIMESPAN = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", classTag[DateTimeSpan]))
-  final val UNITS_COUNT = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", classTag[Count]))
+  final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", Identifier))
+  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A categorical identifier", Seconds))
+  final val UNITS_DATETIMESTAMP = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", DateTimeStamp))
+  final val UNITS_DATETIMESPAN = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", DateTimeSpan))
+  final val UNITS_COUNT = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", Count))
 
 
   // Composite Units
-  final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", classTag[UnitsList[_]]))
+  final val UNITS_COMPOSITE_LIST = META_BASE.addUnits(MetaUnits("list", "A list of...", UnitsList))
 }

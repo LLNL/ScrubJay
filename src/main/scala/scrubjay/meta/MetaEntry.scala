@@ -1,26 +1,27 @@
 package scrubjay.meta
 
 import scrubjay.meta.MetaBase._
+import scrubjay.units.{Units, UnitsTag}
 
 import scala.language.existentials
-
-import scala.reflect._
 
 abstract class MetaDescriptor extends Serializable {
 
   val title: String
   val description: String
-  val unitsChildren: List[MetaUnits] = List.empty
 
-  override def toString: String = title + { if (unitsChildren.nonEmpty) "<" + unitsChildren.map(_.title).mkString(",") + ">" else ""}
+  override def toString: String = title
 }
 
 case class MetaMeaning(override val title: String, override val description: String) extends MetaDescriptor
 case class MetaDimension(override val title: String, override val description: String) extends MetaDescriptor
 case class MetaUnits(override val title: String,
                      override val description: String,
-                     classtag: ClassTag[_] = classTag[Nothing],
-                     override val unitsChildren: List[MetaUnits] = List.empty) extends MetaDescriptor
+                     unitsTag: UnitsTag[_ <: Units[_]],
+                     unitsChildren: List[MetaUnits] = List.empty) extends MetaDescriptor {
+
+  override def toString: String = super.toString + { if (unitsChildren.nonEmpty) "<" + unitsChildren.map(_.title).mkString(",") + ">" else ""}
+}
 
 case class MetaEntry(meaning: MetaMeaning,
                      dimension: MetaDimension,
