@@ -1,4 +1,6 @@
-package scrubjay.meta
+package scrubjay.metasource
+
+import scrubjay.meta.{MetaSource, _}
 
 object LocalMetaSource {
 

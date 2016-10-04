@@ -1,9 +1,11 @@
-package scrubjay.meta
+package scrubjay.metasource
 
-import scala.collection.JavaConversions._
 import java.io.{BufferedWriter, FileReader, FileWriter}
 
 import au.com.bytecode.opencsv.CSVReader
+import scrubjay.meta.{MetaEntry, MetaSource}
+
+import scala.collection.JavaConversions._
 
 object CSVMetaSource {
 

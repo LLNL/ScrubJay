@@ -8,7 +8,7 @@ import scrubjay.derivation.ExplodeList._
 import scrubjay.derivation.NaturalJoin._
 
 import scrubjay.meta._
-import scrubjay.meta.CSVMetaSource._
+import scrubjay.metasource.CSVMetaSource._
 
 import org.scalatest._
 import org.scalactic.source.Position

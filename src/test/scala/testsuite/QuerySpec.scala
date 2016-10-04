@@ -4,7 +4,7 @@ import scrubjay._
 import scrubjay.meta._
 import scrubjay.datasource._
 
-import scrubjay.meta.LocalMetaSource._
+import scrubjay.metasource.LocalMetaSource._
 import scrubjay.datasource.LocalDataSource._
 
 import scrubjay.query._
