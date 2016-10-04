@@ -5,7 +5,7 @@ import scala.reflect._
 import scrubjay.meta._
 import scrubjay.units.ConversionHelpers._
 
-case class Seconds(v: Double) extends Units(v)
+case class Seconds(value: Double) extends Units[Double]
 
 object Seconds extends UnitsTag[Seconds] {
   override val rawValueClass = classTag[Double]

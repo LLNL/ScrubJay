@@ -16,7 +16,7 @@ object DeriveTimeSpan {
     // Helper functions
     def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
       (row(startColumn), row(endColumn)) match {
-        case (s: DateTimeStamp, e: DateTimeStamp) => row ++ Map("span" -> DateTimeSpan(s.v to e.v))
+        case (s: DateTimeStamp, e: DateTimeStamp) => row ++ Map("span" -> DateTimeSpan(s.value to e.value))
       }
     }
 

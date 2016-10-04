@@ -5,7 +5,7 @@ import scrubjay.units.Units._
 
 import scala.reflect._
 
-case class UnitsList[T](v: List[T]) extends Units(v)
+case class UnitsList[T](value: List[T]) extends Units[List[T]]
 
 object UnitsList extends UnitsTag[UnitsList[_]]{
   override val rawValueClass = classTag[List[_]]

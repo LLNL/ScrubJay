@@ -5,7 +5,7 @@ import scrubjay.units.ConversionHelpers._
 
 import scala.reflect._
 
-case class Count(v: Int) extends Units(v)
+case class Count(value: Int) extends Units[Int]
 
 object Count extends UnitsTag[Count] {
   override val rawValueClass = classTag[Int]

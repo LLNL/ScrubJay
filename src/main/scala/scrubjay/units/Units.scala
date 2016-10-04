@@ -7,7 +7,9 @@ import scrubjay.datasource._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-abstract class Units[+T](val value: T) extends Serializable
+abstract class Units[+T] extends Serializable {
+  val value: T
+}
 
 
 object Units {

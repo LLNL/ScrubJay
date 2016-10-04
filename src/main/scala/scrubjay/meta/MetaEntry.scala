@@ -13,13 +13,12 @@ abstract class MetaDescriptor extends Serializable {
   override def toString: String = title
 }
 
-case class MetaMeaning(override val title: String, override val description: String) extends MetaDescriptor
-case class MetaDimension(override val title: String, override val description: String) extends MetaDescriptor
-case class MetaUnits(override val title: String,
-                     override val description: String,
+case class MetaMeaning(title: String, description: String) extends MetaDescriptor
+case class MetaDimension(title: String, description: String) extends MetaDescriptor
+
+case class MetaUnits(title: String, description: String,
                      unitsTag: UnitsTag[_ <: Units[_]],
                      unitsChildren: List[MetaUnits] = List.empty) extends MetaDescriptor {
-
   override def toString: String = super.toString + { if (unitsChildren.nonEmpty) "<" + unitsChildren.map(_.title).mkString(",") + ">" else ""}
 }
 

@@ -6,9 +6,9 @@ import scala.reflect._
 
 import com.github.nscala_time.time.Imports._
 
-case class DateTimeSpan(v: Interval) extends Units(v) {
+case class DateTimeSpan(value: Interval) extends Units[Interval] {
   def explode(step: Period): Seq[DateTimeStamp] = {
-    Iterator.iterate(v.start)(_.plus(step)).takeWhile(!_.isAfter(v.end)).map(DateTimeStamp(_)).toSeq
+    Iterator.iterate(value.start)(_.plus(step)).takeWhile(!_.isAfter(value.end)).map(DateTimeStamp(_)).toSeq
   }
 }
 

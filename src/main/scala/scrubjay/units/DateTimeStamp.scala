@@ -6,7 +6,7 @@ import scala.reflect._
 
 import com.github.nscala_time.time.Imports._
 
-case class DateTimeStamp(v: DateTime) extends Units(v)
+case class DateTimeStamp(value: DateTime) extends Units[DateTime]
 
 object DateTimeStamp extends UnitsTag[DateTimeStamp] {
   override val rawValueClass = classTag[Int]

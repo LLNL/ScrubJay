@@ -59,7 +59,7 @@ object ExplodeList {
               val explodedValues =
                 row.filter { case (k, v) => cols.contains(k) }
                   .map {
-                    case (k, ul: UnitsList[_]) => ul.v.map { case u: Units[_] => (k + "_exploded", u) }
+                    case (k, ul: UnitsList[_]) => ul.value.map { case u: Units[_] => (k + "_exploded", u) }
                     case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
                   }
                   .toList
