@@ -9,7 +9,7 @@ object GlobalMetaBase {
   final val META_BASE: MetaBase = new MetaBase
 
   // Unknowns - REQUIRED
-  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down"))
+  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionType.DISCRETE))
   final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
   final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", Identifier))
 
@@ -22,10 +22,10 @@ object GlobalMetaBase {
   final val MEANING_CUMULATIVE = META_BASE.addMeaning(MetaMeaning("cumulative", "An atomically increasing value representing some thing since some point of origin"))
 
   // Dimensions
-  final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension"))
-  final val DIMENSION_NODE = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster"))
-  final val DIMENSION_RACK = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster"))
-  final val DIMENSION_FLOPS = META_BASE.addDimension(MetaDimension("flops", "Floating-point operations"))
+  final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension", DimensionType.CONTINUOUS))
+  final val DIMENSION_NODE = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster", DimensionType.DISCRETE))
+  final val DIMENSION_RACK = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster", DimensionType.DISCRETE))
+  final val DIMENSION_FLOPS = META_BASE.addDimension(MetaDimension("flops", "Floating-point operations", DimensionType.CONTINUOUS))
 
   // Units
   // *******************************************************************************

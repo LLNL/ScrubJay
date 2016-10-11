@@ -4,23 +4,21 @@ import scrubjay.units._
 
 import scala.language.existentials
 
-sealed abstract class MetaDescriptor extends Serializable {
-  val title: String
-  val description: String
-  override def toString: String = title
-}
 
 object MetaDescriptor {
 
-  // Types of MetaDescriptor
+  object DimensionType extends Enumeration {
+    type DimensionType = Value
+    val CONTINUOUS, DISCRETE = Value
+  }
 
-  case class MetaMeaning(title: String, description: String) extends MetaDescriptor
+  case class MetaMeaning(title: String, description: String)
 
-  case class MetaDimension(title: String, description: String) extends MetaDescriptor
+  case class MetaDimension(title: String, description: String, dimensionType: DimensionType.DimensionType)
 
   case class MetaUnits(title: String, description: String,
                        unitsTag: UnitsTag[_ <: Units[_]],
-                       unitsChildren: List[MetaUnits] = List.empty) extends MetaDescriptor {
+                       unitsChildren: List[MetaUnits] = List.empty) {
     override def toString: String = {
       super.toString + {
         if (unitsChildren.nonEmpty)

@@ -2,6 +2,8 @@ package scrubjay.units
 
 import scrubjay.meta.MetaDescriptor._
 import scrubjay.units.Units._
+import scrubjay.units.UnitsTag.DomainType
+import scrubjay.units.UnitsTag.DomainType.DomainType
 
 import scala.reflect._
 
@@ -14,4 +16,6 @@ object UnitsList extends UnitsTag[UnitsList[_]]{
     case s: String => UnitsList(s.split(",").map(raw2Units(_, metaUnits.unitsChildren.head)).toList)
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
+
+  override val domainType: DomainType = DomainType.MULTIPOINT
 }
