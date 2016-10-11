@@ -1,8 +1,7 @@
 package scrubjay.units
 
-import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 
-import scala.reflect._
 import scala.reflect.ClassTag
 
 abstract class UnitsTag[T <: Units[_]] {

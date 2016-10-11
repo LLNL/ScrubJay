@@ -2,7 +2,7 @@ package scrubjay.units
 
 import scala.reflect._
 
-import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 import scrubjay.units.ConversionHelpers._
 
 case class Seconds(value: Double) extends Units[Double]

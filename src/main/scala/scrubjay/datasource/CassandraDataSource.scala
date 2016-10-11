@@ -2,6 +2,7 @@ package scrubjay.datasource
 
 import scrubjay._
 import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 import scrubjay.units.Units
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

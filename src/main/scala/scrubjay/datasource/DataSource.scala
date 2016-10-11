@@ -2,6 +2,7 @@ package scrubjay.datasource
 
 import org.apache.spark.rdd.RDD
 import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 
 abstract class DataSource extends Serializable {
   val metaBase: MetaBase

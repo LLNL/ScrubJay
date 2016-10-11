@@ -1,6 +1,6 @@
 package scrubjay.units
 
-import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 import scrubjay.units.Units._
 
 import scala.reflect._

@@ -5,6 +5,7 @@ import scrubjay._
 import scrubjay.datasource._
 import scrubjay.meta.GlobalMetaBase._
 import scrubjay.meta._
+import scrubjay.meta.MetaDescriptor._
 
 /*
  * NaturalJoin 
