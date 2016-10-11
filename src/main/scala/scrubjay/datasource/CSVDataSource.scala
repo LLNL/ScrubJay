@@ -34,13 +34,13 @@ class CSVDataSource(sc: SparkContext,
 }
 
 object CSVDataSource {
-  implicit class ScrubJaySession_CSVDataSource(sjs: ScrubJaySession) {
+  implicit class ScrubJaySessionImplicits(sjs: ScrubJaySession) {
     def createCSVDataSource(filename: String, metaSource: MetaSource = new EmptyMetaSource): CSVDataSource = {
       new CSVDataSource(sjs.sc, filename, metaSource, sjs.metaBase)
     }
   }
 
-  implicit class DataSource_saveAsCSV(ds: DataSource) {
+  implicit class DataSourceImplicits(ds: DataSource) {
     def saveAsCSVDataSource(fileName: String,
                             wrapperChar: String = "\"",
                             delimiter: String = ",",

@@ -1,15 +1,9 @@
 package testsuite
 
-import scrubjay._
-import scrubjay.meta._
-import scrubjay.datasource._
+import scrubjay.imports._
 
-import scrubjay.metasource.LocalMetaSource._
-import scrubjay.datasource.LocalDataSource._
-
-import scrubjay.query._
-
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import org.scalatest._
+import org.scalactic.source.Position
 
 
 object QuerySpec {
@@ -24,15 +18,15 @@ object QuerySpec {
 
   def createSingleSourceQueryMetaEntries: Set[MetaEntry] = {
     Set(
-      MetaEntry.fromStringTuple("job", "job", "identifier"),
-      MetaEntry.fromStringTuple("duration", "time", "seconds")
+      metaEntryFromStrings("job", "job", "identifier"),
+      metaEntryFromStrings("duration", "time", "seconds")
     )
   }
 
   def createMultipleSourceQueryMetaEntries: Set[MetaEntry] = {
     Set(
-      MetaEntry.fromStringTuple("rack", "rack", "identifier"),
-      MetaEntry.fromStringTuple("cumulative", "flops", "count")
+      metaEntryFromStrings("rack", "rack", "identifier"),
+      metaEntryFromStrings("cumulative", "flops", "count")
     )
   }
 

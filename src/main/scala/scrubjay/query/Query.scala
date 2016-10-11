@@ -6,7 +6,7 @@ import scrubjay.datasource._
 
 import scrubjay.derivation.NaturalJoin._
 
-import ConstraintSolver._
+import gov.llnl.ConstraintSolver._
 
 
 class Query(val sjs: ScrubJaySession,
@@ -14,17 +14,6 @@ class Query(val sjs: ScrubJaySession,
             val metaEntries: Set[MetaEntry]) {
 
   def run: Iterator[DataSource] = {
-
-    // Easy case: queried meta entries all contained in a single data source
-    lazy val dsWithMetaEntries: Constraint[DataSource] = memoize(args => {
-      val me = args(0).as[Set[MetaEntry]]
-      val ds = args(1).as[DataSource]
-
-      ds match {
-        case dsSat if dsSat.containsMeta(me) => Seq(dsSat)
-        case _ => Seq.empty
-      }
-    })
 
     // Can we join ds1 and ds2?
     lazy val joinedPair: Constraint[DataSource] = memoize(args => {
@@ -47,24 +36,23 @@ class Query(val sjs: ScrubJaySession,
         case Seq(ds1) => Seq(ds1)
 
         // Two elements, check joined pair
-        case Seq(ds1, ds2) => joinedPair(Seq(Arg(ds1), Arg(ds2)))
+        case Seq(ds1, ds2) => joinedPair(Seq(ds1, ds2))
 
         // More than two elements...
         case head +: tail => {
 
-
           // joinPair( head, joinSet(tail) )
-          val restThenPair = joinedSet(Seq(Arg(tail.toSet))).flatMap(tailSolution => joinedPair(Seq(Arg(head), Arg(tailSolution))))
+          val restThenPair = joinedSet(Seq(tail.toSet[DataSource])).flatMap(tailSolution => joinedPair(Seq(head, tailSolution)))
 
           // Set of all joinable pairs between head and some t in tail
-          val head2TailPairs = new ArgumentSpace(Seq(Arg(head)), tail.map(Arg(_))).allSolutions(joinedPair)
+          val head2TailPairs = new ArgumentSpace(Seq(head), tail).allSolutions(joinedPair)
 
           // joinSet( joinPair(head, t) +: rest )
           val pairThenRest = head2TailPairs.flatMap(pair => {
             val pairArgs = pair.arguments.map(_.as[DataSource])
             val rest = dsSet.filterNot(pairArgs.contains)
             pair.solutions.flatMap(sol =>  {
-              joinedSet(Seq(Arg(rest + sol)))
+              joinedSet(Seq(rest + sol))
             })
           })
 
@@ -79,20 +67,22 @@ class Query(val sjs: ScrubJaySession,
       val dsSet = args(1).as[Set[DataSource]]
 
       // Fun case: queried meta entries exist in a data source derived from multiple data sources
-      // TODO: return all unique sets of datasources that satisfy the query
       val dsMeta = dsSet.toSeq.map(_.metaSource.metaEntryMap.values.toSet).reduce(_ union _)
       val metaSatisfied = query.intersect(dsMeta).size == query.size
 
       if (metaSatisfied)
-        joinedSet(Seq(Arg(dsSet)))
+        joinedSet(Seq(dsSet))
       else
         Seq.empty
     })
 
+    // TODO: optimize the order of choosing
+    // 1. only datasources that satisfy part of the query
+    // 2. add in additional other datasources one at a time
     class ChooseNDataSources(me: Seq[MetaEntry], ds: Seq[DataSource]) extends ArgumentSpace {
       override def enumerate: Iterator[Arguments] = {
         (1 until ds.length+1).toIterator.flatMap(
-          ds.combinations(_).map(c => Seq(Arg(metaEntries), Arg(c.toSet)))
+          ds.combinations(_).map(c => Seq(metaEntries, c.toSet[DataSource]))
         )
       }
     }

@@ -1,12 +1,6 @@
 package testsuite
 
-import scrubjay._
-import scrubjay.datasource.CSVDataSource._
-import scrubjay.derivation.DeriveTimeSpan._
-import scrubjay.derivation.ExplodeList._
-import scrubjay.derivation.NaturalJoin._
-
-import scrubjay.metasource.CSVMetaSource._
+import scrubjay.imports._
 
 import org.scalatest._
 import org.scalactic.source.Position

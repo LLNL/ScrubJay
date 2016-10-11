@@ -23,7 +23,7 @@ object CSVMetaSource {
     val header = reader.readNext.map(_.trim)
     val data = reader.readAll.map(row => header.zip(row.map(_.trim)).toMap)
     val metaEntryMap = data.map(row =>
-      (row("column"), MetaEntry.fromStringTuple(row("meaning"), row("dimension"), row("units")))).toMap
+      (row("column"), MetaEntry.metaEntryFromStrings(row("meaning"), row("dimension"), row("units")))).toMap
 
     new MetaSource(metaEntryMap)
   }

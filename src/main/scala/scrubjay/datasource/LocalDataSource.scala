@@ -18,7 +18,7 @@ class LocalDataSource(sc: SparkContext,
 }
 
 object LocalDataSource {
-  implicit class ScrubJaySession_LocalDataSource(sjs: ScrubJaySession) {
+  implicit class ScrubJaySessionImplicits(sjs: ScrubJaySession) {
     def createLocalDataSource(columns: Seq[String], data: Seq[RawDataRow], metaSource: MetaSource): LocalDataSource = {
       new LocalDataSource(sjs.sc, columns, data, metaSource, sjs.metaBase)
     }

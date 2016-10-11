@@ -102,7 +102,7 @@ object CassandraDataSource {
     s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString), ($clusterKeyString)))"
   }
 
-  implicit class DataSource_SaveToCassandra(ds: DataSource) {
+  implicit class DataSourceImplicits(ds: DataSource) {
 
     def saveToExistingCassandraTable(sc: SparkContext,
                                      keyspace: String,
@@ -134,7 +134,7 @@ object CassandraDataSource {
     }
   }
 
-  implicit class ScrubJaySession_CassandraDataSource(sjs: ScrubJaySession) {
+  implicit class ScrubJaySessionImplicits(sjs: ScrubJaySession) {
     def createCassandraDataSource(keyspace: String,
                                   table: String,
                                   metaSource: MetaSource = new EmptyMetaSource,

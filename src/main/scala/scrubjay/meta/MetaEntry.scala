@@ -27,7 +27,7 @@ case class MetaEntry(meaning: MetaMeaning,
                      units: MetaUnits) extends Serializable
 
 object MetaEntry {
-  def fromStringTuple(meaning: String, dimension: String, units: String): MetaEntry = {
+  def metaEntryFromStrings(meaning: String, dimension: String, units: String): MetaEntry = {
     MetaEntry(meaning, dimension, units)
   }
 }

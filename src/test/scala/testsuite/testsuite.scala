@@ -1,5 +1,5 @@
+import scrubjay.imports._
 import scrubjay.units._
-import scrubjay.meta._
 
 import com.github.nscala_time.time.Imports._
 
@@ -80,22 +80,22 @@ package object testsuite {
   )
 
   val jobQueueMeta = Map(
-      "jobid" -> MetaEntry.fromStringTuple("job", "job", "identifier"),
-      "nodelist" -> MetaEntry.fromStringTuple("node", "node", "list<identifier>"),
-      "elapsed" -> MetaEntry.fromStringTuple("duration", "time", "seconds"),
-      "start" -> MetaEntry.fromStringTuple("start", "time", "datetimestamp"),
-      "end" -> MetaEntry.fromStringTuple("end", "time", "datetimestamp")
+      "jobid" -> metaEntryFromStrings("job", "job", "identifier"),
+      "nodelist" -> metaEntryFromStrings("node", "node", "list<identifier>"),
+      "elapsed" -> metaEntryFromStrings("duration", "time", "seconds"),
+      "start" -> metaEntryFromStrings("start", "time", "datetimestamp"),
+      "end" -> metaEntryFromStrings("end", "time", "datetimestamp")
     )
 
   val nodeDataMeta = Map(
-    "node" -> MetaEntry.fromStringTuple("node", "node", "identifier"),
-    "time" -> MetaEntry.fromStringTuple("instant", "time", "datetimestamp"),
-    "flops" -> MetaEntry.fromStringTuple("cumulative", "flops", "count")
+    "node" -> metaEntryFromStrings("node", "node", "identifier"),
+    "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
+    "flops" -> metaEntryFromStrings("cumulative", "flops", "count")
   )
 
   val clusterLayoutMeta = Map(
-    "node" -> MetaEntry.fromStringTuple("node", "node", "identifier"),
-    "rack" -> MetaEntry.fromStringTuple("rack", "rack", "identifier")
+    "node" -> metaEntryFromStrings("node", "node", "identifier"),
+    "rack" -> metaEntryFromStrings("rack", "rack", "identifier")
   )
 
   val trueJobQueue = Set(
