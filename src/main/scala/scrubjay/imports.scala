@@ -14,6 +14,7 @@ object imports {
    */
 
   type ScrubJaySession = scrubjay.ScrubJaySession
+  type CassandraConnection = scrubjay.CassandraConnection
   type MetaSource = scrubjay.meta.MetaSource
   type MetaEntry = scrubjay.meta.MetaEntry
   type DataSource = scrubjay.datasource.DataSource

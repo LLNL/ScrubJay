@@ -28,7 +28,8 @@ class CassandraDataSource(sc: SparkContext,
   }
 
   def addMaterializedView(sc: SparkContext,
-                          name: String,
+                          newKeyspace: String,
+                          newTable: String,
                           primaryKeys: Seq[String],
                           clusterKeys: Seq[String],
                           selectColumns: Option[Seq[String]],
@@ -36,12 +37,15 @@ class CassandraDataSource(sc: SparkContext,
 
     val selectClause = selectColumns.getOrElse(Seq("*")).mkString(", ")
     val whereClause = whereConditions.getOrElse(Seq("1 = 1")).mkString(" AND ")
+    val clusterKeyString =  if (clusterKeys.nonEmpty) ", " + clusterKeys.mkString(",") else ""
+    val primaryKeyString = primaryKeys.mkString(",")
 
     val CQLCommand =
-      s"CREATE MATERIALIZED VIEW $name" +
+      s"CREATE MATERIALIZED VIEW $newKeyspace.$newTable" +
       s" AS SELECT $selectClause" +
       s" FROM $keyspace.$table" +
-      s" WHERE $whereClause"
+      s" WHERE $whereClause" + 
+      s" PRIMARY KEY (($primaryKeyString)$clusterKeyString)"
 
     CassandraConnector(sc.getConf).withSessionDo { session =>
       session.execute(CQLCommand)
@@ -97,10 +101,10 @@ object CassandraDataSource {
                               clusterKeys: List[String]): String = {
 
     val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
+    val clusterKeyString =  if (clusterKeys.nonEmpty) ", " + clusterKeys.mkString(",") else ""
     val primaryKeyString = primaryKeys.mkString(",")
-    val clusterKeyString = clusterKeys.mkString(",")
 
-    s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString), ($clusterKeyString)))"
+    s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString)$clusterKeyString))"
   }
 
   implicit class DataSourceImplicits(ds: DataSource) {

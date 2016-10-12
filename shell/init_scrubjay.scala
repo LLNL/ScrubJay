@@ -1,19 +1,15 @@
 sc.stop
 
-import scrubjay._
-import scrubjay.meta._
-import scrubjay.datasource._
-
-import scrubjay.datasource.LocalDataSource._
-import scrubjay.datasource.CSVDataSource._
-import scrubjay.datasource.CassandraDataSource._
-
-
-import com.datastax.spark.connector._
+import scrubjay.imports._
 
 val cassandraHost = sys.env.get("CQLSH_HOST").getOrElse("localhost")
 
 val sjs = new ScrubJaySession(
-  cassandra_connection = Some(CassandraConnection(hostname = cassandraHost)))
+  //spark_master = "spark://sonar11:7077",
+  cassandra_connection = Some(new CassandraConnection(hostname = cassandraHost)),
+  conf_options = Map(
+    "spark.driver.memory" -> "128g",
+    "spark.executor.memory" -> "128g",
+    "spark.driver.maxResultSize" -> "0"))
 
 println("ScrubJaySession available as sjs")
