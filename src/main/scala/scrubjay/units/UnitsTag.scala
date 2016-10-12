@@ -8,7 +8,7 @@ object UnitsTag {
 
   object DomainType extends Enumeration {
     type DomainType = Value
-    val POINT, MULTIPOINT, RANGE = Value
+    val POINT, MULTIPOINT, RANGE, UNKNOWN= Value
   }
 
 }

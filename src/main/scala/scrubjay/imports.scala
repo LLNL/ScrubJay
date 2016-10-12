@@ -19,6 +19,8 @@ object imports {
   type DataSource = scrubjay.datasource.DataSource
   type Query = scrubjay.query.Query
 
+  type NaturalJoin = scrubjay.derivation.NaturalJoin
+
   /*
    * Standalone functions
    */
@@ -28,7 +30,6 @@ object imports {
   def createCSVMetaSource = scrubjay.metasource.CSVMetaSource.createCSVMetaSource _
   def createLocalMetaSource = scrubjay.metasource.LocalMetaSource.createLocalMetaSource _
 
-  def deriveNaturalJoin = scrubjay.derivation.NaturalJoin.deriveNaturalJoin _
   def deriveTimeSpan = scrubjay.derivation.DeriveTimeSpan.deriveTimeSpan _
   def deriveExplodeList = scrubjay.derivation.ExplodeList.deriveExplodeList _
 

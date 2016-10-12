@@ -4,6 +4,10 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
 
   val columns: Seq[String] = metaEntryMap.keys.toSeq
 
+  def columnForEntry(me: MetaEntry): Option[String] = {
+    metaEntryMap.map(_.swap).get(me)
+  }
+
   def filterEntries(cond: MetaEntry => Boolean): MetaEntryMap = {
     metaEntryMap.filter{case (k, me) => cond(me)}
   }
@@ -31,5 +35,11 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
 
   def withoutColumns(oldColumns: Seq[String]): MetaSource = {
     new MetaSource(metaEntryMap.filter{case (k, v) => oldColumns.contains(k)})
+  }
+}
+
+object MetaSource {
+  def commonMetaEntries(ms1: MetaSource, ms2: MetaSource): Set[MetaEntry] = {
+    ms1.metaEntryMap.values.toSet intersect ms2.metaEntryMap.values.toSet
   }
 }

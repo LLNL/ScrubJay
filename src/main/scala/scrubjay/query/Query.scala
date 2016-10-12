@@ -3,10 +3,8 @@ package scrubjay.query
 import scrubjay._
 import scrubjay.meta._
 import scrubjay.datasource._
-
-import scrubjay.derivation.NaturalJoin._
-
 import gov.llnl.ConstraintSolver._
+import scrubjay.derivation.NaturalJoin
 
 
 class Query(val sjs: ScrubJaySession,
@@ -22,7 +20,7 @@ class Query(val sjs: ScrubJaySession,
 
       // TODO: return all possible joins (a,b), (b,a), natural, quanti, etc
       Seq(
-        deriveNaturalJoin(ds1, ds2, sjs)
+        new NaturalJoin(ds1, ds2).apply
       ).flatten
     })
 

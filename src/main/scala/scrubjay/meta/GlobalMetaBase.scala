@@ -9,7 +9,7 @@ object GlobalMetaBase {
   final val META_BASE: MetaBase = new MetaBase
 
   // Unknowns - REQUIRED
-  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionType.DISCRETE))
+  final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionType.UNKNOWN))
   final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
   final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", Identifier))
 

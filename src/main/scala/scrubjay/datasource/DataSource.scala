@@ -5,7 +5,6 @@ import scrubjay.meta._
 import scrubjay.meta.MetaDescriptor._
 
 abstract class DataSource extends Serializable {
-  val metaBase: MetaBase
   val metaSource: MetaSource
   val rdd: RDD[DataRow]
 

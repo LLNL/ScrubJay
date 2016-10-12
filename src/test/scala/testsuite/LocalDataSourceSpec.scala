@@ -40,7 +40,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = deriveTimeSpan(jobQueue, sjs)
+      lazy val jobQueueSpan = deriveTimeSpan(jobQueue)
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -52,7 +52,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Expanded node list
-      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"), sjs)
+      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"))
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {
@@ -64,7 +64,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Joined with cab layout
-      lazy val jobQueueSpanExpandedJoined = deriveNaturalJoin(jobQueueSpanExploded.get, cabLayout, sjs)
+      lazy val jobQueueSpanExpandedJoined = new NaturalJoin(jobQueueSpanExploded.get, cabLayout).apply
 
       describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {

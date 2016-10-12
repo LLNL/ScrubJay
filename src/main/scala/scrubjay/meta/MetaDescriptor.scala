@@ -9,7 +9,7 @@ object MetaDescriptor {
 
   object DimensionType extends Enumeration {
     type DimensionType = Value
-    val CONTINUOUS, DISCRETE = Value
+    val CONTINUOUS, DISCRETE, UNKNOWN = Value
   }
 
   case class MetaMeaning(title: String, description: String)

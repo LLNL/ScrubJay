@@ -23,8 +23,7 @@ import org.apache.spark.rdd.RDD
 object ExplodeList {
 
   def deriveExplodeList(ds: DataSource,
-                        columns: Seq[String],
-                        sjs: ScrubJaySession): Option[DataSource] = {
+                        columns: Seq[String]): Option[DataSource] = {
 
     // Implementations of abstract members
     val defined = columns.map(ds.metaSource.metaEntryMap(_)).forall(_.units.unitsTag == UnitsList)
@@ -36,8 +35,6 @@ object ExplodeList {
 
       Some(
         new DataSource {
-
-          val metaBase = sjs.metaBase
 
           val metaSource = ds.metaSource.withMetaEntries(
             columns.map(col => col + "_exploded" -> {

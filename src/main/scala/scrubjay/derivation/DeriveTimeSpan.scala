@@ -1,6 +1,5 @@
 package scrubjay.derivation
 
-import scrubjay._
 import scrubjay.datasource._
 import scrubjay.meta.MetaEntry
 import scrubjay.meta.GlobalMetaBase._
@@ -10,8 +9,7 @@ import org.apache.spark.rdd.RDD
 
 object DeriveTimeSpan {
 
-  def deriveTimeSpan(ds: DataSource,
-                     sjs: ScrubJaySession): Option[DataSource] = {
+  def deriveTimeSpan(ds: DataSource): Option[DataSource] = {
 
     // Helper functions
     def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
@@ -42,7 +40,6 @@ object DeriveTimeSpan {
     else {
       Some(
         new DataSource{
-          val metaBase = sjs.metaBase
           val metaSource = ds.metaSource.withMetaEntries(Map("span" -> MetaEntry(MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
           lazy val rdd: RDD[DataRow] = {
             ds.rdd.map(allSpans.find(_.isDefined).get.get)

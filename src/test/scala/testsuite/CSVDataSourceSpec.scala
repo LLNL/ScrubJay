@@ -94,7 +94,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = deriveTimeSpan(jobQueue, sjs)
+      lazy val jobQueueSpan = deriveTimeSpan(jobQueue)
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -106,7 +106,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Exploded node list
-      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"), sjs)
+      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"))
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {
@@ -118,7 +118,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Joined with cab layout
-      lazy val jobQueueSpanExplodedJoined = deriveNaturalJoin(jobQueueSpanExploded.get, cabLayout, sjs)
+      lazy val jobQueueSpanExplodedJoined = new NaturalJoin(jobQueueSpanExploded.get, cabLayout).apply
 
       describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {

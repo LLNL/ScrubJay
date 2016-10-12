@@ -10,6 +10,6 @@ case class Identifier(value: String) extends Units[String]
 
 object Identifier extends UnitsTag[Identifier] {
   override val rawValueClassTag = classTag[String]
-  override val domainType: DomainType = DomainType.POINT
+  override val domainType: DomainType = DomainType.UNKNOWN
   override def convert(value: Any, metaUnits: MetaUnits): Identifier = Identifier(value.toString)
 }
