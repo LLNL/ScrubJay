@@ -2,7 +2,7 @@ package scrubjay.derivation
 
 import scrubjay.datasource.DataSource
 
-abstract class Joiner(val ds1: DataSource, val ds2: DataSource) extends Serializable {
+abstract class Derivation(val ds: DataSource) extends Serializable {
 
   def apply: Option[DataSource] = {
     if (isValid)
@@ -16,3 +16,4 @@ abstract class Joiner(val ds1: DataSource, val ds2: DataSource) extends Serializ
   def derive: DataSource
 
 }
+

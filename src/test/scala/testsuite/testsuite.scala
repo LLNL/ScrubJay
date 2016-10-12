@@ -1,4 +1,4 @@
-import scrubjay.imports._
+import scrubjay._
 import scrubjay.units._
 
 import com.github.nscala_time.time.Imports._

@@ -21,10 +21,10 @@ class InterpolationJoin(ds1: DataSource, ds2: DataSource) extends Joiner(ds1, ds
     new DataSource {
 
       // Implementations of abstract members
-      val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
+      override lazy val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
 
       // RDD derivation defined here
-      lazy val rdd: RDD[DataRow] = {
+      override lazy val rdd: RDD[DataRow] = {
 
         val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry)
         val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry)

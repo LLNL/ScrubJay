@@ -1,16 +1,18 @@
 package testsuite
 
-import scrubjay.imports._
+import scrubjay._
 
 import org.scalatest._
 import org.scalactic.source.Position
 
 import java.io._
 
+import org.apache.spark._
+
 
 class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
-  val sjs: ScrubJaySession = new ScrubJaySession()
+  var sc: SparkContext = _
 
   val jobQueueMetaFile = new File("jobqueuemeta.csv")
   val clusterLayoutMetaFile = new File("clusterlayoutmeta.csv")
@@ -18,6 +20,8 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
   val clusterLayoutDataFile = new File("clusterlayout.csv")
 
   override protected def beforeAll(): Unit = {
+    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
+
     {
       val fileWriter = new PrintWriter(jobQueueMetaFile)
       fileWriter.println("column, meaning, dimension, units")
@@ -59,7 +63,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
   }
 
   override protected def afterAll {
-    sjs.sc.stop()
+    sc.stop()
     jobQueueDataFile.delete()
     clusterLayoutDataFile.delete()
     jobQueueMetaFile.delete()
@@ -70,8 +74,8 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
     lazy val jobQueueMetaSource = createCSVMetaSource(jobQueueMetaFile.getName)
     lazy val clusterLayoutMetaSource = createCSVMetaSource(clusterLayoutMetaFile.getName)
-    lazy val jobQueue = sjs.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
-    lazy val cabLayout = sjs.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
+    lazy val jobQueue = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
+    lazy val cabLayout = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
 
     describe("Creation") {
 
@@ -94,7 +98,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = deriveTimeSpan(jobQueue)
+      lazy val jobQueueSpan = new DeriveTimeSpan(jobQueue).apply
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -106,7 +110,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Exploded node list
-      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"))
+      lazy val jobQueueSpanExploded = new DeriveExplodeList(jobQueueSpan.get, List("nodelist")).apply
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {

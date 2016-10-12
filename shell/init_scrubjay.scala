@@ -1,7 +1,5 @@
 sc.stop
 
-import scrubjay.imports._
-
 val cassandraHost = sys.env.get("CQLSH_HOST").getOrElse("localhost")
 
 val sjs = new ScrubJaySession(

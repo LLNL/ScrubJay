@@ -1,6 +1,8 @@
 package testsuite
 
-import scrubjay.imports._
+import scrubjay._
+
+import org.apache.spark._
 
 import org.scalatest._
 import org.scalactic.source.Position
@@ -8,16 +10,20 @@ import org.scalactic.source.Position
 
 class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
 
-  val sjs: ScrubJaySession = new ScrubJaySession()
+  var sc: SparkContext = _
+
+  override protected def beforeAll {
+    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
+  }
 
   override protected def afterAll {
-    sjs.sc.stop()
+    sc.stop()
   }
 
   describe("LocalDataSource") {
 
-    lazy val jobQueue = sjs.createLocalDataSource(jobQueueMeta.keySet.toSeq, jobQueueRawData, new MetaSource(jobQueueMeta))
-    lazy val cabLayout = sjs.createLocalDataSource(clusterLayoutMeta.keySet.toSeq, clusterLayoutRawData, new MetaSource(clusterLayoutMeta))
+    lazy val jobQueue = sc.createLocalDataSource(jobQueueRawData, jobQueueMeta.keySet.toSeq, new MetaSource(jobQueueMeta))
+    lazy val cabLayout = sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutMeta.keySet.toSeq, new MetaSource(clusterLayoutMeta))
 
     describe("Creation") {
 
@@ -40,7 +46,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = deriveTimeSpan(jobQueue)
+      lazy val jobQueueSpan = new DeriveTimeSpan(jobQueue).apply
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -52,7 +58,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Expanded node list
-      lazy val jobQueueSpanExploded = deriveExplodeList(jobQueueSpan.get, List("nodelist"))
+      lazy val jobQueueSpanExploded = new DeriveExplodeList(jobQueueSpan.get, List("nodelist")).apply
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {

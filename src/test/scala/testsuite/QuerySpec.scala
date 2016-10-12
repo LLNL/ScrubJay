@@ -1,6 +1,8 @@
 package testsuite
 
-import scrubjay.imports._
+import scrubjay._
+
+import org.apache.spark._
 
 import org.scalatest._
 import org.scalactic.source.Position
@@ -8,11 +10,11 @@ import org.scalactic.source.Position
 
 object QuerySpec {
 
-  def createDataSources(sjs: ScrubJaySession): Set[DataSource] = {
+  def createDataSources(sc: SparkContext): Set[DataSource] = {
     Set(
-      sjs.createLocalDataSource(clusterLayoutColumns, clusterLayoutRawData, createLocalMetaSource(clusterLayoutMeta)),
-      sjs.createLocalDataSource(nodeDataColumns, nodeDataRawData, createLocalMetaSource(nodeDataMeta)),
-      sjs.createLocalDataSource(jobQueueColumns, jobQueueRawData, createLocalMetaSource(jobQueueMeta))
+      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, createLocalMetaSource(clusterLayoutMeta)),
+      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, createLocalMetaSource(nodeDataMeta)),
+      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, createLocalMetaSource(jobQueueMeta))
     )
   }
 
@@ -34,15 +36,19 @@ object QuerySpec {
 
 class QuerySpec extends FunSpec with BeforeAndAfterAll {
 
-  val sjs: ScrubJaySession = new ScrubJaySession()
+  var sc: SparkContext = _
+
+  override protected def beforeAll {
+    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
+  }
 
   override protected def afterAll {
-    sjs.sc.stop()
+    sc.stop()
   }
 
   describe("Query with single datasource solution") {
 
-    lazy val query = new Query(sjs, QuerySpec.createDataSources(sjs), QuerySpec.createSingleSourceQueryMetaEntries)
+    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
     lazy val solutions = query.run.toList
 
     it("should have a single solution") {
@@ -56,7 +62,7 @@ class QuerySpec extends FunSpec with BeforeAndAfterAll {
 
   describe("Query with multiple datasources solution") {
 
-    lazy val query = new Query(sjs, QuerySpec.createDataSources(sjs), QuerySpec.createMultipleSourceQueryMetaEntries)
+    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryMetaEntries)
     lazy val solutions = query.run.toList
 
     it("should have a multiple solution") {

@@ -7,8 +7,7 @@ import gov.llnl.ConstraintSolver._
 import scrubjay.derivation.NaturalJoin
 
 
-class Query(val sjs: ScrubJaySession,
-            val dataSources: Set[DataSource],
+class Query(val dataSources: Set[DataSource],
             val metaEntries: Set[MetaEntry]) {
 
   def run: Iterator[DataSource] = {
@@ -88,14 +87,5 @@ class Query(val sjs: ScrubJaySession,
     val argSpace = new ChooseNDataSources(metaEntries.toSeq, dataSources.toSeq)
 
     argSpace.allSolutions(dsSetSatisfiesQuery).flatMap(_.solutions)
-  }
-
-}
-
-object Query {
-  implicit class ScrubJaySession_Query(sjs: ScrubJaySession) {
-    def runQuery(dataSources: Set[DataSource], metaEntries: Set[MetaEntry]): Iterator[DataSource] = {
-      new Query(sjs, dataSources, metaEntries).run
-    }
   }
 }
