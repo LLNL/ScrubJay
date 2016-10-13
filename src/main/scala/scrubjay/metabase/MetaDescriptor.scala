@@ -1,4 +1,4 @@
-package scrubjay.meta
+package scrubjay.metabase
 
 import scrubjay.units._
 

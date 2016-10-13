@@ -15,7 +15,7 @@ object QuerySpec {
       sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, createLocalMetaSource(clusterLayoutMeta)),
       sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, createLocalMetaSource(nodeDataMeta)),
       sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, createLocalMetaSource(jobQueueMeta))
-    )
+    ).flatten
   }
 
   def createSingleSourceQueryMetaEntries: Set[MetaEntry] = {

@@ -1,6 +1,6 @@
-package scrubjay.meta
+package scrubjay.metabase
 
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.MetaDescriptor._
 
 
 class MetaBase(mb: Map[String, MetaMeaning] = Map.empty,

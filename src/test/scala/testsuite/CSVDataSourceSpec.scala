@@ -82,15 +82,20 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       // Create DataSources
 
       describe("CSV sourced job queue data") {
+        it("should be defined") {
+          assert(jobQueue.isDefined)
+        }
         it("should match ground truth") {
-          assert(jobQueue.rdd.collect.toSet == trueJobQueue)
+          assert(jobQueue.get.rdd.collect.toSet == trueJobQueue)
         }
       }
 
-
       describe("Locally generated cab layout data") {
+        it("should be defined") {
+          assert(cabLayout.isDefined)
+        }
         it("should match ground truth") {
-          assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+          assert(cabLayout.get.rdd.collect.toSet == trueCabLayout)
         }
       }
     }
@@ -98,7 +103,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = new DeriveTimeSpan(jobQueue).apply
+      lazy val jobQueueSpan = jobQueue.get.deriveTimeSpan
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -110,7 +115,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Exploded node list
-      lazy val jobQueueSpanExploded = new DeriveExplodeList(jobQueueSpan.get, List("nodelist")).apply
+      lazy val jobQueueSpanExploded = jobQueueSpan.get.deriveExplodeList(List("nodelist"))
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {
@@ -122,7 +127,7 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Joined with cab layout
-      lazy val jobQueueSpanExplodedJoined = new NaturalJoin(jobQueueSpanExploded.get, cabLayout).apply
+      lazy val jobQueueSpanExplodedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
 
       describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {

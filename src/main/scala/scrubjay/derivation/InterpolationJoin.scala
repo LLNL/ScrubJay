@@ -2,11 +2,11 @@ package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource.{DataRow, DataSource}
-import scrubjay.meta.MetaDescriptor.DimensionType
-import scrubjay.meta.MetaSource
+import scrubjay.metabase.MetaDescriptor.DimensionType
+import scrubjay.metasource.MetaSource
 import scrubjay.units.UnitsTag.DomainType
 
-class InterpolationJoin(ds1: DataSource, ds2: DataSource) extends Joiner(ds1, ds2) {
+class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Joiner(dso1, dso2) {
 
   val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
     .filter(me =>

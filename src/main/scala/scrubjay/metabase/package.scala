@@ -1,7 +1,7 @@
 package scrubjay
 
 
-package object meta {
+package object metabase {
 
   type MetaEntryMap = Map[String, MetaEntry]
 

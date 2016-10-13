@@ -1,7 +1,7 @@
-package scrubjay.meta
+package scrubjay.metabase
 
-import scrubjay.meta.GlobalMetaBase._
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.GlobalMetaBase._
+import scrubjay.metabase.MetaDescriptor._
 
 case class MetaEntry(meaning: MetaMeaning,
                      dimension: MetaDimension,

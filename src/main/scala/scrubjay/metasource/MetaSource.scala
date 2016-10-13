@@ -1,4 +1,6 @@
-package scrubjay.meta
+package scrubjay.metasource
+
+import scrubjay.metabase.{MetaEntry, _}
 
 class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
 
@@ -36,10 +38,17 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
   def withoutColumns(oldColumns: Seq[String]): MetaSource = {
     new MetaSource(metaEntryMap.filter{case (k, v) => oldColumns.contains(k)})
   }
+
 }
 
 object MetaSource {
+
+  def empty = {
+    new MetaSource(Map[String, MetaEntry]())
+  }
+
   def commonMetaEntries(ms1: MetaSource, ms2: MetaSource): Set[MetaEntry] = {
     ms1.metaEntryMap.values.toSet intersect ms2.metaEntryMap.values.toSet
   }
+
 }

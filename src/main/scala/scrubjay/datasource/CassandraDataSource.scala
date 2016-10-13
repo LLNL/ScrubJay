@@ -1,17 +1,25 @@
 package scrubjay.datasource
 
-import scrubjay.meta._
-import scrubjay.meta.MetaDescriptor._
-import org.apache.spark.SparkContext
+import scrubjay.util.niceAttempt
+
+import scrubjay.metabase.MetaDescriptor._
+import scrubjay.metasource.MetaSource
+import scrubjay.units.Units
+
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
+
+import org.apache.spark.SparkContext
 
 import scala.reflect._
 
 class CassandraDataSource(cassandraRdd: CassandraTableScanRDD[CassandraRow],
                           providedMetaSource: MetaSource)
-  extends DataSource(cassandraRdd.map(_.toMap), cassandraRdd.selectedColumnRefs.map(_.toString), providedMetaSource)  {
+  extends DataSource {
+
+  override lazy val metaSource = providedMetaSource.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
+  override lazy val rdd = Units.rawRDDToUnitsRDD(cassandraRdd.map(_.toMap), metaSource.metaEntryMap)
 
   val keyspace = cassandraRdd.keyspaceName
   val table = cassandraRdd.tableName
@@ -52,6 +60,23 @@ class CassandraDataSource(cassandraRdd: CassandraTableScanRDD[CassandraRow],
 
 object CassandraDataSource {
 
+  def createCassandraDataSource(providedCassandraRdd: CassandraTableScanRDD[CassandraRow],
+                                metaSource: MetaSource,
+                                selectColumns: Seq[String],
+                                whereConditions: Seq[String]): Option[CassandraDataSource] = {
+
+    niceAttempt {
+
+      val cassandraRdd = {
+        val cassRddSelected = selectColumns.foldLeft(providedCassandraRdd)(_.select(_))
+        val cassRddSelectWhere = whereConditions.foldLeft(cassRddSelected)(_.where(_))
+        cassRddSelectWhere
+      }
+
+      new CassandraDataSource(cassandraRdd, metaSource)
+    }
+  }
+
   // Match Scala type to Cassandra type string
   def inferCassandraTypeString(metaUnits: MetaUnits): String = {
     metaUnits.unitsTag.rawValueClassTag match {
@@ -91,35 +116,32 @@ object CassandraDataSource {
     s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString)$clusterKeyString))"
   }
 
-  implicit class DataSourceImplicits(ds: DataSource) {
+  def saveToExistingCassandraTable(ds: DataSource,
+                                   keyspace: String,
+                                   table: String): Unit = {
 
-    def saveToExistingCassandraTable(sc: SparkContext,
-                                     keyspace: String,
-                                     table: String): Unit = {
+    // Convert rows to CassandraRow instances and save to the table
+    ds.rdd.map(CassandraRow.fromMap(_))
+      .saveToCassandra(keyspace, table)
+  }
 
-      // Convert rows to CassandraRow instances and save to the table
-      ds.rdd.map(CassandraRow.fromMap(_))
-        .saveToCassandra(keyspace, table)
+  def saveToNewCassandraTable(ds: DataSource,
+                              keyspace: String,
+                              table: String,
+                              primaryKeys: Seq[String],
+                              clusterKeys: Seq[String]): Unit = {
+
+    // Infer the schema from the DataSource
+    val schema = cassandraSchemaForDataSource(ds)
+
+    // Generate CQL commands for creating/inserting meta information
+    val CQLCommand = createCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
+
+    // Run the generated CQL commands
+    CassandraConnector(ds.rdd.sparkContext.getConf).withSessionDo { session =>
+      session.execute(CQLCommand)
     }
 
-    def saveToNewCassandraTable(sc: SparkContext,
-                                keyspace: String,
-                                table: String,
-                                primaryKeys: Seq[String],
-                                clusterKeys: Seq[String]): Unit = {
-
-      // Infer the schema from the DataSource
-      val schema = cassandraSchemaForDataSource(ds)
-
-      // Generate CQL commands for creating/inserting meta information
-      val CQLCommand = createCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
-
-      // Run the generated CQL commands
-      CassandraConnector(sc.getConf).withSessionDo { session =>
-        session.execute(CQLCommand)
-      }
-
-      saveToExistingCassandraTable(sc, keyspace, table)
-    }
+    saveToExistingCassandraTable(ds, keyspace, table)
   }
 }

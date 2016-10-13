@@ -1,11 +1,10 @@
 package testsuite
 
 import scrubjay._
-
 import org.apache.spark._
-
 import org.scalatest._
 import org.scalactic.source.Position
+import scrubjay.datasource.DataSource
 
 
 class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
@@ -30,15 +29,21 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       // Create local data sources
 
       describe("Locally generated job queue data") {
+        it("should be defined") {
+          assert(jobQueue.isDefined)
+        }
         it("should match ground truth") {
-          assert(jobQueue.rdd.collect.toSet == trueJobQueue)
+          assert(jobQueue.get.rdd.collect.toSet == trueJobQueue)
         }
       }
 
 
       describe("Locally generated cab layout data") {
+        it("should be defined") {
+          assert(cabLayout.isDefined)
+        }
         it("should match ground truth") {
-          assert(cabLayout.rdd.collect.toSet == trueCabLayout)
+          assert(cabLayout.get.rdd.collect.toSet == trueCabLayout)
         }
       }
     }
@@ -46,7 +51,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
     describe("Derivations") {
 
       // Time span
-      lazy val jobQueueSpan = new DeriveTimeSpan(jobQueue).apply
+      lazy val jobQueueSpan = jobQueue.get.deriveTimeSpan
 
       describe("Job queue with derived time span") {
         it("should be defined") {
@@ -58,7 +63,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Expanded node list
-      lazy val jobQueueSpanExploded = new DeriveExplodeList(jobQueueSpan.get, List("nodelist")).apply
+      lazy val jobQueueSpanExploded = jobQueueSpan.get.deriveExplodeList(Seq("nodelist"))
 
       describe("Job queue with derived time span AND exploded node list") {
         it("should be defined") {
@@ -70,7 +75,7 @@ class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
       }
 
       // Joined with cab layout
-      lazy val jobQueueSpanExpandedJoined = new NaturalJoin(jobQueueSpanExploded.get, cabLayout).apply
+      lazy val jobQueueSpanExpandedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
 
       describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {

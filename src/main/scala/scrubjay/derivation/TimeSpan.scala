@@ -1,13 +1,13 @@
 package scrubjay.derivation
 
 import scrubjay.datasource._
-import scrubjay.meta.MetaEntry
-import scrubjay.meta.GlobalMetaBase._
+import scrubjay.metabase.MetaEntry
+import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
 import com.github.nscala_time.time.Imports._
 import org.apache.spark.rdd.RDD
 
-class DeriveTimeSpan(ds: DataSource) extends Derivation(ds) {
+class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
 
   // Helper functions
   def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
@@ -32,7 +32,7 @@ class DeriveTimeSpan(ds: DataSource) extends Derivation(ds) {
 
   val isValid = allSpans.exists(_.isDefined)
 
-  def derive = new DataSource(null, null, null) {
+  def derive = new DataSource {
     override lazy val metaSource = ds.metaSource.withMetaEntries(Map("span" -> MetaEntry(MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
     override lazy val rdd: RDD[DataRow] = {
       ds.rdd.map(allSpans.find(_.isDefined).get.get)

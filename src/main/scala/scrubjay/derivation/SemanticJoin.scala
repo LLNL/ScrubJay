@@ -2,8 +2,10 @@ package scrubjay.derivation
 
 import scrubjay.datasource._
 
-class SemanticJoin(ds1: DataSource, ds2: DataSource) extends Joiner(ds1, ds2) {
+class SemanticJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Joiner(dso1, dso2) {
+
   override def isValid: Boolean = ???
 
   override def derive: DataSource = ???
+
 }

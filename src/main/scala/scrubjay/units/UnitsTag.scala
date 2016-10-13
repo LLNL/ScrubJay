@@ -1,6 +1,6 @@
 package scrubjay.units
 
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.MetaDescriptor._
 
 import scala.reflect.ClassTag
 

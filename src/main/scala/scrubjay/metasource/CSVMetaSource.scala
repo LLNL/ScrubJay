@@ -3,7 +3,7 @@ package scrubjay.metasource
 import java.io.{BufferedWriter, FileReader, FileWriter}
 
 import au.com.bytecode.opencsv.CSVReader
-import scrubjay.meta.{MetaEntry, MetaSource}
+import scrubjay.metabase.MetaEntry
 
 import scala.collection.JavaConversions._
 
@@ -28,18 +28,17 @@ object CSVMetaSource {
     new MetaSource(metaEntryMap)
   }
 
-  implicit class MetaSource_saveCSV(m: MetaSource) {
-    def saveAsCSVMetaSource(filename: String): Unit = {
-      val bw = new BufferedWriter(new FileWriter(filename))
+  def saveToCSV(m: MetaSource, fileName: String): Unit = {
 
-      bw.write("column, meaning, dimension, units")
+    val bw = new BufferedWriter(new FileWriter(fileName))
+
+    bw.write("column, meaning, dimension, units")
+    bw.newLine()
+
+    m.metaEntryMap.foreach{case (column, metaEntry) => {
+      val rowString = Seq(column, metaEntry.meaning.title, metaEntry.dimension.title, metaEntry.units.title).mkString(",")
+      bw.write(rowString)
       bw.newLine()
-
-      m.metaEntryMap.foreach{case (column, metaEntry) => {
-        val rowString = Seq(column, metaEntry.meaning.title, metaEntry.dimension.title, metaEntry.units.title).mkString(",")
-        bw.write(rowString)
-        bw.newLine()
-      }}
-    }
+    }}
   }
 }

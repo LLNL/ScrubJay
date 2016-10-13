@@ -2,8 +2,8 @@ package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
-import scrubjay.meta.GlobalMetaBase._
-import scrubjay.meta._
+import scrubjay.metabase.GlobalMetaBase._
+import scrubjay.metasource.MetaSource
 
 /*
  * NaturalJoin 
@@ -16,16 +16,16 @@ import scrubjay.meta._
  *  The inner join of the two dataSources, based on their common columns
  */
 
-class NaturalJoin(ds1: DataSource, ds2: DataSource) extends Joiner(ds1, ds2) {
+class NaturalJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Joiner(dso1, dso2) {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
+  lazy val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
     .filter(me => me.units == UNITS_IDENTIFIER && me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
-  def isValid = validEntries.nonEmpty
+  override protected def isValid = validEntries.nonEmpty
 
-  def derive: DataSource = {
+  override protected def derive: DataSource = {
 
     new DataSource {
 

@@ -2,8 +2,8 @@ package scrubjay.units
 
 import java.io.Serializable
 
-import scrubjay.meta._
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase._
+import scrubjay.metabase.MetaDescriptor._
 import scrubjay.datasource._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

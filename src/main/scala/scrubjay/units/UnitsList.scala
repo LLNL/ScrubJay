@@ -1,6 +1,6 @@
 package scrubjay.units
 
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.Units._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType

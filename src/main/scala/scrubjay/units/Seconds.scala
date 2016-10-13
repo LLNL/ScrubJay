@@ -1,7 +1,7 @@
 package scrubjay.units
 
 import scala.reflect._
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.ConversionHelpers._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType

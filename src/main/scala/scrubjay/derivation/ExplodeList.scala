@@ -2,8 +2,8 @@ package scrubjay.derivation
 
 import scrubjay._
 import scrubjay.datasource._
-import scrubjay.meta._
-import scrubjay.meta.GlobalMetaBase._
+import scrubjay.metabase._
+import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
 
 import org.apache.spark.rdd.RDD
@@ -20,11 +20,11 @@ import org.apache.spark.rdd.RDD
  *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExplodeList(ds: DataSource, columns: Seq[String]) extends Derivation(ds) {
+class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transformer(dso) {
 
   val isValid = columns.map(ds.metaSource.metaEntryMap(_)).forall(_.units.unitsTag == UnitsList)
 
-  def derive: DataSource = new DataSource(null, null, null) {
+  def derive: DataSource = new DataSource {
 
     // Add column_exploded meta entry for each column
     override lazy val metaSource = ds.metaSource.withMetaEntries(

@@ -1,6 +1,6 @@
 package scrubjay.metasource
 
-import scrubjay.meta._
+import scrubjay.metabase._
 
 import org.apache.spark.SparkContext
 import com.datastax.spark.connector._

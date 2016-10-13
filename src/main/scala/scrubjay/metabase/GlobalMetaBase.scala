@@ -1,8 +1,8 @@
-package scrubjay.meta
+package scrubjay.metabase
 
 import scrubjay.units._
 
-import scrubjay.meta.MetaDescriptor._
+import scrubjay.metabase.MetaDescriptor._
 
 object GlobalMetaBase {
 

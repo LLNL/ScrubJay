@@ -1,7 +1,7 @@
 package scrubjay.query
 
 import scrubjay._
-import scrubjay.meta._
+import scrubjay.metabase._
 import scrubjay.datasource._
 import gov.llnl.ConstraintSolver._
 import scrubjay.derivation.NaturalJoin
@@ -19,7 +19,7 @@ class Query(val dataSources: Set[DataSource],
 
       // TODO: return all possible joins (a,b), (b,a), natural, quanti, etc
       Seq(
-        new NaturalJoin(ds1, ds2).apply
+        ds1.deriveNaturalJoin(Some(ds2))
       ).flatten
     })
 
