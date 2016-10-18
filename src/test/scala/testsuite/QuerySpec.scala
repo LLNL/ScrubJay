@@ -48,8 +48,8 @@ class QuerySpec extends FunSpec with BeforeAndAfterAll {
 
   describe("Query with single datasource solution") {
 
-    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
-    lazy val solutions = query.run.toList
+    lazy val solutions = sc.runQuery(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
+      .toList
 
     it("should have a single solution") {
       assert(solutions.length == 1)

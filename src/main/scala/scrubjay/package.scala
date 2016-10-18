@@ -23,6 +23,7 @@ package object scrubjay {
   type DataSource = scrubjay.datasource.DataSource
   type MetaSource = metasource.MetaSource
   type MetaEntry = scrubjay.metabase.MetaEntry
+  type Query = scrubjay.query.Query
 
   /**
    * Standalone functions

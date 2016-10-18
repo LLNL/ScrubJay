@@ -5,7 +5,6 @@ import java.io.Serializable
 import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.datasource._
-import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 abstract class Units[+T] extends Serializable {

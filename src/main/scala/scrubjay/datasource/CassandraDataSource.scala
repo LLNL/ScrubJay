@@ -93,7 +93,7 @@ object CassandraDataSource {
       case t if t == classTag[Map[_,_]] => "map<"  + inferCassandraTypeString(metaUnits.unitsChildren.head) + "," +
                                                      inferCassandraTypeString(metaUnits.unitsChildren(1)) + ">"
 
-     case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
+      case unk => throw new RuntimeException(s"Unable to infer Cassandra data type for $unk")
    }
  }
 
