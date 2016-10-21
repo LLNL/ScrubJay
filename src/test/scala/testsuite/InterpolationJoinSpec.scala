@@ -11,34 +11,40 @@ import org.scalactic.source.Position
 object InterpolationJoinSpec {
   val temperatureData = Seq(
     Map(
+      "node" -> 1,
       "time" -> "2016-08-11T3:30:00+0000",
       "temp" -> 40.0
     ),
     Map(
-    "time" -> "2016-08-11T3:31:00+0000",
-    "temp" -> 50.0
+      "node" -> 1,
+      "time" -> "2016-08-11T3:31:00+0000",
+      "temp" -> 50.0
     )
   )
 
   val flopsData = Seq(
     Map(
+      "node" -> 1,
       "time" -> "2016-08-11T3:30:30+0000",
       "flops" -> 2000238
     )
   )
 
   val temperatureMeta = Map(
+    "node" -> metaEntryFromStrings("node", "node", "identifier"),
     "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
     "temp" -> metaEntryFromStrings("instant", "temperature", "degrees Celsius")
   )
 
   val flopsMeta = Map(
+    "node" -> metaEntryFromStrings("node", "node", "identifier"),
     "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
     "flops" -> metaEntryFromStrings("cumulative", "flops", "count")
   )
 
   val trueFlopsJoinTemp = Set(
     Map(
+      "node" -> Identifier("1"),
       "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:30+0000")),
       "flops" -> Count(2000238),
       "temp" -> DegreesCelsius(45.0)
@@ -51,12 +57,12 @@ class InterpolationJoinSpec extends ScrubJaySpec {
   describe("InterpolationJoin") {
     lazy val temp = sc.createLocalDataSource(
       InterpolationJoinSpec.temperatureData,
-      Seq("time", "temp"),
+      Seq("node", "time", "temp"),
       createLocalMetaSource(InterpolationJoinSpec.temperatureMeta))
 
     lazy val flops = sc.createLocalDataSource(
       InterpolationJoinSpec.flopsData,
-      Seq("time", "flops"),
+      Seq("node", "time", "flops"),
       createLocalMetaSource(InterpolationJoinSpec.flopsMeta))
 
     describe("Many-to-one projection") {

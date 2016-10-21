@@ -28,4 +28,10 @@ package object util {
     }
   }
 
+  implicit class OptionIfDefinedThen[T](o: Option[T]) {
+    def ifDefinedThen[R](f: T => R): Option[R] = {
+      o.fold(None: Option[R])(a => Some(f(a)))
+    }
+  }
+
 }

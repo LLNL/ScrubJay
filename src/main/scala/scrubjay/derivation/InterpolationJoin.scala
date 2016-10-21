@@ -4,21 +4,18 @@ import scrubjay.units._
 import scrubjay.metasource._
 import scrubjay.datasource._
 import scrubjay.metabase.MetaDescriptor.DimensionType
-import scrubjay.units.UnitsTag.DomainType
 
 import scala.language.existentials
 import org.apache.spark.rdd.RDD
 
 class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], window: Double) extends Joiner(dso1, dso2) {
 
-  val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
-    .filter(me =>
-      me.units.unitsTag.domainType == DomainType.POINT &&
-        me.dimension.dimensionType == DimensionType.CONTINUOUS)
-    .toSeq
+  val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
+  val commonContinuousDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.CONTINUOUS).toSeq
+  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.DISCRETE).toSeq
 
-  // Single axis for now
-  def isValid = validEntries.length == 1
+  // Single continuous axis for now
+  def isValid = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
 
   def derive: DataSource = {
 
@@ -30,16 +27,23 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
       // RDD derivation defined here
       override lazy val rdd: RDD[DataRow] = {
 
-        val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry).head
-        val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry).head
+        val continuousDimColumn1 = commonContinuousDimensions.flatMap{case (d, me) => ds1.metaSource.columnForEntry(me._1)}.head
+        val continuousDimColumn2 = commonContinuousDimensions.flatMap{case (d, me) => ds2.metaSource.columnForEntry(me._2)}.head
+
+        val discreteDimColumns1 = commonDiscreteDimensions.flatMap{case (d, me) => ds1.metaSource.columnForEntry(me._1)}
+        val discreteDimColumns2 = commonDiscreteDimensions.flatMap{case (d, me) => ds2.metaSource.columnForEntry(me._2)}
 
         // Key by all values in the current window and next
-        val flooredRDD1 = ds1.rdd.keyBy(row => scala.math.floor(row(keyColumns1).asInstanceOf[Continuous].asDouble/window).toInt)
-        val flooredRDD2 = ds2.rdd.keyBy(row => scala.math.floor(row(keyColumns2).asInstanceOf[Continuous].asDouble/window).toInt)
+        val flooredRDD1 = ds1.rdd.keyBy(row =>
+          discreteDimColumns1.map(row) :+ scala.math.floor(row(continuousDimColumn1).asInstanceOf[Continuous].asDouble/window).toInt)
+        val flooredRDD2 = ds2.rdd.keyBy(row =>
+          discreteDimColumns2.map(row) :+ scala.math.floor(row(continuousDimColumn2).asInstanceOf[Continuous].asDouble/window).toInt)
 
         // Key by all values in the current window and previous
-        val ceilRDD1 = ds1.rdd.keyBy(row => scala.math.ceil(row(keyColumns1).asInstanceOf[Continuous].asDouble/window).toInt)
-        val ceilRDD2 = ds2.rdd.keyBy(row => scala.math.ceil(row(keyColumns2).asInstanceOf[Continuous].asDouble/window).toInt)
+        val ceilRDD1 = ds1.rdd.keyBy(row =>
+          discreteDimColumns1.map(row) :+ scala.math.ceil(row(continuousDimColumn1).asInstanceOf[Continuous].asDouble/window).toInt)
+        val ceilRDD2 = ds2.rdd.keyBy(row =>
+          discreteDimColumns2.map(row) :+ scala.math.ceil(row(continuousDimColumn2).asInstanceOf[Continuous].asDouble/window).toInt)
 
         // Group each
         val floorGrouped = flooredRDD1.cogroup(flooredRDD2)
@@ -80,7 +84,7 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
           row ++ projectedValues
         }
 
-        grouped.map{case (k, l2) => projection(k, keyColumns1, l2, keyColumns2)}
+        grouped.map{case (k, l2) => projection(k, continuousDimColumn1, l2, continuousDimColumn2)}
       }
     }
   }

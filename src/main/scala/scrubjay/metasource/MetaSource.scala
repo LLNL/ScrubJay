@@ -1,6 +1,9 @@
 package scrubjay.metasource
 
+import scrubjay.metabase.MetaDescriptor.MetaDimension
 import scrubjay.metabase.{MetaEntry, _}
+
+import scrubjay.util._
 
 class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
 
@@ -49,6 +52,12 @@ object MetaSource {
 
   def commonMetaEntries(ms1: MetaSource, ms2: MetaSource): Set[MetaEntry] = {
     ms1.metaEntryMap.values.toSet intersect ms2.metaEntryMap.values.toSet
+  }
+
+  def commonDimensionEntries(ms1: MetaSource, ms2: MetaSource): Map[MetaDimension, (MetaEntry, MetaEntry)] = {
+    val ms1Dims = ms1.metaEntryMap.filter(_._2.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map{case (k, me) => me.dimension -> me}
+    val ms2Dims = ms2.metaEntryMap.filter(_._2.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map{case (k, me) => me.dimension -> me}
+    ms1Dims.flatMap{case (d, me1) => ms2Dims.get(d).ifDefinedThen(me2 => (d, (me1, me2)))}
   }
 
 }
