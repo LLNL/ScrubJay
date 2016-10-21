@@ -10,6 +10,7 @@ trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 
   override protected def beforeAll {
     sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
+    sc.setLogLevel("WARN")
   }
 
   override protected def afterAll {

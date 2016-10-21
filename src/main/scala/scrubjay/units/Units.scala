@@ -3,10 +3,17 @@ package scrubjay.units
 import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.datasource._
+
 import org.apache.spark.rdd.RDD
+import scala.language.existentials
 
 abstract class Units[T] extends Serializable {
   val value: T
+}
+
+// TODO: How to enforce that a Units class for a Continuous dimension should implement Continuous?
+trait Continuous {
+  def asDouble: Double
 }
 
 object Units {

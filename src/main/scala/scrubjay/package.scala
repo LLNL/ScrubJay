@@ -41,8 +41,6 @@ package object scrubjay {
 
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
-    sc.setLogLevel("WARN")
-
     val metaBase = GlobalMetaBase.META_BASE
 
     /**

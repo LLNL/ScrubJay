@@ -5,12 +5,9 @@ import scrubjay.metasource._
 import scrubjay.datasource._
 import scrubjay.metabase.MetaDescriptor.DimensionType
 import scrubjay.units.UnitsTag.DomainType
-import breeze.interpolation.LinearInterpolator
-import breeze.linalg.DenseVector
-import breeze.math.Field
-import org.apache.spark.rdd.RDD
 
-import scala.reflect.ClassTag
+import scala.language.existentials
+import org.apache.spark.rdd.RDD
 
 class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], window: Double) extends Joiner(dso1, dso2) {
 
@@ -37,12 +34,12 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
         val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry).head
 
         // Key by all values in the current window and next
-        val flooredRDD1 = ds1.rdd.keyBy(row => scala.math.floor(row(keyColumns1).asInstanceOf[Double]/window).toInt)
-        val flooredRDD2 = ds2.rdd.keyBy(row => scala.math.floor(row(keyColumns2).asInstanceOf[Double]/window).toInt)
+        val flooredRDD1 = ds1.rdd.keyBy(row => scala.math.floor(row(keyColumns1).asInstanceOf[Continuous].asDouble/window).toInt)
+        val flooredRDD2 = ds2.rdd.keyBy(row => scala.math.floor(row(keyColumns2).asInstanceOf[Continuous].asDouble/window).toInt)
 
         // Key by all values in the current window and previous
-        val ceilRDD1 = ds1.rdd.keyBy(row => scala.math.ceil(row(keyColumns1).asInstanceOf[Double]/window).toInt)
-        val ceilRDD2 = ds2.rdd.keyBy(row => scala.math.ceil(row(keyColumns2).asInstanceOf[Double]/window).toInt)
+        val ceilRDD1 = ds1.rdd.keyBy(row => scala.math.ceil(row(keyColumns1).asInstanceOf[Continuous].asDouble/window).toInt)
+        val ceilRDD2 = ds2.rdd.keyBy(row => scala.math.ceil(row(keyColumns2).asInstanceOf[Continuous].asDouble/window).toInt)
 
         // Group each
         val floorGrouped = flooredRDD1.cogroup(flooredRDD2)
@@ -70,14 +67,14 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
             }
           }
 
-          for (mapRow <- mappedRows; mapElem <- mapRow) {
-            addObservation(mapElem._1, mapRow(mappedKeyColumn).asInstanceOf[Double], mapElem._2)
+          for (mapRow <- mappedRows; mapElem <- mapRow.filterNot{case (k,v) => k == mappedKeyColumn}) {
+            addObservation(mapElem._1, mapRow(mappedKeyColumn).asInstanceOf[Continuous].asDouble, mapElem._2)
           }
 
           val projectedValues = for (obs <- observations) yield {
             val unitsTag = ds2MetaEntries.value(obs._1).units.unitsTag
             val f = unitsTag.createGeneralInterpolator(obs._2._1, obs._2._2)
-            obs._1 -> f(row(keyColumn).value.asInstanceOf[Double])
+            obs._1 -> f(row(keyColumn).asInstanceOf[Continuous].asDouble)
           }
 
           row ++ projectedValues

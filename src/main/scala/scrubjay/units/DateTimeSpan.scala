@@ -1,11 +1,10 @@
 package scrubjay.units
 
 import scrubjay.metabase.MetaDescriptor._
-
-import scala.reflect._
-import com.github.nscala_time.time.Imports._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
+
+import com.github.nscala_time.time.Imports._
 
 case class DateTimeSpan(value: Interval) extends Units[ Interval] {
   def explode(step: Period): Seq[DateTimeStamp] = {
@@ -13,9 +12,8 @@ case class DateTimeSpan(value: Interval) extends Units[ Interval] {
   }
 }
 
-object DateTimeSpan extends UnitsTag[DateTimeSpan] {
+object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
 
-  override val rawValueClassTag = classTag[Interval]
   override val domainType: DomainType = DomainType.RANGE
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeSpan = value match {

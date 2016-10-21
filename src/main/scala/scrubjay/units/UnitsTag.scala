@@ -2,6 +2,7 @@ package scrubjay.units
 
 import scrubjay.metabase.MetaDescriptor._
 
+import scala.reflect._
 import scala.reflect.ClassTag
 
 object UnitsTag {
@@ -13,10 +14,9 @@ object UnitsTag {
 
 }
 
-abstract class UnitsTag[T <: Units[_] : ClassTag] extends Serializable {
+abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializable {
 
-  // FIXME: Infer the rawValueClassTag
-  val rawValueClassTag: ClassTag[_]
+  val rawValueClassTag: ClassTag[_] = classTag[R]
   val domainType: UnitsTag.DomainType.DomainType
 
   def extract(units: Units[_]): T = units match {

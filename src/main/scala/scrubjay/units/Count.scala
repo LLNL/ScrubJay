@@ -9,11 +9,12 @@ import scrubjay.units.UnitsTag.DomainType.DomainType
 
 import scala.reflect._
 
-case class Count(value: Long) extends Units[Long]
+case class Count(value: Long) extends Units[Long] with Continuous {
+  override def asDouble: Double = value.toDouble
+}
 
-object Count extends UnitsTag[Count] {
+object Count extends UnitsTag[Count, Long] {
 
-  override val rawValueClassTag = classTag[Long]
   override val domainType: DomainType = DomainType.POINT
 
   override def convert(value: Any, metaUnits: MetaUnits): Count = Count(value)

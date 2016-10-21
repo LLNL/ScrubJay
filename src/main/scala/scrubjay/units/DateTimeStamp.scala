@@ -1,19 +1,19 @@
 package scrubjay.units
 
-import breeze.interpolation.LinearInterpolator
-import breeze.linalg.DenseVector
 import scrubjay.metabase.MetaDescriptor._
-
-import scala.reflect._
-import com.github.nscala_time.time.Imports._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 
-case class DateTimeStamp(value: DateTime) extends Units[DateTime]
+import breeze.interpolation.LinearInterpolator
+import breeze.linalg.DenseVector
+import com.github.nscala_time.time.Imports._
 
-object DateTimeStamp extends UnitsTag[DateTimeStamp] {
+case class DateTimeStamp(value: DateTime) extends Units[DateTime] with Continuous {
+  override def asDouble: Double = value.getMillis.toDouble
+}
 
-  override val rawValueClassTag = classTag[Int]
+object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
+
   override val domainType: DomainType = DomainType.POINT
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {

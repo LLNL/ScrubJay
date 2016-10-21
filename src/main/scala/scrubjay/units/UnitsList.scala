@@ -5,13 +5,10 @@ import scrubjay.units.Units._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 
-import scala.reflect._
-
 case class UnitsList[T](value: List[T]) extends Units[List[T]]
 
-object UnitsList extends UnitsTag[UnitsList[_]]{
+object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
 
-  override val rawValueClassTag = classTag[List[_]]
   override val domainType: DomainType = DomainType.MULTIPOINT
 
   override def convert(value: Any, metaUnits: MetaUnits): UnitsList[_] = value match {

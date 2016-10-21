@@ -17,7 +17,7 @@ object MetaDescriptor {
   case class MetaDimension(title: String, description: String, dimensionType: DimensionType.DimensionType)
 
   case class MetaUnits(title: String, description: String,
-                       unitsTag: UnitsTag[_ <: Units[_]],
+                       unitsTag: UnitsTag[_ <: Units[_], _],
                        unitsChildren: List[MetaUnits] = List.empty) {
     override def toString: String = {
       super.toString + {
