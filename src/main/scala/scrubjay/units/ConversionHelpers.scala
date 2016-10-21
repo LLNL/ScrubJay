@@ -18,4 +18,10 @@ object ConversionHelpers {
     case _ => throw new RuntimeException(s"Cannot cast $a to Int!")
   }
 
+  implicit def any2Long(a: Any): Long = a match {
+    case n: Number => n.longValue
+    case s: String => s.toLong
+    case _ => throw new RuntimeException(s"Cannot cast $a to Long!")
+  }
+
 }

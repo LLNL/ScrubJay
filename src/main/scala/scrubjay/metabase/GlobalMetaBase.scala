@@ -23,6 +23,7 @@ object GlobalMetaBase {
 
   // Dimensions
   final val DIMENSION_TIME = META_BASE.addDimension(MetaDimension("time", "The time dimension", DimensionType.CONTINUOUS))
+  final val DIMENSION_TEMPERATURE = META_BASE.addDimension(MetaDimension("temperature", "The temperature dimension", DimensionType.CONTINUOUS))
   final val DIMENSION_NODE = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster", DimensionType.DISCRETE))
   final val DIMENSION_RACK = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster", DimensionType.DISCRETE))
   final val DIMENSION_FLOPS = META_BASE.addDimension(MetaDimension("flops", "Floating-point operations", DimensionType.CONTINUOUS))
@@ -52,7 +53,8 @@ object GlobalMetaBase {
   // *
   // *******************************************************************************
   final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", Identifier))
-  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A categorical identifier", Seconds))
+  final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A quantity of seconds", Seconds))
+  final val UNITS_DEGREES_CELSIUS = META_BASE.addUnits(MetaUnits("degrees Celsius", "A measured temperature in degrees Celsius", DegreesCelsius))
   final val UNITS_DATETIMESTAMP = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", DateTimeStamp))
   final val UNITS_DATETIMESPAN = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", DateTimeSpan))
   final val UNITS_COUNT = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", Count))

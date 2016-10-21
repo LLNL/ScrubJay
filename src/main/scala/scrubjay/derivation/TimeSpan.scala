@@ -12,7 +12,10 @@ class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
   // Helper functions
   def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
     (row(startColumn), row(endColumn)) match {
-      case (s: DateTimeStamp, e: DateTimeStamp) => row ++ Map("span" -> DateTimeSpan(s.value to e.value))
+      case (s: DateTimeStamp, e: DateTimeStamp) => {
+        val newDataRow: DataRow = Map("span" -> DateTimeSpan(s.value to e.value))
+        row ++ newDataRow
+      }
     }
   }
 

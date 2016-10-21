@@ -114,6 +114,10 @@ package object scrubjay {
       new scrubjay.derivation.NaturalJoin(Some(ds), ds2).apply
     }
 
+    def deriveInterpolationJoin(ds2: Option[DataSource], window: Double) = {
+      new scrubjay.derivation.InterpolationJoin(Some(ds), ds2, window).apply
+    }
+
     /**
      * Save formats
      */

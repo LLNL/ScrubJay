@@ -1,12 +1,16 @@
 package scrubjay.derivation
 
+import scrubjay.units._
+import scrubjay.metasource._
+import scrubjay.datasource._
+import scrubjay.metabase.MetaDescriptor.DimensionType
+import scrubjay.units.UnitsTag.DomainType
 import breeze.interpolation.LinearInterpolator
 import breeze.linalg.DenseVector
-import scrubjay.datasource.{DataRow, DataSource}
-import scrubjay.metabase.MetaDescriptor.DimensionType
-import scrubjay.metasource.MetaSource
-import scrubjay.units.UnitsTag.DomainType
+import breeze.math.Field
 import org.apache.spark.rdd.RDD
+
+import scala.reflect.ClassTag
 
 class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], window: Double) extends Joiner(dso1, dso2) {
 
@@ -32,42 +36,55 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
         val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry).head
         val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry).head
 
-        // Key each rdd by the window it falls in
-        def createKeyForDoubleRow(row: DataRow, keyColumn: String, keyFn: Double => Int) = {
-          row(keyColumn).value match {
-            case n: Number => keyFn(n.doubleValue)
-            case _ => throw new RuntimeException("Value of a continuous dimension is not numerical! Cannot continue!")
-          }
-        }
-
         // Key by all values in the current window and next
-        val flooredRDD1 = ds1.rdd.keyBy(createKeyForDoubleRow(_, keyColumns1, (d: Double) => scala.math.floor(d/window).toInt))
-        val flooredRDD2 = ds2.rdd.keyBy(createKeyForDoubleRow(_, keyColumns2, (d: Double) => scala.math.floor(d/window).toInt))
+        val flooredRDD1 = ds1.rdd.keyBy(row => scala.math.floor(row(keyColumns1).asInstanceOf[Double]/window).toInt)
+        val flooredRDD2 = ds2.rdd.keyBy(row => scala.math.floor(row(keyColumns2).asInstanceOf[Double]/window).toInt)
 
         // Key by all values in the current window and previous
-        val ceiledRDD1 = ds1.rdd.keyBy(createKeyForDoubleRow(_, keyColumns1, (d: Double) => scala.math.ceil(d/window).toInt))
-        val ceiledRDD2 = ds2.rdd.keyBy(createKeyForDoubleRow(_, keyColumns2, (d: Double) => scala.math.ceil(d/window).toInt))
+        val ceilRDD1 = ds1.rdd.keyBy(row => scala.math.ceil(row(keyColumns1).asInstanceOf[Double]/window).toInt)
+        val ceilRDD2 = ds2.rdd.keyBy(row => scala.math.ceil(row(keyColumns2).asInstanceOf[Double]/window).toInt)
 
         // Group each
         val floorGrouped = flooredRDD1.cogroup(flooredRDD2)
-        val ceilGrouped = ceiledRDD1.cogroup(ceiledRDD2)
+        val ceilGrouped = ceilRDD1.cogroup(ceilRDD2)
 
         // Create 1 to N mapping from ds1 to ds2 for each
         val floorMapped = floorGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2))}
         val ceilMapped = ceilGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2))}
 
         // Co-group both window mappings and combine their results
-        val grouped = floorMapped.cogroup(ceilMapped).map{case (k, (floored, ceiled)) => (k, floored ++ ceiled)}
+        val grouped = floorMapped.cogroup(ceilMapped)
+          .map{case (k, (f, c)) => (k, (f.flatten ++ c.flatten).toSeq)}
 
+        // Lift the heavies here
+        val ds2MetaEntries = grouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
         def projection(row: DataRow, keyColumn: String, mappedRows: Seq[DataRow], mappedKeyColumn: String): DataRow = {
-          // Create a seq of (x, y) observations
-          //   (t=0, "flops"=100 "blorg"=200), (t=1, "flops"=200)
-          row
+
+          val observations = scala.collection.mutable.Map[String,(Seq[Double], Seq[Units[_]])]()
+
+          // Add a single observation to the set of observations
+          def addObservation(column: String, x: Double, y: Units[_]): Unit = {
+            observations.get(column) match {
+              case Some((xs, ys)) => observations.update(column, (xs :+ x, ys :+ y))
+              case None => observations += (column -> (Seq(x), Seq(y)))
+            }
+          }
+
+          for (mapRow <- mappedRows; mapElem <- mapRow) {
+            addObservation(mapElem._1, mapRow(mappedKeyColumn).asInstanceOf[Double], mapElem._2)
+          }
+
+          val projectedValues = for (obs <- observations) yield {
+            val unitsTag = ds2MetaEntries.value(obs._1).units.unitsTag
+            val typedValues = obs._2._2.map(unitsTag.extract)
+            val f = unitsTag.createInterpolator(obs._2._1, typedValues)
+            obs._1 -> f(row(keyColumn).value.asInstanceOf[Double])
+          }
+
+          row ++ projectedValues
         }
 
-        // Now reduce the N points to get a single interpolated point projected onto ds1
-        //val mapping = grouped.map{case (k, l2) => l2.minBy(_.get(keyColumns1))}
-        ds1.rdd
+        grouped.map{case (k, l2) => projection(k, keyColumns1, l2, keyColumns2)}
       }
     }
   }
