@@ -1,23 +1,10 @@
 package testsuite
 
 import scrubjay._
-import org.apache.spark._
-import org.scalatest._
+
 import org.scalactic.source.Position
-import scrubjay.datasource.DataSource
 
-
-class LocalDataSourceSpec extends FunSpec with BeforeAndAfterAll {
-
-  var sc: SparkContext = _
-
-  override protected def beforeAll {
-    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
-  }
-
-  override protected def afterAll {
-    sc.stop()
-  }
+class LocalDataSourceSpec extends ScrubJaySpec {
 
   describe("LocalDataSource") {
 

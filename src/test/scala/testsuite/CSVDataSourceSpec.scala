@@ -2,25 +2,18 @@ package testsuite
 
 import scrubjay._
 
-import org.scalatest._
 import org.scalactic.source.Position
-
 import java.io._
 
-import org.apache.spark._
-
-
-class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
-
-  var sc: SparkContext = _
+class CSVDataSourceSpec extends ScrubJaySpec {
 
   val jobQueueMetaFile = new File("jobqueuemeta.csv")
   val clusterLayoutMetaFile = new File("clusterlayoutmeta.csv")
   val jobQueueDataFile = new File("jobqueue.csv")
   val clusterLayoutDataFile = new File("clusterlayout.csv")
 
-  override protected def beforeAll(): Unit = {
-    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
+  override protected def beforeAll: Unit = {
+    super.beforeAll()
 
     {
       val fileWriter = new PrintWriter(jobQueueMetaFile)
@@ -63,7 +56,8 @@ class CSVDataSourceSpec extends FunSpec with BeforeAndAfterAll {
   }
 
   override protected def afterAll {
-    sc.stop()
+    super.afterAll()
+    
     jobQueueDataFile.delete()
     clusterLayoutDataFile.delete()
     jobQueueMetaFile.delete()

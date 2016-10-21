@@ -1,7 +1,5 @@
 package scrubjay.units
 
-import java.io.Serializable
-
 import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.datasource._

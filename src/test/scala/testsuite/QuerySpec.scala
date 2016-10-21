@@ -2,9 +2,7 @@ package testsuite
 
 import scrubjay._
 
-import org.apache.spark._
-
-import org.scalatest._
+import org.apache.spark.SparkContext
 import org.scalactic.source.Position
 
 
@@ -34,17 +32,7 @@ object QuerySpec {
 
 }
 
-class QuerySpec extends FunSpec with BeforeAndAfterAll {
-
-  var sc: SparkContext = _
-
-  override protected def beforeAll {
-    sc = new SparkContext(new SparkConf().setMaster("local[*]").setAppName("ScrubJayTest"))
-  }
-
-  override protected def afterAll {
-    sc.stop()
-  }
+class QuerySpec extends ScrubJaySpec {
 
   describe("Query with single datasource solution") {
 
