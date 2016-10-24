@@ -6,7 +6,11 @@ import scrubjay.units.UnitsTag.DomainType.DomainType
 
 import com.github.nscala_time.time.Imports._
 
-case class DateTimeSpan(value: Interval) extends Units[ Interval] {
+case class DateTimeSpan(value: Interval) extends Units[Interval] with Range {
+
+  override def minDouble: Double = value.getStart.getMillis
+  override def maxDouble: Double = value.getEnd.getMillis
+
   def explode(step: Period): Seq[DateTimeStamp] = {
     Iterator.iterate(value.start)(_.plus(step)).takeWhile(!_.isAfter(value.end)).map(DateTimeStamp(_)).toSeq
   }

@@ -16,6 +16,11 @@ trait Continuous {
   def asDouble: Double
 }
 
+trait Range {
+  def minDouble: Double
+  def maxDouble: Double
+}
+
 object Units {
 
   def raw2Units(v: Any, mu: MetaUnits) = {
