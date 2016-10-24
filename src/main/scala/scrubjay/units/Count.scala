@@ -18,7 +18,7 @@ object Count extends UnitsTag[Count, Long] {
   override val domainType: DomainType = DomainType.POINT
 
   override def convert(value: Any, metaUnits: MetaUnits): Count = Count(value)
-  override def createInterpolator(xs: Seq[Double], ys: Seq[Count]): (Double) => Count = {
+  protected override def createInterpolator(xs: Seq[Double], ys: Seq[Count]): (Double) => Count = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.toDouble):_*))
     (d: Double) => Count(Math.round(f(d)))
   }

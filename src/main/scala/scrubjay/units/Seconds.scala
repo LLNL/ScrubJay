@@ -16,7 +16,7 @@ object Seconds extends UnitsTag[Seconds, Double] {
 
   override def convert(value: Any, metaUnits: MetaUnits): Seconds = Seconds(value)
 
-  override def createInterpolator(xs: Seq[Double], ys: Seq[Seconds]): (Double) => Seconds = {
+  protected override def createInterpolator(xs: Seq[Double], ys: Seq[Seconds]): (Double) => Seconds = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value):_*))
     (d: Double) => Seconds(f(d))
   }

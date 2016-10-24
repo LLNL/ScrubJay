@@ -16,7 +16,7 @@ object DegreesCelsius extends UnitsTag[DegreesCelsius, Double] {
 
   override def convert(value: Any, metaUnits: MetaUnits): DegreesCelsius = DegreesCelsius(value)
 
-  override def createInterpolator(xs: Seq[Double], ys: Seq[DegreesCelsius]): (Double) => DegreesCelsius = {
+  protected override def createInterpolator(xs: Seq[Double], ys: Seq[DegreesCelsius]): (Double) => DegreesCelsius = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value):_*))
     (d: Double) => DegreesCelsius(f(d))
   }

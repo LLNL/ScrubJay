@@ -50,6 +50,21 @@ object InterpolationJoinSpec {
       "temp" -> DegreesCelsius(45.0)
     )
   )
+
+  val trueTempJoinFlops = Set(
+    Map(
+      "node" -> Identifier("1"),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:00+0000")),
+      "flops" -> Count(2000238),
+      "temp" -> DegreesCelsius(40.0)
+    ),
+    Map(
+      "node" -> Identifier("1"),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:31:00+0000")),
+      "flops" -> Count(2000238),
+      "temp" -> DegreesCelsius(50.0)
+    )
+  )
 }
 
 class InterpolationJoinSpec extends ScrubJaySpec {
@@ -77,7 +92,6 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       }
     }
 
-    /*
     describe("One-to-many projection") {
       lazy val interjoined = temp.get.deriveInterpolationJoin(flops, 60000)
 
@@ -86,10 +100,9 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       }
 
       it("should match ground truth") {
-        assert(interjoined.get.rdd.collect.toSet == InterpolationJoinSpec.flopsInterjoinTempGroundTruth)
+        assert(interjoined.get.rdd.collect.toSet == InterpolationJoinSpec.trueTempJoinFlops)
       }
     }
-    */
   }
 
 }

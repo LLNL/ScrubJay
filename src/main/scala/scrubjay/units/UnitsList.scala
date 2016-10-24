@@ -17,7 +17,7 @@ object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
-  override def createInterpolator(xs: Seq[Double], ys: Seq[UnitsList[_]]): (Double) => UnitsList[_] = {
+  protected override def createInterpolator(xs: Seq[Double], ys: Seq[UnitsList[_]]): (Double) => UnitsList[_] = {
     (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
   }
 

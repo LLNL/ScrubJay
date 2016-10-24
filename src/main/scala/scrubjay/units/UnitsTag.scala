@@ -33,8 +33,11 @@ abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializ
 
   def convert(value: Any, metaUnits: MetaUnits): T
   def createGeneralInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
-    createInterpolator(xs, extractSeq(ys))
+    if (ys.length == 1)
+      (d: Double) => ys.head
+    else
+      createInterpolator(xs, extractSeq(ys))
   }
-  def createInterpolator(xs: Seq[Double], ys: Seq[T]): (Double) => T
+  protected def createInterpolator(xs: Seq[Double], ys: Seq[T]): (Double) => T
 }
 
