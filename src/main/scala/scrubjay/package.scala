@@ -138,6 +138,39 @@ package object scrubjay {
                   noneString: String = "null") = {
       scrubjay.datasource.CSVDataSource.saveToCSV(ds, filename, wrapperChar, delimiter, noneString)
     }
+
+    /**
+      * Create a new LocalMetaSource by interactively choosing them from the GlobalMetaBase
+      */
+    def createMetaSourceInteractively: MetaSource = {
+
+      createLocalMetaSource {
+        {
+          for (column <- ds.metaSource.columns) yield {
+
+            // Get meaning
+            GlobalMetaBase.META_BASE.meaningBase.foreach(meaning =>
+              println(String.format("%-30s %s", meaning._1, meaning._2.description))
+            )
+            val meaning = scala.io.StdIn.readLine("Specify a meaning for column " + column + ": ")
+
+            // Get dimension
+            GlobalMetaBase.META_BASE.dimensionBase.foreach(dimension =>
+              println(String.format("%-30s %s", dimension._1, dimension._2.description))
+            )
+            val dimension = scala.io.StdIn.readLine("Specify a dimension for column " + column + ": ")
+
+            // Get units
+            GlobalMetaBase.META_BASE.unitsBase.foreach(units =>
+              println(String.format("%-30s %s", units._1, units._2.description))
+            )
+            val units = scala.io.StdIn.readLine("Specify units for column " + column + ": ")
+
+            column -> metaEntryFromStrings(meaning, dimension, units)
+          }
+        }.toMap
+      }
+    }
   }
 
   /**
