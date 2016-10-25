@@ -14,9 +14,9 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
   val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
   val commonContinuousDimensions = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionType.CONTINUOUS &&
-      d._2._1.units.unitsTag.domainType == DomainType.POINT &&
-      d._2._2.units.unitsTag.domainType == DomainType.POINT).toSeq
-  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.DISCRETE).toSeq
+    d._2.units.unitsTag.domainType == DomainType.POINT &&
+    d._3.units.unitsTag.domainType == DomainType.POINT)
+  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.DISCRETE)
 
   // Single continuous axis for now
   def isValid = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
@@ -29,11 +29,11 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
 
       override lazy val rdd: RDD[DataRow] = {
 
-        val continuousDimColumn1 = commonContinuousDimensions.flatMap{case (d, me) => ds1.metaSource.columnForEntry(me._1)}.head
-        val continuousDimColumn2 = commonContinuousDimensions.flatMap{case (d, me) => ds2.metaSource.columnForEntry(me._2)}.head
+        val continuousDimColumn1 = commonContinuousDimensions.flatMap{case (d, me1, me2) => ds1.metaSource.columnForEntry(me1)}.head
+        val continuousDimColumn2 = commonContinuousDimensions.flatMap{case (d, me1, me2) => ds2.metaSource.columnForEntry(me2)}.head
 
-        val discreteDimColumns1 = commonDiscreteDimensions.flatMap{case (d, me) => ds1.metaSource.columnForEntry(me._1)}
-        val discreteDimColumns2 = commonDiscreteDimensions.flatMap{case (d, me) => ds2.metaSource.columnForEntry(me._2)}
+        val discreteDimColumns1 = commonDiscreteDimensions.flatMap{case (d, me1, me2) => ds1.metaSource.columnForEntry(me1)}
+        val discreteDimColumns2 = commonDiscreteDimensions.flatMap{case (d, me1, me2) => ds2.metaSource.columnForEntry(me2)}
 
         // Key by all values in the current window and next
         val flooredRDD1 = ds1.rdd.keyBy(row =>

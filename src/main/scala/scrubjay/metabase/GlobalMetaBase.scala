@@ -18,7 +18,7 @@ object GlobalMetaBase {
   final val MEANING_START = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
   final val MEANING_END = META_BASE.addMeaning(MetaMeaning("end", "The end of something"))
   final val MEANING_DURATION = META_BASE.addMeaning(MetaMeaning("duration", "A quantity of time"))
-  final val MEANING_SPAN = META_BASE.addMeaning(MetaMeaning("duration", "A span of time"))
+  final val MEANING_SPAN = META_BASE.addMeaning(MetaMeaning("span", "A span of time"))
   final val MEANING_CUMULATIVE = META_BASE.addMeaning(MetaMeaning("cumulative", "An atomically increasing value representing some thing since some point of origin"))
 
   // Dimensions

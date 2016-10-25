@@ -116,6 +116,10 @@ package object scrubjay {
       new scrubjay.derivation.InterpolationJoin(Some(ds), ds2, window).apply
     }
 
+    def deriveRangeJoin(ds2: Option[DataSource]) = {
+      new scrubjay.derivation.RangeJoin(Some(ds), ds2).apply
+    }
+
     /**
      * Save formats
      */

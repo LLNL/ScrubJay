@@ -22,7 +22,7 @@ import org.apache.spark.rdd.RDD
 
 class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transformer(dso) {
 
-  val isValid = columns.map(ds.metaSource.metaEntryMap(_)).forall(_.units.unitsTag == UnitsList)
+  val isValid = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_COMPOSITE_LIST)
 
   def derive: DataSource = new DataSource {
 
@@ -32,6 +32,7 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
         val originalMetaEntry = ds.metaSource.metaEntryMap(col)
         originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
       }).toMap)
+      .withoutColumns(columns)
 
     override lazy val rdd: RDD[DataRow] = {
 
@@ -57,13 +58,12 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
 
         // For each combination of exploded values, add a row
         for (combination <- combinations) yield {
-          row ++ Map(combination: _*)
+          row.filterNot(kv => columns.contains(kv._1)) ++ Map(combination: _*)
         }
       }
 
       // Create the derived dataset
-      ds.rdd.flatMap(row =>
-        derivation(row, columns))
+      ds.rdd.flatMap(row => derivation(row, columns))
     }
   }
 }

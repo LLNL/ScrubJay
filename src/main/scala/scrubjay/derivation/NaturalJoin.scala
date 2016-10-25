@@ -23,6 +23,9 @@ class NaturalJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Jo
     .filter(me => me.units == UNITS_IDENTIFIER && me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
+  val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry)
+  val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry)
+
   override protected def isValid = validEntries.nonEmpty
 
   override protected def derive: DataSource = {
@@ -31,12 +34,11 @@ class NaturalJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Jo
 
       // Implementations of abstract members
       override lazy val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
+        .withoutColumns(keyColumns2)
 
       // RDD derivation defined here
       override lazy val rdd: RDD[DataRow] = {
 
-        val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry)
-        val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry)
 
         // Create key
         val keyedRDD1 = ds1.rdd.keyBy(row => keyColumns1.map(row))

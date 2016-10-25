@@ -9,12 +9,15 @@ import org.apache.spark.rdd.RDD
 
 class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
 
+  val startEntry = ds.metaSource.metaEntryMap.find(me => me._2.dimension == DIMENSION_TIME && me._2.meaning == MEANING_START)
+  val endEntry = ds.metaSource.metaEntryMap.find(me => me._2.dimension == DIMENSION_TIME && me._2.meaning == MEANING_END)
+
   // Helper functions
   def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
     (row(startColumn), row(endColumn)) match {
       case (s: DateTimeStamp, e: DateTimeStamp) => {
         val newDataRow: DataRow = Map("span" -> DateTimeSpan(s.value to e.value))
-        row ++ newDataRow
+        row.filterNot(kv => Set(startColumn, endColumn).contains(kv._1)) ++ newDataRow
       }
     }
   }
@@ -27,16 +30,14 @@ class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
   }
 
   // Create a sequence of possible functions that create a row with a time span from an existing row
-  val allSpans: Seq[Option[(DataRow) => DataRow]] = Seq(
-    spanFromStartEnd(
-      ds.metaSource.metaEntryMap.find(_._2.meaning == MEANING_START).map(_._1),
-      ds.metaSource.metaEntryMap.find(_._2.meaning == MEANING_END).map(_._1))
-  )
+  val allSpans: Seq[Option[(DataRow) => DataRow]] = Seq(spanFromStartEnd(startEntry.map(_._1), endEntry.map(_._1)))
 
   val isValid = allSpans.exists(_.isDefined)
 
   def derive = new DataSource {
-    override lazy val metaSource = ds.metaSource.withMetaEntries(Map("span" -> MetaEntry(MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
+    override lazy val metaSource = ds.metaSource
+      .withMetaEntries(Map("span" -> MetaEntry(MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
+      .withoutColumns(Seq(startEntry.get._1, endEntry.get._1))
     override lazy val rdd: RDD[DataRow] = {
       ds.rdd.map(allSpans.find(_.isDefined).get.get)
     }

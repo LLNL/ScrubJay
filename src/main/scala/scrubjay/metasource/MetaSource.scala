@@ -39,7 +39,7 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
   }
 
   def withoutColumns(oldColumns: Seq[String]): MetaSource = {
-    new MetaSource(metaEntryMap.filter{case (k, v) => oldColumns.contains(k)})
+    new MetaSource(metaEntryMap.filterNot { case (k, v) => oldColumns.contains(k) } )
   }
 
 }
@@ -54,10 +54,18 @@ object MetaSource {
     ms1.metaEntryMap.values.toSet intersect ms2.metaEntryMap.values.toSet
   }
 
-  def commonDimensionEntries(ms1: MetaSource, ms2: MetaSource): Map[MetaDimension, (MetaEntry, MetaEntry)] = {
-    val ms1Dims = ms1.metaEntryMap.filter(_._2.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map{case (k, me) => me.dimension -> me}
-    val ms2Dims = ms2.metaEntryMap.filter(_._2.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map{case (k, me) => me.dimension -> me}
-    ms1Dims.flatMap{case (d, me1) => ms2Dims.get(d).ifDefinedThen(me2 => (d, (me1, me2)))}
+  def commonDimensionEntries(ms1: MetaSource, ms2: MetaSource): Seq[(MetaDimension, MetaEntry, MetaEntry)] = {
+
+    val ms1Entries = ms1.metaEntryMap.values.map(me => (1, me))
+    val ms2Entries = ms2.metaEntryMap.values.map(me => (2, me))
+
+    (ms1Entries ++ ms2Entries).groupBy(_._2.dimension)
+      .flatMap(kv => {
+        val ms1d = kv._2.filter(_._1 == 1).map(_._2).toSeq
+        val ms2d = kv._2.filter(_._1 == 2).map(_._2).toSeq
+        for (ms1de <- ms1d; ms2de <- ms2d) yield (kv._1, ms1de, ms2de)
+      }).toSeq
+
   }
 
 }

@@ -12,7 +12,7 @@ case class Seconds(value: Double) extends Units[Double]
 
 object Seconds extends UnitsTag[Seconds, Double] {
 
-  override val domainType: DomainType = DomainType.POINT
+  override val domainType: DomainType = DomainType.QUANTITY
 
   override def convert(value: Any, metaUnits: MetaUnits): Seconds = Seconds(value)
 

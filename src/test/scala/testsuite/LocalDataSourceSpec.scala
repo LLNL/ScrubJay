@@ -10,6 +10,7 @@ class LocalDataSourceSpec extends ScrubJaySpec {
 
     lazy val jobQueue = sc.createLocalDataSource(jobQueueRawData, jobQueueMeta.keySet.toSeq, new MetaSource(jobQueueMeta))
     lazy val cabLayout = sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutMeta.keySet.toSeq, new MetaSource(clusterLayoutMeta))
+    lazy val nodeFlops = sc.createLocalDataSource(nodeDataRawData, nodeDataMeta.keySet.toSeq, new MetaSource(nodeDataMeta))
 
     describe("Creation") {
 
@@ -62,14 +63,30 @@ class LocalDataSourceSpec extends ScrubJaySpec {
       }
 
       // Joined with cab layout
-      lazy val jobQueueSpanExpandedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
+      lazy val jobQueueSpanExplodedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
 
       describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
         it("should be defined") {
-          assert(jobQueueSpanExpandedJoined.isDefined)
+          assert(jobQueueSpanExplodedJoined.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExpandedJoined.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoined)
+          assert(jobQueueSpanExplodedJoined.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoined)
+
+          println
+          jobQueueSpanExplodedJoined.get.metaSource.metaEntryMap.foreach(kv => println(kv._1 + " -> " + kv._2.units + ", " + kv._2.dimension + ", " + kv._2.units.unitsTag.domainType))
+          println
+          nodeFlops.get.metaSource.metaEntryMap.foreach(kv => println(kv._1 + " -> " + kv._2.units + ", " + kv._2.dimension + ", " + kv._2.units.unitsTag.domainType))
+        }
+      }
+
+
+      lazy val jobQueueSpanExplodedJoinedFlops = jobQueueSpanExplodedJoined.get.deriveRangeJoin(nodeFlops)
+
+      describe("Job queue with derived time span AND exploded node list AND joined with cab layout AND range-joined with node FLOPs") {
+        it("should be defined") {
+          assert(jobQueueSpanExplodedJoinedFlops.isDefined)
+
+          jobQueueSpanExplodedJoinedFlops.get.rdd.collect.foreach(println)
         }
       }
     }
