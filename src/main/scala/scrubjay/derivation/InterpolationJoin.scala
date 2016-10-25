@@ -9,6 +9,8 @@ import scala.language.existentials
 import org.apache.spark.rdd.RDD
 import scrubjay.units.UnitsTag.DomainType
 
+import org.apache.spark.sql.types.StringType
+
 class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], window: Double) extends Joiner(dso1, dso2) {
 
   val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
