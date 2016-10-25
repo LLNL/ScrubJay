@@ -52,9 +52,10 @@ class RangeJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Join
           range.minDouble <= point.asDouble && point.asDouble <= range.maxDouble
         }}
 
+        // Reduce all points that fall in a range using the appropriate reducer for those units
         val meta = ds1.rdd.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
-        val reducedMatch = continuousMatch.reduceByKey((row21, row22) =>
-          (row21.toSeq ++ row22.toSeq).groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap)
+        val reducedMatch = continuousMatch.mapValues(_.toSeq).reduceByKey(_ ++ _)
+          .mapValues(_.groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap[String, Units[_]])
 
         // Remove redundant continuous entries from row2 and combine results
         reducedMatch.map { case (row1, row2) => row1 ++ row2.filterNot { case (k, v) => k == continuousDimColumn2 } }

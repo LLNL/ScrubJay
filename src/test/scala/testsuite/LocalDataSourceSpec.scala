@@ -53,7 +53,7 @@ class LocalDataSourceSpec extends ScrubJaySpec {
       // Expanded node list
       lazy val jobQueueSpanExploded = jobQueueSpan.get.deriveExplodeList(Seq("nodelist"))
 
-      describe("Job queue with derived time span AND exploded node list") {
+      describe("...with exploded node list") {
         it("should be defined") {
           assert(jobQueueSpanExploded.isDefined)
         }
@@ -65,28 +65,24 @@ class LocalDataSourceSpec extends ScrubJaySpec {
       // Joined with cab layout
       lazy val jobQueueSpanExplodedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
 
-      describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
+      describe("...joined with cab layout") {
         it("should be defined") {
           assert(jobQueueSpanExplodedJoined.isDefined)
         }
         it("should match ground truth") {
           assert(jobQueueSpanExplodedJoined.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoined)
-
-          println
-          jobQueueSpanExplodedJoined.get.metaSource.metaEntryMap.foreach(kv => println(kv._1 + " -> " + kv._2.units + ", " + kv._2.dimension + ", " + kv._2.units.unitsTag.domainType))
-          println
-          nodeFlops.get.metaSource.metaEntryMap.foreach(kv => println(kv._1 + " -> " + kv._2.units + ", " + kv._2.dimension + ", " + kv._2.units.unitsTag.domainType))
         }
       }
 
 
       lazy val jobQueueSpanExplodedJoinedFlops = jobQueueSpanExplodedJoined.get.deriveRangeJoin(nodeFlops)
 
-      describe("Job queue with derived time span AND exploded node list AND joined with cab layout AND range-joined with node FLOPs") {
+      describe("...range-joined with node flops") {
         it("should be defined") {
           assert(jobQueueSpanExplodedJoinedFlops.isDefined)
-
-          jobQueueSpanExplodedJoinedFlops.get.rdd.collect.foreach(println)
+        }
+        it("should match ground truth") {
+          assert(jobQueueSpanExplodedJoinedFlops.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
         }
       }
     }

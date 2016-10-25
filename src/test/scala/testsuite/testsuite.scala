@@ -210,6 +210,15 @@ package object testsuite {
       "nodelist_exploded" -> Identifier("3"))
   )
 
+  val trueJobQueueSpanExplodedJoinedFlops = Set(
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")), "jobid" -> Identifier("456"), "elapsed" -> Seconds(45.0), "flops" -> Count(75227),  "nodelist_exploded" -> Identifier("5"), "rack" -> Identifier("2")),
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")), "jobid" -> Identifier("456"), "elapsed" -> Seconds(45.0), "flops" -> Count(41843),  "nodelist_exploded" -> Identifier("6"), "rack" -> Identifier("2")),
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")), "jobid" -> Identifier("123"), "elapsed" -> Seconds(23.0), "flops" -> Count(23334),  "nodelist_exploded" -> Identifier("1"), "rack" -> Identifier("1")),
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")), "jobid" -> Identifier("123"), "elapsed" -> Seconds(23.0), "flops" -> Count(1099),   "nodelist_exploded" -> Identifier("3"), "rack" -> Identifier("1")),
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")), "jobid" -> Identifier("456"), "elapsed" -> Seconds(45.0), "flops" -> Count(234956), "nodelist_exploded" -> Identifier("4"), "rack" -> Identifier("2")),
+    Map("span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")), "jobid" -> Identifier("123"), "elapsed" -> Seconds(23.0), "flops" -> Count(35225),  "nodelist_exploded" -> Identifier("2"), "rack" -> Identifier("1"))
+  )
+
   val trueNodeDataJoinedWithClusterLayout = Set(
     Map("node" -> Identifier("4"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(92864)),
     Map("node" -> Identifier("4"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(142092)),
