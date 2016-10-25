@@ -25,8 +25,12 @@ object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
-  protected override def createInterpolator(xs: Seq[Double], ys: Seq[DateTimeSpan]): (Double) => DateTimeSpan = {
+  override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeSpan]): (Double) => DateTimeSpan = {
     (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
+  }
+
+  override protected def typedReduce(ys: Seq[DateTimeSpan]): DateTimeSpan = {
+    DateTimeSpan(ys.map(_.value.getStart).min to ys.map(_.value.getEnd).max)
   }
 
 }

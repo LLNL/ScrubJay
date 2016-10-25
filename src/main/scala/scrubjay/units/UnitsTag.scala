@@ -9,7 +9,7 @@ object UnitsTag {
 
   object DomainType extends Enumeration {
     type DomainType = Value
-    val POINT, QUANTITY, MULTIPOINT, RANGE, UNKNOWN= Value
+    val POINT, QUANTITY, MULTIPOINT, RANGE, UNKNOWN = Value
   }
 
 }
@@ -32,12 +32,17 @@ abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializ
   }
 
   def convert(value: Any, metaUnits: MetaUnits): T
-  def createGeneralInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
+  def createInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
     if (ys.length == 1)
       (d: Double) => ys.head
     else
-      createInterpolator(xs, extractSeq(ys))
+      createTypedInterpolator(xs, extractSeq(ys))
   }
-  protected def createInterpolator(xs: Seq[Double], ys: Seq[T]): (Double) => T
+  def reduce(ys: Seq[Units[_]]): Units[_] = {
+    typedReduce(extractSeq(ys))
+  }
+
+  protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[T]): (Double) => T
+  protected def typedReduce(ys: Seq[T]): T
 }
 

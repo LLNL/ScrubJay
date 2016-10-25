@@ -79,7 +79,7 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
 
           val projectedValues = for (obs <- observations) yield {
             val unitsTag = ds2MetaEntries.value(obs._1).units.unitsTag
-            val f = unitsTag.createGeneralInterpolator(obs._2._1, obs._2._2)
+            val f = unitsTag.createInterpolator(obs._2._1, obs._2._2)
             obs._1 -> f(row(keyColumn).asInstanceOf[Continuous].asDouble)
           }
 

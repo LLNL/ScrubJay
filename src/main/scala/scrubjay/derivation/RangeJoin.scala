@@ -36,25 +36,28 @@ class RangeJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Join
 
       override lazy val rdd: RDD[DataRow] = {
 
-
         // Cartesian
         val cartesian = ds1.rdd.cartesian(ds2.rdd)
 
         // Filter out all pairs where the discrete columns don't match
         val discreteMatch = cartesian.filter { case (row1, row2) => discreteDimColumns1.map(row1) == discreteDimColumns2.map(row2) }
 
+        // Remove redundant discrete entries
+        val filteredDiscrete = discreteMatch.map { case (row1, row2) => (row1, row2.filterNot { case (k, v) => discreteDimColumns2.contains(k) } ) }
 
         // Filter out all pairs where the POINT in ds2 does not reside in the RANGE of ds1
-        val continuousMatch = discreteMatch.filter { case (row1, row2) => {
+        val continuousMatch = filteredDiscrete.filter { case (row1, row2) => {
           val range = row1(continuousDimColumn1).asInstanceOf[Range]
           val point = row2(continuousDimColumn2).asInstanceOf[Continuous]
           range.minDouble <= point.asDouble && point.asDouble <= range.maxDouble
         }}
 
-        // Remove redundant discrete entries from row2 and combine results
-        continuousMatch.map { case (row1, row2) => row1 ++ row2.filterNot {
-          case (k, v) => discreteDimColumns2.contains(k) || k == continuousDimColumn2
-        }}
+        val meta = ds1.rdd.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
+        val reducedMatch = continuousMatch.reduceByKey((row21, row22) =>
+          (row21.toSeq ++ row22.toSeq).groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap)
+
+        // Remove redundant continuous entries from row2 and combine results
+        reducedMatch.map { case (row1, row2) => row1 ++ row2.filterNot { case (k, v) => k == continuousDimColumn2 } }
       }
     }
   }

@@ -11,7 +11,12 @@ object Identifier extends UnitsTag[Identifier, String] {
   override val domainType: DomainType = DomainType.POINT
 
   override def convert(value: Any, metaUnits: MetaUnits): Identifier = Identifier(value.toString)
-  protected override def createInterpolator(xs: Seq[Double], ys: Seq[Identifier]): (Double) => Identifier = {
+
+  override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Identifier]): (Double) => Identifier = {
     (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
+  }
+
+  override protected def typedReduce(ys: Seq[Identifier]): Identifier = {
+    ys.groupBy(i => i).maxBy(_._2.length)._1 // mode
   }
 }

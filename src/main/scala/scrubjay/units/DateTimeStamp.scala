@@ -21,8 +21,12 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
-  protected override def createInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
+  override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.getMillis.toDouble):_*))
     (d: Double) => DateTimeStamp(Math.round(f(d)).toDateTime)
+  }
+
+  override protected def typedReduce(ys: Seq[DateTimeStamp]): DateTimeStamp = {
+    DateTimeStamp(Math.round(ys.map(_.value.getMillis.toDouble).sum / ys.length).toDateTime)
   }
 }
