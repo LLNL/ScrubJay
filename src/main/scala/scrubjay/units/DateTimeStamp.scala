@@ -18,8 +18,10 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
     case s: String => DateTimeStamp(DateTime.parse(s))
-    case l: Long => DateTimeStamp(l.toDateTime)
-    case i: Int => DateTimeStamp(i.toDateTime)
+    case d: Double => DateTimeStamp((Math.round(d)*1000L).toDateTime)
+    case f: Float => DateTimeStamp((Math.round(f)*1000L).toDateTime)
+    case l: Long => DateTimeStamp((l*1000L).toDateTime)
+    case i: Int => DateTimeStamp((i*1000L).toDateTime)
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
