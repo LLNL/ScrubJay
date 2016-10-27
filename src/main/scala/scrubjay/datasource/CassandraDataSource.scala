@@ -1,16 +1,14 @@
 package scrubjay.datasource
 
 import scrubjay.util.niceAttempt
-
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.metasource.MetaSource
 import scrubjay.units.Units
-
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
-
 import org.apache.spark.SparkContext
+import com.github.nscala_time.time.Imports._
 
 import scala.reflect._
 
@@ -86,6 +84,7 @@ object CassandraDataSource {
       case t if t == classTag[Double] => "double"
       case t if t == classTag[Double] => "decimal"
       case t if t == classTag[BigInt] => "varint"
+      case t if t == classTag[DateTime] => "timestamp"
 
       // Cassandra collections
       case t if t == classTag[List[_]]  => "list<" + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"
