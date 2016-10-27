@@ -108,7 +108,7 @@ object CassandraDataSource {
                               primaryKeys: Seq[String],
                               clusterKeys: Seq[String]): String = {
 
-    val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
+    val schemaString = schema.map{case (s, v) => s"\"$s\" $v"}.mkString(", ")
     val clusterKeyString =  if (clusterKeys.nonEmpty) ", " + clusterKeys.mkString(",") else ""
     val primaryKeyString = primaryKeys.mkString(",")
 
