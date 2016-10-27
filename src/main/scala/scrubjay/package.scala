@@ -124,12 +124,12 @@ package object scrubjay {
      * Save formats
      */
 
-    def saveToExistingCassandraTable(keyspace: String, table: String) = {
-      scrubjay.datasource.CassandraDataSource.saveToExistingCassandraTable(ds, keyspace, table)
+    def saveToCassandra(keyspace: String, table: String) = {
+      scrubjay.datasource.CassandraDataSource.saveToCassandra(ds, keyspace, table)
     }
 
-    def saveToNewCassandraTable(keyspace: String, table: String, primaryKeys: Seq[String], clusterKeys: Seq[String]) = {
-      scrubjay.datasource.CassandraDataSource.saveToNewCassandraTable(ds, keyspace, table, primaryKeys, clusterKeys)
+    def createCassandraTable(keyspace: String, table: String, primaryKeys: Seq[String], clusterKeys: Seq[String]) = {
+      scrubjay.datasource.CassandraDataSource.createCassandraTable(ds, keyspace, table, primaryKeys, clusterKeys)
     }
 
     def saveToCSV(filename: String,

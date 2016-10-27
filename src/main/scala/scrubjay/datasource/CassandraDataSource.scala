@@ -116,20 +116,20 @@ object CassandraDataSource {
     s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString)$clusterKeyString))"
   }
 
-  def saveToExistingCassandraTable(ds: DataSource,
-                                   keyspace: String,
-                                   table: String): Unit = {
+  def saveToCassandra(ds: DataSource,
+                      keyspace: String,
+                      table: String): Unit = {
 
     // Convert rows to CassandraRow instances and save to the table
     ds.rdd.map(row => CassandraRow.fromMap(row.map(kv => kv._1 -> kv._2.value.toString)))
       .saveToCassandra(keyspace, table)
   }
 
-  def saveToNewCassandraTable(ds: DataSource,
-                              keyspace: String,
-                              table: String,
-                              primaryKeys: Seq[String],
-                              clusterKeys: Seq[String]): Unit = {
+  def createCassandraTable(ds: DataSource,
+                           keyspace: String,
+                           table: String,
+                           primaryKeys: Seq[String],
+                           clusterKeys: Seq[String]): Unit = {
 
     // Infer the schema from the DataSource
     val schema = cassandraSchemaForDataSource(ds)
@@ -141,7 +141,5 @@ object CassandraDataSource {
     CassandraConnector(ds.rdd.sparkContext.getConf).withSessionDo { session =>
       session.execute(CQLCommand)
     }
-
-    saveToExistingCassandraTable(ds, keyspace, table)
   }
 }
