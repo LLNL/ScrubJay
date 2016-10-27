@@ -14,7 +14,14 @@ if ! cmd-exists spark-shell; then
 fi
 
 if [ -f $SCRUBJAR ]; then
-    spark-shell --jars $SCRUBJAR -i $SCRUBINIT
+    spark-shell \
+        --name "ScrubJay Shell" \
+        --master spark://sonar11:7077 \
+        --driver-memory 128g \
+        --executor-memory 127g \
+        --conf spark.driver.maxresultsize=0 \
+        --jars $SCRUBJAR \
+        -i $SCRUBINIT
 else
     echo "Assembly jar $SCRUBJAR not found! Run \`sbt assembly\` first!"
     echo "Aborting"
