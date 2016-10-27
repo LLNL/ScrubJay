@@ -98,7 +98,7 @@ object CassandraDataSource {
 
   // Get columns and datatypes from the data and add meta_data for each column
   def cassandraSchemaForDataSource(ds: DataSource): Seq[(String, String)] = {
-    ds.metaSource.metaEntryMap.map{case (c, me) => (c, inferCassandraTypeString(me.units))}.toSeq
+    ds.metaSource.metaEntryMap.map{case (c, me) => ("\"" + c + "\"", inferCassandraTypeString(me.units))}.toSeq
   }
 
   // The CQL command to create a Cassandra table with the specified schema
@@ -108,7 +108,7 @@ object CassandraDataSource {
                               primaryKeys: Seq[String],
                               clusterKeys: Seq[String]): String = {
 
-    val schemaString = schema.map{case (s, v) => s"\"$s\" $v"}.mkString(", ")
+    val schemaString = schema.map{case (s, v) => s"$s $v"}.mkString(", ")
     val clusterKeyString =  if (clusterKeys.nonEmpty) ", " + clusterKeys.mkString(",") else ""
     val primaryKeyString = primaryKeys.mkString(",")
 
