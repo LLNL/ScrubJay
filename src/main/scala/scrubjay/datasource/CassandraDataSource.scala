@@ -83,7 +83,8 @@ object CassandraDataSource {
       case t if t == classTag[Float] => "float"
       case t if t == classTag[Double] => "double"
       case t if t == classTag[Double] => "decimal"
-      case t if t == classTag[BigInt] => "varint"
+      case t if t == classTag[Long] => "bigint"
+      case t if t == classTag[BigInt] => "bigint"
       case t if t == classTag[DateTime] => "timestamp"
 
       // Cassandra collections
