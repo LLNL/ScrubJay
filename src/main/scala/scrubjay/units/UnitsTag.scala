@@ -19,17 +19,8 @@ abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializ
   val rawValueClassTag: ClassTag[_] = classTag[R]
   val domainType: UnitsTag.DomainType.DomainType
 
-  def extract(units: Units[_]): T = units match {
-    case t: T => t
-    case _ => throw new RuntimeException("Invalid extractor for type!")
-  }
-
-  def extractSeq(unitsSeq: Seq[Units[_]]): Seq[T] = {
-    unitsSeq.map{
-      case t: T => t
-      case _ => throw new RuntimeException("Invalid extractor for type!")
-    }
-  }
+  def extract(units: Units[_]): T = units.asInstanceOf[T]
+  def extractSeq(unitsSeq: Seq[Units[_]]): Seq[T] = unitsSeq.map(extract)
 
   def convert(value: Any, metaUnits: MetaUnits): T
   def createInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
