@@ -24,18 +24,16 @@ object CassandraMetaSource {
     new MetaSource(metaEntryMap)
   }
 
-  implicit class MetaSource_saveCassandra(m: MetaSource) {
-    def saveAsCassandraMetaSource(sc: SparkContext, keyspace: String, table: String): Unit = {
-      val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) => {
-        CassandraRow.fromMap(Map(
-          "column" -> column,
-          "meaning" -> metaEntry.meaning.title,
-          "dimension" -> metaEntry.dimension.title,
-          "units" -> metaEntry.units.title
-        ))
-      }}.toSeq
-      sc.parallelize(cassandraRows).saveAsCassandraTable(keyspace, table)
-    }
+  def saveToCassandra(m: MetaSource, sc: SparkContext, keyspace: String, table: String): Unit = {
+    val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) => {
+      CassandraRow.fromMap(Map(
+        "column" -> column,
+        "meaning" -> metaEntry.meaning.title,
+        "dimension" -> metaEntry.dimension.title,
+        "units" -> metaEntry.units.title
+      ))
+    }}.toSeq
+    sc.parallelize(cassandraRows).saveToCassandra(keyspace, table)
   }
 }
 

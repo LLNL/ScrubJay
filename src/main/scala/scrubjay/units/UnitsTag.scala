@@ -24,10 +24,11 @@ abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializ
 
   def convert(value: Any, metaUnits: MetaUnits): T
   def createInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
+    val (nxs, nys) = xs.zip(ys).toMap.toSeq.unzip
     if (ys.length == 1)
       (d: Double) => ys.head
     else
-      createTypedInterpolator(xs, extractSeq(ys))
+      createTypedInterpolator(nxs, extractSeq(nys))
   }
   def reduce(ys: Seq[Units[_]]): Units[_] = {
     typedReduce(extractSeq(ys))

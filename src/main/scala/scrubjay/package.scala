@@ -187,7 +187,9 @@ package object scrubjay {
       scrubjay.metasource.CSVMetaSource.saveToCSV(metaSource, fileName)
     }
 
-    // TODO: CassandraMetaSource, load/save/auto-load from scrubjay table
+    def saveToCassandra(sc: SparkContext, keyspace: String, table: String) = {
+      scrubjay.metasource.CassandraMetaSource.saveToCassandra(metaSource, sc, keyspace, table)
+    }
 
   }
 
