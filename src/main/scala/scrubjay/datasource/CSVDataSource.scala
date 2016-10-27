@@ -46,7 +46,7 @@ object CSVDataSource {
     // TODO (possibly): optimize this by collecting a partition at a time
     bw.write(header.map(wrapperChar + _ + wrapperChar).mkString(delimiter))
     bw.newLine()
-    csvRdd.toLocalIterator.foreach(rowString => {
+    csvRdd.collect.foreach(rowString => {
       bw.write(rowString)
       bw.newLine()
     })

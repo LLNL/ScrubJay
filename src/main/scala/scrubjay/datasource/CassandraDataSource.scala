@@ -120,7 +120,7 @@ object CassandraDataSource {
                                    table: String): Unit = {
 
     // Convert rows to CassandraRow instances and save to the table
-    ds.rdd.map(CassandraRow.fromMap(_))
+    ds.rdd.map(row => CassandraRow.fromMap(row.map(kv => kv._1 -> kv._2.value.toString)))
       .saveToCassandra(keyspace, table)
   }
 
