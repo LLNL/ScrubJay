@@ -30,8 +30,8 @@ object Units {
 
   def rawRDDToUnitsRDD(rawRDD: RDD[RawDataRow], metaEntryMap: MetaEntryMap): RDD[DataRow] = {
     val broadcastMetaMap = rawRDD.sparkContext.broadcast(metaEntryMap)
-    rawRDD.map(row => row.map{case (k, v) => {
-      (k, raw2Units(v, broadcastMetaMap.value.getOrElse(k, UNKNOWN_META_ENTRY).units))
-    }}.toMap)
+    rawRDD.map(row => row.map {
+      case (k, v) => k -> raw2Units(v, broadcastMetaMap.value.getOrElse(k, UNKNOWN_META_ENTRY).units)
+    }.toMap)
   }
 }

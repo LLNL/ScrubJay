@@ -17,7 +17,7 @@ class CassandraDataSource(cassandraRdd: CassandraTableScanRDD[CassandraRow],
   extends DataSource {
 
   override lazy val metaSource = providedMetaSource.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
-  override lazy val rdd = Units.rawRDDToUnitsRDD(cassandraRdd.map(_.toMap), metaSource.metaEntryMap)
+  override lazy val rdd = Units.rawRDDToUnitsRDD(cassandraRdd.map(_.toMap.filter{case (k, null) => false; case _ => true}), metaSource.metaEntryMap)
 
   val keyspace = cassandraRdd.keyspaceName
   val table = cassandraRdd.tableName
