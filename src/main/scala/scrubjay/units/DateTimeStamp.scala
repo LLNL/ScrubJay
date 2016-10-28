@@ -3,6 +3,7 @@ package scrubjay.units
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
+import scrubjay.util.niceAttempt
 
 import breeze.interpolation.LinearInterpolator
 import breeze.linalg.DenseVector
@@ -16,8 +17,18 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
 
   override val domainType: DomainType = DomainType.POINT
 
+  def dateTimeFromString(s: String): DateTimeStamp = {
+
+    val attempts = Seq(
+      niceAttempt(DateTime.parse(s)),
+      niceAttempt(DateTimeFormat.forPattern("E MMM d H:m:s z y").parseDateTime(s))
+    )
+
+    DateTimeStamp(attempts.flatten.head)
+  }
+
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
-    case s: String => DateTimeStamp(DateTime.parse(s))
+    case s: String => dateTimeFromString(s)
     case d: Double => DateTimeStamp((Math.round(d)*1000L).toDateTime)
     case f: Float => DateTimeStamp((Math.round(f)*1000L).toDateTime)
     case l: Long => DateTimeStamp((l*1000L).toDateTime)
