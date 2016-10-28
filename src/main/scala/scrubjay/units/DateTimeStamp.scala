@@ -29,6 +29,7 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
   }
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
+    case dt: DateTime => DateTimeStamp(dt)
     case s: String => dateTimeFromString(s)
     case d: Double => DateTimeStamp((Math.round(d)*1000L).toDateTime)
     case f: Float => DateTimeStamp((Math.round(f)*1000L).toDateTime)
