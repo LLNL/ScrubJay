@@ -9,6 +9,7 @@ import scala.language.existentials
 
 abstract class Units[T] extends Serializable {
   val value: T
+  def rawString: String = value.toString
 }
 
 // TODO: How to enforce that a Units class for a Continuous dimension should implement Continuous?

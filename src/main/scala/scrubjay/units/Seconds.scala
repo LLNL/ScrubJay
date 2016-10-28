@@ -4,7 +4,6 @@ import breeze.interpolation.LinearInterpolator
 import breeze.linalg.DenseVector
 
 import scrubjay.metabase.MetaDescriptor._
-import scrubjay.units.ConversionHelpers._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 
@@ -14,7 +13,16 @@ object Seconds extends UnitsTag[Seconds, Double] {
 
   override val domainType: DomainType = DomainType.QUANTITY
 
-  override def convert(value: Any, metaUnits: MetaUnits): Seconds = Seconds(value)
+  override def convert(value: Any, metaUnits: MetaUnits): Seconds = value match {
+    case n: Number => Seconds(n.doubleValue)
+    case s: String => s.split(":").toSeq match {
+      case Seq(sec: String) => Seconds(sec.toDouble)
+      case Seq(min: String, sec: String) => Seconds(min.toDouble*60.0 + sec.toDouble)
+      case Seq(hr: String, min: String, sec: String) => Seconds(hr.toDouble*3600 + min.toDouble*60.0 + sec.toDouble)
+      case _ => throw new RuntimeException(s"Cannot convert String $s to $metaUnits")
+    }
+    case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
+  }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Seconds]): (Double) => Seconds = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value):_*))
