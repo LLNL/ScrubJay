@@ -8,6 +8,7 @@ import scrubjay.util.niceAttempt
 import breeze.interpolation.LinearInterpolator
 import breeze.linalg.DenseVector
 import com.github.nscala_time.time.Imports._
+import scala.util.control.Exception.allCatch
 
 case class DateTimeStamp(value: DateTime) extends Units[DateTime] with Continuous {
   override def asDouble: Double = value.getMillis.toDouble
@@ -20,8 +21,8 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
   def dateTimeFromString(s: String): DateTimeStamp = {
 
     val attempts = Seq(
-      niceAttempt(DateTime.parse(s)),
-      niceAttempt(DateTimeFormat.forPattern("E MMM d H:m:s z y").parseDateTime(s))
+      allCatch.opt(DateTime.parse(s)),
+      allCatch.opt(DateTimeFormat.forPattern("E MMM d H:m:s z y").parseDateTime(s))
     )
 
     DateTimeStamp(attempts.flatten.head)
