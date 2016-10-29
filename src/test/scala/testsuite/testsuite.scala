@@ -215,14 +215,14 @@ package object testsuite {
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(75227),
+      "flops" -> Count(37614),
       "nodelist_exploded" -> Identifier("5"),
       "rack" -> Identifier("2")),
     Map(
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(41843),
+      "flops" -> Count(20922),
       "nodelist_exploded" -> Identifier("6"),
       "rack" -> Identifier("2")),
     Map(
@@ -243,7 +243,7 @@ package object testsuite {
       "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(234956),
+      "flops" -> Count(117478),
       "nodelist_exploded" -> Identifier("4"),
       "rack" -> Identifier("2")),
     Map(
