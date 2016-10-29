@@ -86,6 +86,7 @@ object CassandraDataSource {
       case t if t == classTag[Long] => "bigint"
       case t if t == classTag[BigInt] => "bigint"
       case t if t == classTag[DateTime] => "timestamp"
+      case t if t == classTag[Interval] => "tuple<timestamp, timestamp>"
 
       // Cassandra collections
       case t if t == classTag[List[_]]  => "list<" + inferCassandraTypeString(metaUnits.unitsChildren.head) + ">"

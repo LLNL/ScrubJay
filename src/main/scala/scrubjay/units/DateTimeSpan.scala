@@ -11,6 +11,9 @@ case class DateTimeSpan(value: Interval) extends Units[Interval] with Range {
   override def minDouble: Double = value.getStart.getMillis
   override def maxDouble: Double = value.getEnd.getMillis
 
+  // TODO: read in this rawstring format
+  override def rawString: String = "('" + value.getStart.toString + "', '" + value.getEnd.toString + "')"
+
   def explode(step: Period): Seq[DateTimeStamp] = {
     Iterator.iterate(value.start)(_.plus(step)).takeWhile(!_.isAfter(value.end)).map(DateTimeStamp(_)).toSeq
   }
