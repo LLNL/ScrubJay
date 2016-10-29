@@ -23,7 +23,7 @@ object Count extends UnitsTag[Count, Long] {
   }
 
   override protected def typedReduce(ys: Seq[Count]): Count = {
-    Count(ys.map(_.value).sum)
+    Count(Math.round(ys.map(_.value).sum.toDouble / ys.length))
   }
 }
 
