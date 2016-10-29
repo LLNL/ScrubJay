@@ -23,19 +23,21 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
     val attempts = Seq(
       allCatch.opt(DateTime.parse(s)),
       allCatch.opt(DateTimeFormat.forPattern("E MMM d H:m:s z y").parseDateTime(s))
-    )
+    ).flatten
 
-    DateTimeStamp(attempts.flatten.head)
+    if (attempts.isEmpty)
+      throw new RuntimeException(s"Cannot convert $s to DateTime")
+
+    DateTimeStamp(attempts.head)
   }
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
     case dt: DateTime => DateTimeStamp(dt)
-    case s: String => dateTimeFromString(s)
     case d: Double => DateTimeStamp((Math.round(d)*1000L).toDateTime)
     case f: Float => DateTimeStamp((Math.round(f)*1000L).toDateTime)
     case l: Long => DateTimeStamp((l*1000L).toDateTime)
     case i: Int => DateTimeStamp((i*1000L).toDateTime)
-    case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
+    case v => dateTimeFromString(v.toString)
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
