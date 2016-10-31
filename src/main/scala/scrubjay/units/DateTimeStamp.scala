@@ -3,11 +3,12 @@ package scrubjay.units
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
-import scrubjay.util.niceAttempt
 
 import breeze.interpolation.LinearInterpolator
 import breeze.linalg.DenseVector
-import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+
 import scala.util.control.Exception.allCatch
 
 case class DateTimeStamp(value: DateTime) extends Units[DateTime] with Continuous {
@@ -34,19 +35,19 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
     case dt: DateTime => DateTimeStamp(dt)
-    case d: Double => DateTimeStamp((Math.round(d)*1000L).toDateTime)
-    case f: Float => DateTimeStamp((Math.round(f)*1000L).toDateTime)
-    case l: Long => DateTimeStamp((l*1000L).toDateTime)
-    case i: Int => DateTimeStamp((i*1000L).toDateTime)
+    case d: Double => DateTimeStamp(new DateTime(Math.round(d)*1000L))
+    case f: Float => DateTimeStamp(new DateTime(Math.round(f)*1000L))
+    case l: Long => DateTimeStamp(new DateTime(l*1000L))
+    case i: Int => DateTimeStamp(new DateTime(i*1000L))
     case v => dateTimeFromString(v.toString)
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
     val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.getMillis.toDouble):_*))
-    (d: Double) => DateTimeStamp((Math.round(d)*1000L).toDateTime)
+    (d: Double) => DateTimeStamp(new DateTime(Math.round(d)*1000L))
   }
 
   override protected def typedReduce(ys: Seq[DateTimeStamp]): DateTimeStamp = {
-    DateTimeStamp(Math.round(ys.map(_.value.getMillis.toDouble).sum / ys.length).toDateTime)
+    DateTimeStamp(new DateTime(Math.round(ys.map(_.value.getMillis.toDouble).sum / ys.length)))
   }
 }

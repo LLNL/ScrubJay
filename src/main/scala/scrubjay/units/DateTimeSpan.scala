@@ -4,7 +4,7 @@ import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{DateTime, Interval, Period}
 
 case class DateTimeSpan(value: Interval) extends Units[Interval] with Range {
 
@@ -15,7 +15,7 @@ case class DateTimeSpan(value: Interval) extends Units[Interval] with Range {
   override def rawString: String = "('" + value.getStart.toString + "', '" + value.getEnd.toString + "')"
 
   def explode(step: Period): Seq[DateTimeStamp] = {
-    Iterator.iterate(value.start)(_.plus(step)).takeWhile(!_.isAfter(value.end)).map(DateTimeStamp(_)).toSeq
+    Iterator.iterate(value.getStart)(_.plus(step)).takeWhile(!_.isAfter(value.getEnd)).map(DateTimeStamp(_)).toSeq
   }
 }
 
@@ -24,7 +24,7 @@ object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
   override val domainType: DomainType = DomainType.RANGE
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeSpan = value match {
-    case (s: String, e: String) => DateTimeSpan(DateTime.parse(s) to DateTime.parse(e))
+    case (s: String, e: String) => DateTimeSpan(new Interval(DateTime.parse(s), DateTime.parse(e)))
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
@@ -33,7 +33,7 @@ object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
   }
 
   override protected def typedReduce(ys: Seq[DateTimeSpan]): DateTimeSpan = {
-    DateTimeSpan(ys.map(_.value.getStart).min to ys.map(_.value.getEnd).max)
+    DateTimeSpan(new Interval(ys.map(_.value.getStart.getMillis).min, ys.map(_.value.getEnd.getMillis).max))
   }
 
 }

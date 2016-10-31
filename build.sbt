@@ -41,7 +41,6 @@ libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
 // Misc
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
-libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.12.0"
 
 // Fix dependency relocation for xml-apis
 libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
