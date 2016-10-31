@@ -6,22 +6,11 @@ import scrubjay.units._
 import scrubjay.util.cartesianProduct
 
 import org.apache.spark.rdd.RDD
+import org.joda.time.Period
 
-/*
- * ExplodeList
- *
- * Requirements: 
- *  1. A single DataSource to derive from
- *  2. A set of user-specified columns, all of which are UnitList[_]
- *
- * Derivation:
- *  For every row with a list <a1, a2, list=[i1, i2, i3]>,
- *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
- */
+class ExplodeTimeSpan(dso: Option[DataSource], columns: Seq[String], periods: Seq[Period]) extends Transformer(dso) {
 
-class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transformer(dso) {
-
-  val isValid = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_COMPOSITE_LIST)
+  val isValid = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_DATETIMESPAN)
 
   def derive: DataSource = new DataSource {
 
@@ -39,10 +28,11 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
       def derivation(row: DataRow, cols: Seq[String]): Seq[DataRow] = {
 
         // Get lists to explode
-        val explodedValues = cols.map(col => (col, row(col)))
+        val explodedValues =
+        cols.zip(periods).map(col => (col._1, col._2, row(col._1)))
           .map {
-            case (k, ul: UnitsList[_]) => ul.value.map(u => (k + "_exploded", u.asInstanceOf[Units[_]]))
-            case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
+            case (k, p, span: DateTimeSpan) => span.explode(p).map(stamp => (k + "_exploded", stamp))
+            case (k, p, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: DateTimeSpan\nvalue: $v")
           }
 
         // For multiple expansion columns, explode into the cartesian product
@@ -59,3 +49,4 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
     }
   }
 }
+

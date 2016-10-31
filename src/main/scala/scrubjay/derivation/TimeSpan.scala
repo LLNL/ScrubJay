@@ -4,8 +4,8 @@ import scrubjay.datasource._
 import scrubjay.metabase.MetaEntry
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
-import com.github.nscala_time.time.Imports._
 import org.apache.spark.rdd.RDD
+import org.joda.time.Interval
 
 class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
 
@@ -16,7 +16,7 @@ class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
   def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
     (row(startColumn), row(endColumn)) match {
       case (s: DateTimeStamp, e: DateTimeStamp) => {
-        val newDataRow: DataRow = Map("span" -> DateTimeSpan(s.value to e.value))
+        val newDataRow: DataRow = Map("span" -> DateTimeSpan(new Interval(s.value, e.value)))
         row.filterNot(kv => Set(startColumn, endColumn).contains(kv._1)) ++ newDataRow
       }
     }

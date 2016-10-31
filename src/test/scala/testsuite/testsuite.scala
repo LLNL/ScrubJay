@@ -1,7 +1,7 @@
 import scrubjay._
 import scrubjay.units._
 
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{DateTime, Interval}
 
 package object testsuite {
 
@@ -126,12 +126,12 @@ package object testsuite {
 
   val trueJobQueueSpan = Set(
     Map(
-     "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+     "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"), DateTime.parse("2016-08-11T03:32:00.000Z"))),
      "jobid" -> Identifier("456"),
      "elapsed" -> Seconds(45.0),
      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6")))),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3")))
@@ -140,32 +140,32 @@ package object testsuite {
 
   val trueJobQueueSpanExploded = Set(
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "nodelist_exploded" -> Identifier("4")),
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "nodelist_exploded" -> Identifier("5")),
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "nodelist_exploded" -> Identifier("6")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "nodelist_exploded" -> Identifier("1")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "nodelist_exploded" -> Identifier("2")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "nodelist_exploded" -> Identifier("3"))
@@ -173,37 +173,37 @@ package object testsuite {
 
   val trueJobQueueSpanExplodedJoined = Set(
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "rack" -> Identifier("2"),
       "nodelist_exploded" -> Identifier("4")),
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "rack" -> Identifier("2"),
       "nodelist_exploded" -> Identifier("5")),
     Map(
-      "span"-> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "rack" -> Identifier("2"),
       "nodelist_exploded" -> Identifier("6")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "rack" -> Identifier("1"),
       "nodelist_exploded" -> Identifier("1")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "rack" -> Identifier("1"),
       "nodelist_exploded" -> Identifier("2")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "rack" -> Identifier("1"),
@@ -212,42 +212,42 @@ package object testsuite {
 
   val trueJobQueueSpanExplodedJoinedFlops = Set(
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "flops" -> Count(37614),
       "nodelist_exploded" -> Identifier("5"),
       "rack" -> Identifier("2")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "flops" -> Count(20922),
       "nodelist_exploded" -> Identifier("6"),
       "rack" -> Identifier("2")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "flops" -> Count(23334),
       "nodelist_exploded" -> Identifier("1"),
       "rack" -> Identifier("1")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "flops" -> Count(1099),
       "nodelist_exploded" -> Identifier("3"),
       "rack" -> Identifier("1")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:32:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
       "jobid" -> Identifier("456"),
       "elapsed" -> Seconds(45.0),
       "flops" -> Count(117478),
       "nodelist_exploded" -> Identifier("4"),
       "rack" -> Identifier("2")),
     Map(
-      "span" -> DateTimeSpan(DateTime.parse("2016-08-11T03:30:00.000Z") to DateTime.parse("2016-08-11T03:31:00.000Z")),
+      "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
       "jobid" -> Identifier("123"),
       "elapsed" -> Seconds(23.0),
       "flops" -> Count(35225),

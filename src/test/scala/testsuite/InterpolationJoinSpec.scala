@@ -2,8 +2,7 @@ package testsuite
 
 import scrubjay._
 import scrubjay.units._
-
-import com.github.nscala_time.time.Imports._
+import org.joda.time.DateTime
 import org.scalactic.source.Position
 
 

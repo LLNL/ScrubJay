@@ -29,9 +29,14 @@ package object util {
   }
 
   implicit class OptionIfDefinedThen[T](o: Option[T]) {
-    def ifDefinedThen[R](f: T => R): Option[R] = {
-      o.fold(None: Option[R])(a => Some(f(a)))
+    def ifDefinedThen[R](f: T => R)(elseVal: Option[R] = None): Option[R] = {
+      o.fold(elseVal)(a => Some(f(a)))
     }
+  }
+
+  def cartesianProduct[T](xss: Seq[Seq[T]]): Seq[Seq[T]] = xss match {
+    case Nil => Seq(Nil)
+    case h +: t => for (xh <- h; xt <- cartesianProduct(t)) yield xh +: xt
   }
 
 }
