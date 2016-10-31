@@ -18,7 +18,7 @@ class ExplodeTimeSpan(dso: Option[DataSource], columnsWithPeriods: Seq[(String, 
     override lazy val metaSource = ds.metaSource.withMetaEntries(
       columnsWithPeriods.map(col => col._1 + "_exploded" -> {
         val originalMetaEntry = ds.metaSource.metaEntryMap(col._1)
-        originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
+        originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
       }).toMap)
       .withoutColumns(columnsWithPeriods.map(_._1))
 
