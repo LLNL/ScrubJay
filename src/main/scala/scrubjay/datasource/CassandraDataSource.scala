@@ -61,14 +61,16 @@ object CassandraDataSource {
   def createCassandraDataSource(providedCassandraRdd: CassandraTableScanRDD[CassandraRow],
                                 metaSource: MetaSource,
                                 selectColumns: Seq[String],
-                                whereConditions: Seq[String]): Option[CassandraDataSource] = {
+                                whereConditions: Seq[String],
+                                limit: Option[Long]): Option[CassandraDataSource] = {
 
     niceAttempt {
 
       val cassandraRdd = {
-        val cassRddSelected = selectColumns.foldLeft(providedCassandraRdd)(_.select(_))
-        val cassRddSelectWhere = whereConditions.foldLeft(cassRddSelected)(_.where(_))
-        cassRddSelectWhere
+        val cassRddSelect = selectColumns.foldLeft(providedCassandraRdd)(_.select(_))
+        val cassRddSelectWhere = whereConditions.foldLeft(cassRddSelect)(_.where(_))
+        val cassRddSelectWhereLimit = limit.foldLeft(cassRddSelectWhere)(_.limit(_))
+        cassRddSelectWhereLimit
       }
 
       new CassandraDataSource(cassandraRdd, metaSource)

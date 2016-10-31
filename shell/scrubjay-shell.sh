@@ -54,8 +54,8 @@ done
 spark-shell \
     --name "ScrubJay Shell" \
     --master $SPARK_MASTER \
-    --driver-memory 128g \
-    --executor-memory 64g \
+    --driver-memory 255g \
+    --executor-memory 127g \
     --conf spark.driver.maxresultsize=0 \
     --conf spark.cassandra.output.ignoreNulls=true \
     --conf spark.cassandra.connection.host=$CASSANDRA_HOST \

@@ -33,6 +33,7 @@ package object scrubjay {
 
   def createCSVMetaSource = scrubjay.metasource.CSVMetaSource.createCSVMetaSource _
   def createLocalMetaSource = scrubjay.metasource.LocalMetaSource.createLocalMetaSource _
+  def createCassandraMetaSource = scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource _
 
 
   /**
@@ -61,8 +62,9 @@ package object scrubjay {
                                   table: String,
                                   metaSource: MetaSource = MetaSource.empty,
                                   selectColumns: Seq[String] = Seq.empty,
-                                  whereConditions: Seq[String] = Seq.empty): Option[CassandraDataSource] = {
-      scrubjay.datasource.CassandraDataSource.createCassandraDataSource(sc.cassandraTable(keyspace, table), metaSource, selectColumns, whereConditions)
+                                  whereConditions: Seq[String] = Seq.empty,
+                                  limit: Option[Long] = None): Option[CassandraDataSource] = {
+      scrubjay.datasource.CassandraDataSource.createCassandraDataSource(sc.cassandraTable(keyspace, table), metaSource, selectColumns, whereConditions, limit)
     }
 
     /**
