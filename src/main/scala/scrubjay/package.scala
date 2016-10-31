@@ -9,10 +9,9 @@ import scrubjay.datasource._
 import scrubjay.metabase._
 import scrubjay.metasource._
 import scrubjay.query._
-
 import com.datastax.spark.connector._
-
 import org.apache.spark._
+import org.joda.time.Period
 
 package object scrubjay {
 
@@ -108,6 +107,10 @@ package object scrubjay {
 
     def deriveExplodeList(columns: Seq[String]) = {
       new scrubjay.derivation.ExplodeList(Some(ds), columns).apply
+    }
+
+    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Period)]) = {
+      new scrubjay.derivation.ExplodeTimeSpan(Some(ds), columnsWithPeriods).apply
     }
 
     def deriveNaturalJoin(ds2: Option[DataSource]) = {
