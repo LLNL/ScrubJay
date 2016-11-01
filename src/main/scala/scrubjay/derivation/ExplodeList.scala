@@ -1,10 +1,9 @@
 package scrubjay.derivation
 
-import scrubjay._
 import scrubjay.datasource._
-import scrubjay.metabase._
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
+import scrubjay.util.cartesianProduct
 
 import org.apache.spark.rdd.RDD
 
@@ -36,24 +35,17 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
 
     override lazy val rdd: RDD[DataRow] = {
 
-      // For multiple expansion columns, explode into the cartesian product
-      def cartesianProduct[T](xss: List[List[T]]): List[List[T]] = xss match {
-        case Nil => List(Nil)
-        case h :: t => for (xh <- h; xt <- cartesianProduct(t)) yield xh :: xt
-      }
-
       // Derivation function for flatMap returns a sequence of DataRows
       def derivation(row: DataRow, cols: Seq[String]): Seq[DataRow] = {
 
         // Get lists to explode
-        val explodedValues =
-          row.filter { case (k, v) => cols.contains(k) }
-            .map {
-              case (k, ul: UnitsList[_]) => ul.value.map { case u: Units[_] => (k + "_exploded", u) }
-              case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
-            }
-            .toList
+        val explodedValues = cols.map(col => (col, row(col)))
+          .map {
+            case (k, ul: UnitsList[_]) => ul.value.map(u => (k + "_exploded", u.asInstanceOf[Units[_]]))
+            case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
+          }
 
+        // For multiple expansion columns, explode into the cartesian product
         val combinations = cartesianProduct(explodedValues)
 
         // For each combination of exploded values, add a row

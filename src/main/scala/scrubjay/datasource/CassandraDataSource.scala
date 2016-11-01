@@ -8,7 +8,7 @@ import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.SparkContext
-import com.github.nscala_time.time.Imports._
+import org.joda.time.{DateTime, Interval}
 
 import scala.reflect._
 
