@@ -40,5 +40,7 @@ object CSVMetaSource {
       bw.write(rowString)
       bw.newLine()
     }}
+
+    bw.close()
   }
 }
