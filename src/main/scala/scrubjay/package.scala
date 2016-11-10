@@ -49,8 +49,8 @@ package object scrubjay {
 
     def createLocalDataSource(rawData: Seq[RawDataRow],
                               columns: Seq[String],
-                              providedMetaSource: MetaSource): Option[LocalDataSource] = {
-      scrubjay.datasource.LocalDataSource.createLocalDataSource(sc.parallelize(rawData), columns, providedMetaSource)
+                              metaSource: MetaSource = MetaSource.empty): Option[LocalDataSource] = {
+      scrubjay.datasource.LocalDataSource.createLocalDataSource(sc.parallelize(rawData), columns, metaSource)
     }
 
     /**
