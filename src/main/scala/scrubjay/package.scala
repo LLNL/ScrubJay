@@ -101,6 +101,10 @@ package object scrubjay {
      * Derivations
      */
 
+    def deriveMergeColumns(columns: Seq[String]) = {
+      new scrubjay.derivation.MergeColumns(Some(ds), columns).apply
+    }
+
     def deriveTimeSpan = {
       new scrubjay.derivation.TimeSpan(Some(ds)).apply
     }
