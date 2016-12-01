@@ -21,6 +21,7 @@ SPARK_MASTER="local[*]"
 CASSANDRA_HOST="localhost"
 CASSANDRA_USER="cassandra"
 CASSANDRA_PASSWORD="cassandra"
+INPUT_SCRIPT="/dev/null"
 
 # Parse arguments
 while [[ $# -gt 1 ]]
@@ -43,6 +44,10 @@ do
         CASSANDRA_PASSWORD="$2"
         shift
         ;;
+        -i|--input-script)
+        INPUT_SCRIPT="$2"
+        shift
+        ;;
         *)
         echo "Unknown argument!"
         ;;
@@ -54,11 +59,14 @@ done
 spark-shell \
     --name "ScrubJay Shell" \
     --master $SPARK_MASTER \
-    --driver-memory 255g \
-    --executor-memory 127g \
+    --conf spark.max.cores=32 \
+    --conf spark.executor.cores=32 \
+    --conf spark.default.parallelism=128 \
     --conf spark.driver.maxresultsize=0 \
     --conf spark.cassandra.output.ignoreNulls=true \
     --conf spark.cassandra.connection.host=$CASSANDRA_HOST \
     --conf spark.cassandra.auth.username=$CASSANDRA_USER \
     --conf spark.cassandra.auth.password=$CASSANDRA_PASSWORD \
-    --jars $SCRUBJAR
+    --conf spark.cassandra.output.ignoreNulls=true \
+    --jars $SCRUBJAR \
+    -i $INPUT_SCRIPT
