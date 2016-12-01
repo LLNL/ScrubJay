@@ -41,23 +41,13 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
         val flooredRDD2 = ds2.rdd.keyBy(row =>
           discreteDimColumns2.map(row) :+ scala.math.floor(row(continuousDimColumn2).asInstanceOf[Continuous].asDouble/window).toInt)
 
-        // Key by all values in the current window and previous
-        val ceilRDD1 = ds1.rdd.keyBy(row =>
-          discreteDimColumns1.map(row) :+ scala.math.ceil(row(continuousDimColumn1).asInstanceOf[Continuous].asDouble/window).toInt)
-        val ceilRDD2 = ds2.rdd.keyBy(row =>
-          discreteDimColumns2.map(row) :+ scala.math.ceil(row(continuousDimColumn2).asInstanceOf[Continuous].asDouble/window).toInt)
+        // TODO: Resample continuous values
 
         // Group each
         val floorGrouped = flooredRDD1.cogroup(flooredRDD2)
-        val ceilGrouped = ceilRDD1.cogroup(ceilRDD2)
 
         // Create 1 to N mapping from ds1 to ds2 for each
-        val floorMapped = floorGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2))}
-        val ceilMapped = ceilGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2))}
-
-        // Co-group both window mappings and combine their results
-        val grouped = floorMapped.cogroup(ceilMapped)
-          .map{case (k, (f, c)) => (k, (f.flatten ++ c.flatten).toSeq)}
+        val grouped = floorGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2.toSeq))}
 
         // Lift the heavies here
         val ds2MetaEntries = grouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
