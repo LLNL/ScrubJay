@@ -87,9 +87,6 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       }
 
       it("should match ground truth") {
-
-        println(interjoined.get.rdd.collect.toSet)
-
         assert(interjoined.get.rdd.collect.toSet == InterpolationJoinSpec.trueFlopsJoinTemp)
       }
     }
