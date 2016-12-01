@@ -100,179 +100,179 @@ package object testsuite {
 
   val trueJobQueue = Set(
     Map(
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:00.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
-      "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6")))
+      "nodelist" -> UnitsList(List(UnorderedDiscrete("4"), UnorderedDiscrete("5"), UnorderedDiscrete("6")))
     ),
     Map(
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
       "end" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:00.000Z")),
       "start" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")),
-      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3")))
+      "nodelist" -> UnitsList(List(UnorderedDiscrete("1"), UnorderedDiscrete("2"), UnorderedDiscrete("3")))
     )
   )
 
   val trueCabLayout = Set(
-    Map("node" -> Identifier("1"), "rack" -> Identifier("1")),
-    Map("node" -> Identifier("2"), "rack" -> Identifier("1")),
-    Map("node" -> Identifier("3"), "rack" -> Identifier("1")),
-    Map("node" -> Identifier("5"), "rack" -> Identifier("2")),
-    Map("node" -> Identifier("6"), "rack" -> Identifier("2")),
-    Map("node" -> Identifier("4"), "rack" -> Identifier("2"))
+    Map("node" -> UnorderedDiscrete("1"), "rack" -> UnorderedDiscrete("1")),
+    Map("node" -> UnorderedDiscrete("2"), "rack" -> UnorderedDiscrete("1")),
+    Map("node" -> UnorderedDiscrete("3"), "rack" -> UnorderedDiscrete("1")),
+    Map("node" -> UnorderedDiscrete("5"), "rack" -> UnorderedDiscrete("2")),
+    Map("node" -> UnorderedDiscrete("6"), "rack" -> UnorderedDiscrete("2")),
+    Map("node" -> UnorderedDiscrete("4"), "rack" -> UnorderedDiscrete("2"))
   )
 
   val trueJobQueueSpan = Set(
     Map(
      "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"), DateTime.parse("2016-08-11T03:32:00.000Z"))),
-     "jobid" -> Identifier("456"),
+     "jobid" -> UnorderedDiscrete("456"),
      "elapsed" -> Seconds(45.0),
-     "nodelist" -> UnitsList(List(Identifier("4"), Identifier("5"), Identifier("6")))),
+     "nodelist" -> UnitsList(List(UnorderedDiscrete("4"), UnorderedDiscrete("5"), UnorderedDiscrete("6")))),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "nodelist" -> UnitsList(List(Identifier("1"), Identifier("2"), Identifier("3")))
+      "nodelist" -> UnitsList(List(UnorderedDiscrete("1"), UnorderedDiscrete("2"), UnorderedDiscrete("3")))
     )
   )
 
   val trueJobQueueSpanExploded = Set(
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "nodelist_exploded" -> Identifier("4")),
+      "nodelist_exploded" -> UnorderedDiscrete("4")),
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "nodelist_exploded" -> Identifier("5")),
+      "nodelist_exploded" -> UnorderedDiscrete("5")),
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "nodelist_exploded" -> Identifier("6")),
+      "nodelist_exploded" -> UnorderedDiscrete("6")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "nodelist_exploded" -> Identifier("1")),
+      "nodelist_exploded" -> UnorderedDiscrete("1")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "nodelist_exploded" -> Identifier("2")),
+      "nodelist_exploded" -> UnorderedDiscrete("2")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "nodelist_exploded" -> Identifier("3"))
+      "nodelist_exploded" -> UnorderedDiscrete("3"))
   )
 
   val trueJobQueueSpanExplodedJoined = Set(
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "rack" -> Identifier("2"),
-      "nodelist_exploded" -> Identifier("4")),
+      "rack" -> UnorderedDiscrete("2"),
+      "nodelist_exploded" -> UnorderedDiscrete("4")),
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "rack" -> Identifier("2"),
-      "nodelist_exploded" -> Identifier("5")),
+      "rack" -> UnorderedDiscrete("2"),
+      "nodelist_exploded" -> UnorderedDiscrete("5")),
     Map(
       "span"-> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "rack" -> Identifier("2"),
-      "nodelist_exploded" -> Identifier("6")),
+      "rack" -> UnorderedDiscrete("2"),
+      "nodelist_exploded" -> UnorderedDiscrete("6")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "rack" -> Identifier("1"),
-      "nodelist_exploded" -> Identifier("1")),
+      "rack" -> UnorderedDiscrete("1"),
+      "nodelist_exploded" -> UnorderedDiscrete("1")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "rack" -> Identifier("1"),
-      "nodelist_exploded" -> Identifier("2")),
+      "rack" -> UnorderedDiscrete("1"),
+      "nodelist_exploded" -> UnorderedDiscrete("2")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "rack" -> Identifier("1"),
-      "nodelist_exploded" -> Identifier("3"))
+      "rack" -> UnorderedDiscrete("1"),
+      "nodelist_exploded" -> UnorderedDiscrete("3"))
   )
 
   val trueJobQueueSpanExplodedJoinedFlops = Set(
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(37614),
-      "nodelist_exploded" -> Identifier("5"),
-      "rack" -> Identifier("2")),
+      "flops" -> OrderedDiscrete(37614),
+      "nodelist_exploded" -> UnorderedDiscrete("5"),
+      "rack" -> UnorderedDiscrete("2")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(20922),
-      "nodelist_exploded" -> Identifier("6"),
-      "rack" -> Identifier("2")),
+      "flops" -> OrderedDiscrete(20922),
+      "nodelist_exploded" -> UnorderedDiscrete("6"),
+      "rack" -> UnorderedDiscrete("2")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "flops" -> Count(23334),
-      "nodelist_exploded" -> Identifier("1"),
-      "rack" -> Identifier("1")),
+      "flops" -> OrderedDiscrete(23334),
+      "nodelist_exploded" -> UnorderedDiscrete("1"),
+      "rack" -> UnorderedDiscrete("1")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "flops" -> Count(1099),
-      "nodelist_exploded" -> Identifier("3"),
-      "rack" -> Identifier("1")),
+      "flops" -> OrderedDiscrete(1099),
+      "nodelist_exploded" -> UnorderedDiscrete("3"),
+      "rack" -> UnorderedDiscrete("1")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:32:00.000Z"))),
-      "jobid" -> Identifier("456"),
+      "jobid" -> UnorderedDiscrete("456"),
       "elapsed" -> Seconds(45.0),
-      "flops" -> Count(117478),
-      "nodelist_exploded" -> Identifier("4"),
-      "rack" -> Identifier("2")),
+      "flops" -> OrderedDiscrete(117478),
+      "nodelist_exploded" -> UnorderedDiscrete("4"),
+      "rack" -> UnorderedDiscrete("2")),
     Map(
       "span" -> DateTimeSpan(new Interval(DateTime.parse("2016-08-11T03:30:00.000Z"),DateTime.parse("2016-08-11T03:31:00.000Z"))),
-      "jobid" -> Identifier("123"),
+      "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
-      "flops" -> Count(35225),
-      "nodelist_exploded" -> Identifier("2"),
-      "rack" -> Identifier("1"))
+      "flops" -> OrderedDiscrete(35225),
+      "nodelist_exploded" -> UnorderedDiscrete("2"),
+      "rack" -> UnorderedDiscrete("1"))
   )
 
   val trueNodeDataJoinedWithClusterLayout = Set(
-    Map("node" -> Identifier("4"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(92864)),
-    Map("node" -> Identifier("4"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(142092)),
-    Map("node" -> Identifier("4"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(177369)),
-    Map("node" -> Identifier("1"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(23334)),
-    Map("node" -> Identifier("1"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(45523)),
-    Map("node" -> Identifier("1"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(219126)),
-    Map("node" -> Identifier("5"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(22884)),
-    Map("node" -> Identifier("5"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(52343)),
-    Map("node" -> Identifier("5"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(102535)),
-    Map("node" -> Identifier("2"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(35225)),
-    Map("node" -> Identifier("2"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(45417)),
-    Map("node" -> Identifier("2"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(89912)),
-    Map("node" -> Identifier("6"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(5465)),
-    Map("node" -> Identifier("6"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(36378)),
-    Map("node" -> Identifier("6"), "rack" -> Identifier("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(68597)),
-    Map("node" -> Identifier("3"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> Count(1099)),
-    Map("node" -> Identifier("3"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> Count(25437)),
-    Map("node" -> Identifier("3"), "rack" -> Identifier("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> Count(66482))
+    Map("node" -> UnorderedDiscrete("4"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(92864)),
+    Map("node" -> UnorderedDiscrete("4"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(142092)),
+    Map("node" -> UnorderedDiscrete("4"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(177369)),
+    Map("node" -> UnorderedDiscrete("1"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(23334)),
+    Map("node" -> UnorderedDiscrete("1"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(45523)),
+    Map("node" -> UnorderedDiscrete("1"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(219126)),
+    Map("node" -> UnorderedDiscrete("5"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(22884)),
+    Map("node" -> UnorderedDiscrete("5"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(52343)),
+    Map("node" -> UnorderedDiscrete("5"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(102535)),
+    Map("node" -> UnorderedDiscrete("2"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(35225)),
+    Map("node" -> UnorderedDiscrete("2"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(45417)),
+    Map("node" -> UnorderedDiscrete("2"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(89912)),
+    Map("node" -> UnorderedDiscrete("6"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(5465)),
+    Map("node" -> UnorderedDiscrete("6"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(36378)),
+    Map("node" -> UnorderedDiscrete("6"), "rack" -> UnorderedDiscrete("2"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(68597)),
+    Map("node" -> UnorderedDiscrete("3"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:30:00.000Z")), "flops" -> OrderedDiscrete(1099)),
+    Map("node" -> UnorderedDiscrete("3"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:31:20.000Z")), "flops" -> OrderedDiscrete(25437)),
+    Map("node" -> UnorderedDiscrete("3"), "rack" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp(DateTime.parse("2016-08-11T03:32:20.000Z")), "flops" -> OrderedDiscrete(66482))
   )
 }

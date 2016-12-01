@@ -11,7 +11,7 @@ object GlobalMetaBase {
   // Unknowns - REQUIRED
   final val DIMENSION_UNKNOWN = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionType.UNKNOWN))
   final val MEANING_UNKNOWN = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
-  final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", Identifier))
+  final val UNITS_UNKNOWN = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", UnorderedDiscrete))
 
   // Meanings
   final val MEANING_IDENTITY = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
@@ -52,12 +52,14 @@ object GlobalMetaBase {
   // *      final val UNITS_SOME_UNITS = META_BASE.addUnits(MetaUnits("SomeUnits", "Some description", SomeUnits))
   // *
   // *******************************************************************************
-  final val UNITS_IDENTIFIER = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", Identifier))
+  final val UNITS_UNORDERED_DISCRETE = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", UnorderedDiscrete))
+  final val UNITS_ORDERED_DISCRETE = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", OrderedDiscrete))
+  final val UNITS_ORDERED_CONTINUOUS = META_BASE.addUnits(MetaUnits("amount", "An amount that is ordered and continuous (real numbers)", OrderedContinuous))
+
   final val UNITS_SECONDS = META_BASE.addUnits(MetaUnits("seconds", "A quantity of seconds", Seconds))
   final val UNITS_DEGREES_CELSIUS = META_BASE.addUnits(MetaUnits("degrees Celsius", "A measured temperature in degrees Celsius", DegreesCelsius))
   final val UNITS_DATETIMESTAMP = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", DateTimeStamp))
   final val UNITS_DATETIMESPAN = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", DateTimeSpan))
-  final val UNITS_COUNT = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", Count))
 
 
   // Composite Units

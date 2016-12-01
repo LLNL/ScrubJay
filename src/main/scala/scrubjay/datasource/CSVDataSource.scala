@@ -39,7 +39,7 @@ object CSVDataSource {
 
     val header = ds.metaSource.columns
     val csvRdd = ds.rdd.map(row => header.map(col => wrapperChar +
-      row.getOrElse(col, Identifier(noneString)).value.toString +
+      row.getOrElse(col, UnorderedDiscrete(noneString)).value.toString +
       wrapperChar).mkString(delimiter))
     val bw = new BufferedWriter(new FileWriter(fileName))
 

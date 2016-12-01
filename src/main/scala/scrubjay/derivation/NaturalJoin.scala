@@ -20,7 +20,7 @@ class NaturalJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Jo
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
   lazy val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
-    .filter(me => me.units == UNITS_IDENTIFIER && me.dimension != DIMENSION_UNKNOWN)
+    .filter(me => me.units == UNITS_UNORDERED_DISCRETE && me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
   val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry)
