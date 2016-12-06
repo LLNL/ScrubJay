@@ -6,11 +6,18 @@ import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
 import org.apache.spark.rdd.RDD
 import org.joda.time.Interval
+import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
 
-  val startEntry = ds.metaSource.metaEntryMap.find(me => me._2.dimension == DIMENSION_TIME && me._2.meaning == MEANING_START)
-  val endEntry = ds.metaSource.metaEntryMap.find(me => me._2.dimension == DIMENSION_TIME && me._2.meaning == MEANING_END)
+  val startEntry = ds.metaSource.metaEntryMap.find(me =>
+    me._2.relationType == MetaRelationType.DOMAIN &&
+      me._2.dimension == DIMENSION_TIME &&
+      me._2.meaning == MEANING_START)
+  val endEntry = ds.metaSource.metaEntryMap.find(me =>
+    me._2.relationType == MetaRelationType.DOMAIN &&
+      me._2.dimension == DIMENSION_TIME &&
+      me._2.meaning == MEANING_END)
 
   // Helper functions
   def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
@@ -36,7 +43,7 @@ class TimeSpan(dso: Option[DataSource]) extends Transformer(dso) {
 
   def derive = new DataSource {
     override lazy val metaSource = ds.metaSource
-      .withMetaEntries(Map("span" -> MetaEntry(MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
+      .withMetaEntries(Map("span" -> MetaEntry(MetaRelationType.DOMAIN, MEANING_SPAN, DIMENSION_TIME, UNITS_DATETIMESPAN)))
       .withoutColumns(Seq(startEntry.get._1, endEntry.get._1))
     override lazy val rdd: RDD[DataRow] = {
       ds.rdd.map(allSpans.find(_.isDefined).get.get)

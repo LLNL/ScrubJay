@@ -17,20 +17,20 @@ class CSVDataSourceSpec extends ScrubJaySpec {
 
     {
       val fileWriter = new PrintWriter(jobQueueMetaFile)
-      fileWriter.println("column, meaning, dimension, units")
-      fileWriter.println("jobid, job, job, identifier")
-      fileWriter.println("nodelist, node, node, list<identifier>")
-      fileWriter.println("elapsed, duration, time, seconds")
-      fileWriter.println("start, start, time, datetimestamp")
-      fileWriter.println("end, end, time, datetimestamp")
+      fileWriter.println("column, relationType, meaning, dimension, units")
+      fileWriter.println("jobid, domain, job, job, identifier")
+      fileWriter.println("nodelist, domain, node, node, list<identifier>")
+      fileWriter.println("elapsed, value, duration, time, seconds")
+      fileWriter.println("start, domain, start, time, datetimestamp")
+      fileWriter.println("end, domain, end, time, datetimestamp")
       fileWriter.close()
     }
 
     {
       val fileWriter = new PrintWriter(clusterLayoutMetaFile)
-      fileWriter.println("column, meaning, dimension, units")
-      fileWriter.println("node, node, node, identifier")
-      fileWriter.println("rack, rack, rack, identifier")
+      fileWriter.println("column, relationType, meaning, dimension, units")
+      fileWriter.println("node, domain, node, node, identifier")
+      fileWriter.println("rack, domain, rack, rack, identifier")
       fileWriter.close()
     }
 

@@ -3,7 +3,7 @@ package scrubjay.derivation
 import scrubjay.units._
 import scrubjay.metasource._
 import scrubjay.datasource._
-import scrubjay.metabase.MetaDescriptor.DimensionType
+import scrubjay.metabase.MetaDescriptor.DimensionSpace
 
 import scala.language.existentials
 import org.apache.spark.rdd.RDD
@@ -13,10 +13,10 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
 
   val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
   val commonContinuousDimensions = commonDimensions.filter(d =>
-    d._1.dimensionType == DimensionType.CONTINUOUS &&
+    d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
     d._3.units.unitsTag.domainType == DomainType.POINT)
-  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.DISCRETE)
+  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionSpace.DISCRETE)
 
   // Single continuous axis for now
   def isValid = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
@@ -35,22 +35,40 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
         val discreteDimColumns1 = commonDiscreteDimensions.flatMap{case (d, me1, me2) => ds1.metaSource.columnForEntry(me1)}
         val discreteDimColumns2 = commonDiscreteDimensions.flatMap{case (d, me1, me2) => ds2.metaSource.columnForEntry(me2)}
 
-        // Key by all values in the current window and next
-        val flooredRDD1 = ds1.rdd.keyBy(row =>
-          discreteDimColumns1.map(row) :+ scala.math.floor(row(continuousDimColumn1).asInstanceOf[Continuous].asDouble/window).toInt)
-        val flooredRDD2 = ds2.rdd.keyBy(row =>
-          discreteDimColumns2.map(row) :+ scala.math.floor(row(continuousDimColumn2).asInstanceOf[Continuous].asDouble/window).toInt)
+        val binnedRdd1 = ds1.rdd.flatMap(row => {
+          val continuousVal = row(continuousDimColumn1).asInstanceOf[Continuous].asDouble
+          // Bin by 2x window
+          val key1 = discreteDimColumns1.map(row) :+ scala.math.floor(continuousVal/(2*window)).toInt
+          // Overlapping bin by 1 window
+          val key2 = discreteDimColumns1.map(row) :+ scala.math.floor((continuousVal+window)/(2*window)).toInt
+          Seq((key1, row), (key2, row))
+        })
+        val binnedRdd2 = ds2.rdd.flatMap(row => {
+          val continuousVal = row(continuousDimColumn2).asInstanceOf[Continuous].asDouble
+          // Bin by 2x window
+          val key1 = discreteDimColumns2.map(row) :+ scala.math.floor(continuousVal/(2*window)).toInt
+          // Overlapping bin by 1 window
+          val key2 = discreteDimColumns2.map(row) :+ scala.math.floor((continuousVal+window)/(2*window)).toInt
+          Seq((key1, row), (key2, row))
+        })
 
-        // TODO: Resample continuous values
-
-        // Group each
-        val floorGrouped = flooredRDD1.cogroup(flooredRDD2)
-
-        // Create 1 to N mapping from ds1 to ds2 for each
-        val grouped = floorGrouped.flatMap{case (k, (l1, l2)) => l1.map(row => (row, l2.toSeq))}
+        // Co-group
+        val cogrouped = binnedRdd1.cogroup(binnedRdd2)
+          // Create 1 to N mapping from ds1 to ds2
+          .flatMap{case (k, (l1, l2)) => l1.map(l1row => {
+            // Filter out cells that are farther than `window` away
+            val l1v = l1row(continuousDimColumn1).asInstanceOf[Continuous].asDouble
+            (l1row, l2.filter(l2row => {
+              val l2v = l2row(continuousDimColumn2).asInstanceOf[Continuous].asDouble
+              Math.abs(l1v - l2v) < window
+            // Convert to Set so we can avoid repeat rows
+            }).toSet)
+          })}
+          .reduceByKey(_ ++ _) // Combine all ds2 rows that map to the same ds1 row, without repeat rows
+          .mapValues(_.toSeq) // Convert back to Seq now that repeats are gone
 
         // Lift the heavies here
-        val ds2MetaEntries = grouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
+        val ds2MetaEntries = cogrouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
         def projection(row: DataRow, keyColumn: String, mappedRows: Seq[DataRow], mappedKeyColumn: String): DataRow = {
 
           val observations = scala.collection.mutable.Map[String,(Seq[Double], Seq[Units[_]])]()
@@ -76,7 +94,7 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
           row ++ projectedValues
         }
 
-        grouped.map{case (k, l2) => projection(k, continuousDimColumn1, l2, continuousDimColumn2)}
+        cogrouped.map{case (k, l2) => projection(k, continuousDimColumn1, l2, continuousDimColumn2)}
       }
     }
   }

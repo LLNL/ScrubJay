@@ -18,15 +18,15 @@ object QuerySpec {
 
   def createSingleSourceQueryMetaEntries: Set[MetaEntry] = {
     Set(
-      metaEntryFromStrings("job", "job", "identifier"),
-      metaEntryFromStrings("duration", "time", "seconds")
+      metaEntryFromStrings("domain", "job", "job", "identifier"),
+      metaEntryFromStrings("value", "duration", "time", "seconds")
     )
   }
 
   def createMultipleSourceQueryMetaEntries: Set[MetaEntry] = {
     Set(
-      metaEntryFromStrings("rack", "rack", "identifier"),
-      metaEntryFromStrings("cumulative", "flops", "count")
+      metaEntryFromStrings("domain", "rack", "rack", "identifier"),
+      metaEntryFromStrings("value", "cumulative", "flops", "count")
     )
   }
 

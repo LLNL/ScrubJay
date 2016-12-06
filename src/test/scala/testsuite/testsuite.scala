@@ -80,22 +80,22 @@ package object testsuite {
   )
 
   val jobQueueMeta = Map(
-      "jobid" -> metaEntryFromStrings("job", "job", "identifier"),
-      "nodelist" -> metaEntryFromStrings("node", "node", "list<identifier>"),
-      "elapsed" -> metaEntryFromStrings("duration", "time", "seconds"),
-      "start" -> metaEntryFromStrings("start", "time", "datetimestamp"),
-      "end" -> metaEntryFromStrings("end", "time", "datetimestamp")
+      "jobid" -> metaEntryFromStrings("domain", "job", "job", "identifier"),
+      "nodelist" -> metaEntryFromStrings("domain", "node", "node", "list<identifier>"),
+      "elapsed" -> metaEntryFromStrings("value", "duration", "time", "seconds"),
+      "start" -> metaEntryFromStrings("domain", "start", "time", "datetimestamp"),
+      "end" -> metaEntryFromStrings("domain", "end", "time", "datetimestamp")
     )
 
   val nodeDataMeta = Map(
-    "node" -> metaEntryFromStrings("node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
-    "flops" -> metaEntryFromStrings("cumulative", "flops", "count")
+    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
+    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
+    "flops" -> metaEntryFromStrings("value", "cumulative", "flops", "count")
   )
 
   val clusterLayoutMeta = Map(
-    "node" -> metaEntryFromStrings("node", "node", "identifier"),
-    "rack" -> metaEntryFromStrings("rack", "rack", "identifier")
+    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
+    "rack" -> metaEntryFromStrings("domain", "rack", "rack", "identifier")
   )
 
   val trueJobQueue = Set(
