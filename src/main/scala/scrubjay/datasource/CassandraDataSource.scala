@@ -66,8 +66,10 @@ object CassandraDataSource {
 
     niceAttempt {
 
+      val selectStatement: Option[String] = if (selectColumns.nonEmpty) Some(selectColumns.mkString(", ")) else None
+
       val cassandraRdd = {
-        val cassRddSelect = selectColumns.foldLeft(providedCassandraRdd)(_.select(_))
+        val cassRddSelect = selectStatement.foldLeft(providedCassandraRdd)(_.select(_))
         val cassRddSelectWhere = whereConditions.foldLeft(cassRddSelect)(_.where(_))
         val cassRddSelectWhereLimit = limit.foldLeft(cassRddSelectWhere)(_.limit(_))
         cassRddSelectWhereLimit
