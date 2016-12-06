@@ -157,6 +157,12 @@ package object scrubjay {
         {
           for (column <- ds.metaSource.columns) yield {
 
+            // Get relation type
+            Seq("domain", "value").foreach(relationType =>
+              println(String.format("%-30s %s", relationType))
+            )
+            val relationType = scala.io.StdIn.readLine("Specify a relation type for column " + column + ": ")
+
             // Get meaning
             GlobalMetaBase.META_BASE.meaningBase.foreach(meaning =>
               println(String.format("%-30s %s", meaning._1, meaning._2.description))
@@ -175,7 +181,7 @@ package object scrubjay {
             )
             val units = scala.io.StdIn.readLine("Specify units for column " + column + ": ")
 
-            column -> metaEntryFromStrings(meaning, dimension, units)
+            column -> metaEntryFromStrings(relationType, meaning, dimension, units)
           }
         }.toMap
       }

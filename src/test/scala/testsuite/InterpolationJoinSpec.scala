@@ -30,15 +30,15 @@ object InterpolationJoinSpec {
   )
 
   val temperatureMeta = Map(
-    "node" -> metaEntryFromStrings("node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
-    "temp" -> metaEntryFromStrings("instant", "temperature", "degrees Celsius")
+    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
+    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
+    "temp" -> metaEntryFromStrings("value", "instant", "temperature", "degrees Celsius")
   )
 
   val flopsMeta = Map(
-    "node" -> metaEntryFromStrings("node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("instant", "time", "datetimestamp"),
-    "flops" -> metaEntryFromStrings("cumulative", "flops", "count")
+    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
+    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
+    "flops" -> metaEntryFromStrings("value", "cumulative", "flops", "count")
   )
 
   val trueFlopsJoinTemp = Set(
@@ -80,7 +80,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       createLocalMetaSource(InterpolationJoinSpec.flopsMeta))
 
     describe("Many-to-one projection") {
-      lazy val interjoined = flops.get.deriveInterpolationJoin(temp, 70000)
+      lazy val interjoined = flops.get.deriveInterpolationJoin(temp, 60000)
 
       it("should be defined") {
         assert(interjoined.isDefined)
@@ -92,7 +92,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
     }
 
     describe("One-to-many projection") {
-      lazy val interjoined = temp.get.deriveInterpolationJoin(flops, 70000)
+      lazy val interjoined = temp.get.deriveInterpolationJoin(flops, 60000)
 
       it("should be defined") {
         assert(interjoined.isDefined)

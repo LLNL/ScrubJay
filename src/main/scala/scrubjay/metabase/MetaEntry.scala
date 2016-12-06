@@ -3,7 +3,8 @@ package scrubjay.metabase
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.metabase.MetaDescriptor._
 
-case class MetaEntry(meaning: MetaMeaning,
+case class MetaEntry(relationType: MetaRelationType.MetaRelationType,
+                     meaning: MetaMeaning,
                      dimension: MetaDimension,
                      units: MetaUnits) extends Serializable
 
@@ -27,10 +28,12 @@ object MetaEntry {
     })
   }
 
-  def metaEntryFromStrings(meaningString: String,
+  def metaEntryFromStrings(relationTypeString: String,
+                           meaningString: String,
                            dimensionString: String,
                            unitsString: String): MetaEntry = {
     MetaEntry(
+      relationType = MetaRelationType.fromString(relationTypeString),
       meaning = META_BASE.meaningBase.getOrElse(meaningString, MEANING_UNKNOWN),
       dimension = META_BASE.dimensionBase.getOrElse(dimensionString, DIMENSION_UNKNOWN),
       units = metaUnitsFromString(unitsString)

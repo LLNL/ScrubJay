@@ -2,7 +2,7 @@ package scrubjay.derivation
 
 import scrubjay.DataSource
 import scrubjay.datasource.DataRow
-import scrubjay.metabase.MetaDescriptor.DimensionType
+import scrubjay.metabase.MetaDescriptor.DimensionSpace
 import scrubjay.metasource.MetaSource
 import scrubjay.units._
 import org.apache.spark.rdd.RDD
@@ -12,10 +12,10 @@ class RangeJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Join
 
   val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
   val commonContinuousDimensions = commonDimensions.filter(d =>
-    d._1.dimensionType == DimensionType.CONTINUOUS &&
+    d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.RANGE &&
     d._3.units.unitsTag.domainType == DomainType.POINT)
-  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionType.DISCRETE)
+  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionSpace.DISCRETE)
 
   // Single continuous axis for now
   def isValid = commonContinuousDimensions.length == 1

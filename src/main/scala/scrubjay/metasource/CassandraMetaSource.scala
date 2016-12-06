@@ -19,7 +19,7 @@ object CassandraMetaSource {
   def createCassandraMetaSource(sc: SparkContext, keyspace: String, table: String): MetaSource = {
     val data = sc.cassandraTable(keyspace, table).map(_.toMap.map{case (k, v) => (k, v.toString)}.toMap).collect
     val metaEntryMap = data.map(row =>
-      (row("column"), MetaEntry.metaEntryFromStrings(row("meaning"), row("dimension"), row("units")))).toMap
+      (row("column"), MetaEntry.metaEntryFromStrings(row("relationType"), row("meaning"), row("dimension"), row("units")))).toMap
 
     new MetaSource(metaEntryMap)
   }
