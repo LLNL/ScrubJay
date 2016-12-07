@@ -3,6 +3,7 @@ package scrubjay.metasource
 import java.io.{BufferedWriter, FileReader, FileWriter}
 
 import au.com.bytecode.opencsv.CSVReader
+import scrubjay.metabase.MetaDescriptor.MetaRelationType
 import scrubjay.metabase.MetaEntry
 
 import scala.collection.JavaConversions._
@@ -32,11 +33,18 @@ object CSVMetaSource {
 
     val bw = new BufferedWriter(new FileWriter(fileName))
 
-    bw.write("column, meaning, dimension, units")
+    bw.write("column, relationType, meaning, dimension, units")
     bw.newLine()
 
     m.metaEntryMap.foreach{case (column, metaEntry) => {
-      val rowString = Seq(column, metaEntry.meaning.title, metaEntry.dimension.title, metaEntry.units.title).mkString(",")
+      val rowString = Seq(
+        column,
+        MetaRelationType.toString(metaEntry.relationType),
+        metaEntry.meaning.title,
+        metaEntry.dimension.title,
+        metaEntry.units.title
+      ).mkString(",")
+
       bw.write(rowString)
       bw.newLine()
     }}

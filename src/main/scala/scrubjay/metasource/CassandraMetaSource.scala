@@ -1,9 +1,9 @@
 package scrubjay.metasource
 
 import scrubjay.metabase._
-
 import org.apache.spark.SparkContext
 import com.datastax.spark.connector._
+import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 object CassandraMetaSource {
 
@@ -28,6 +28,7 @@ object CassandraMetaSource {
     val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) => {
       CassandraRow.fromMap(Map(
         "column" -> column,
+        "relationType" -> MetaRelationType.toString(metaEntry.relationType),
         "meaning" -> metaEntry.meaning.title,
         "dimension" -> metaEntry.dimension.title,
         "units" -> metaEntry.units.title
