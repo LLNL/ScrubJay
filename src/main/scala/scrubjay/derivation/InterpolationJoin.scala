@@ -61,10 +61,13 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
           )
         })
 
+        val groupMapping = ds1.rdd.sparkContext.longAccumulator("Group Mapping")
+
         // Co-group
         val cogrouped = binnedRdd1.cogroup(binnedRdd2)
           // Create 1 to N mapping from ds1 to ds2
           .flatMap{case (k, (l1, l2)) => l1.map(l1row => {
+            groupMapping.add(l2.toSeq.length)
             // Filter out cells that are farther than `window` away
             val l1v = l1row(continuousDimColumn1).asInstanceOf[Continuous].asDouble
             (l1row, l2.filter(l2row => {
@@ -74,6 +77,7 @@ class InterpolationJoin(dso1: Option[DataSource], dso2: Option[DataSource], wind
           })}
            // Combine all ds2 rows that map to the same ds1 row, without repeat rows
           .aggregateByKey(Set[DataRow]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
+          .cache
 
         // Lift the heavies here
         val ds2MetaEntries = cogrouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)

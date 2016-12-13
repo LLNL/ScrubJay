@@ -1,7 +1,7 @@
 package scrubjay.metasource
 
 import scrubjay.metabase.MetaDescriptor.MetaDimension
-import scrubjay.metabase.{MetaEntry, _}
+import scrubjay.metabase._
 
 import scrubjay.util._
 
@@ -56,8 +56,8 @@ object MetaSource {
 
   def commonDimensionEntries(ms1: MetaSource, ms2: MetaSource): Seq[(MetaDimension, MetaEntry, MetaEntry)] = {
 
-    val ms1Entries = ms1.metaEntryMap.values.map(me => (1, me))
-    val ms2Entries = ms2.metaEntryMap.values.map(me => (2, me))
+    val ms1Entries = ms1.metaEntryMap.values.filter(_.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map(me => (1, me))
+    val ms2Entries = ms2.metaEntryMap.values.filter(_.dimension != GlobalMetaBase.DIMENSION_UNKNOWN).map(me => (2, me))
 
     (ms1Entries ++ ms2Entries).groupBy(_._2.dimension)
       .flatMap(kv => {
