@@ -12,14 +12,12 @@ class TransformColumn(dso: Option[DataSource], column: String, fn: Units[_] => U
 
   def derive: DataSource = new DataSource {
 
-    override lazy val metaSource = ds.metaSource.withMetaEntries(Map(column -> newMetaEntry))
-      .withoutColumns(Seq(column))
+    override lazy val metaSource = ds.metaSource.withMetaEntries(Map(column -> newMetaEntry), overwrite = true)
 
     override lazy val rdd: RDD[DataRow] = {
 
       ds.rdd.map(row => {
-        val newVal = fn(row(column))
-        row.filterNot(_._1 == column) ++ Map(column -> newVal)
+        row ++ Map(column -> fn(row(column)))
       })
     }
   }
