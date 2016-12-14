@@ -67,5 +67,8 @@ spark-shell \
     --conf spark.cassandra.auth.username=$CASSANDRA_USER \
     --conf spark.cassandra.auth.password=$CASSANDRA_PASSWORD \
     --conf spark.cassandra.output.ignoreNulls=true \
+    --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
+    --conf spark.kryo.registrationRequired=true \
+    --conf spark.kryo.registrator=scrubjay.registrator.KryoRegistrator \
     --jars $SCRUBJAR \
     -i $INPUT_SCRIPT
