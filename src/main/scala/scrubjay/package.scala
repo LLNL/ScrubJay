@@ -12,6 +12,7 @@ import scrubjay.query._
 import com.datastax.spark.connector._
 import org.apache.spark._
 import org.joda.time.Period
+import scrubjay.units.Units
 
 package object scrubjay {
 
@@ -100,6 +101,10 @@ package object scrubjay {
     /**
      * Derivations
      */
+
+    def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry) = {
+      new scrubjay.derivation.TransformColumn(Some(ds), column, fn, newMetaEntry).apply
+    }
 
     def deriveMergeColumns(columns: Seq[String]) = {
       new scrubjay.derivation.MergeColumns(Some(ds), columns).apply
