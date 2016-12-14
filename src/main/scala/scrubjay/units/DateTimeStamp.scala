@@ -13,7 +13,7 @@ import scala.util.control.Exception.allCatch
 
 case class DateTimeStamp(value: DateTime) extends Units[DateTime] with Continuous {
   override def asDouble: Double = value.getMillis.toDouble
-  override def rawString: String = "'" + value.toString() + "'"
+  override def rawString: String = "'" + DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(value) + "'"
 }
 
 object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
