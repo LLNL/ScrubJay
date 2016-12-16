@@ -14,7 +14,7 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
   }
 
   def filterEntries(cond: MetaEntry => Boolean): MetaEntryMap = {
-    metaEntryMap.filter{case (k, me) => cond(me)}
+    metaEntryMap.filter{case (_, me) => cond(me)}
   }
 
   def withMetaEntries(newMetaEntryMap: MetaEntryMap, overwrite: Boolean = false): MetaSource = {
@@ -32,21 +32,21 @@ class MetaSource(val metaEntryMap: MetaEntryMap) extends Serializable {
       new MetaSource(metaEntryMap ++ newColumns.map(_ -> UNKNOWN_META_ENTRY))
     }
     else {
-      val knownEntries = metaEntryMap.filter{case (k, v) => newColumns.contains(k)}
+      val knownEntries = metaEntryMap.filter{case (k, _) => newColumns.contains(k)}
       val newEntries = newColumns.filterNot(metaEntryMap.keySet.contains)
       new MetaSource(knownEntries ++ newEntries.map(_ -> UNKNOWN_META_ENTRY))
     }
   }
 
   def withoutColumns(oldColumns: Seq[String]): MetaSource = {
-    new MetaSource(metaEntryMap.filterNot { case (k, v) => oldColumns.contains(k) } )
+    new MetaSource(metaEntryMap.filterNot { case (k, _) => oldColumns.contains(k) } )
   }
 
 }
 
 object MetaSource {
 
-  def empty = {
+  def empty: MetaSource = {
     new MetaSource(Map[String, MetaEntry]())
   }
 

@@ -24,7 +24,7 @@ trait Range {
 
 object Units {
 
-  def raw2Units(v: Any, mu: MetaUnits) = {
+  def raw2Units(v: Any, mu: MetaUnits): Units[_] = {
     mu.unitsTag.convert(v, mu)
   }
 

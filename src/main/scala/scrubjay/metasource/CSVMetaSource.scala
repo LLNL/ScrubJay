@@ -36,7 +36,7 @@ object CSVMetaSource {
     bw.write("column, relationType, meaning, dimension, units")
     bw.newLine()
 
-    m.metaEntryMap.foreach{case (column, metaEntry) => {
+    m.metaEntryMap.foreach{case (column, metaEntry) =>
       val rowString = Seq(
         column,
         MetaRelationType.toString(metaEntry.relationType),
@@ -47,7 +47,7 @@ object CSVMetaSource {
 
       bw.write(rowString)
       bw.newLine()
-    }}
+    }
 
     bw.close()
   }

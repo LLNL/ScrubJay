@@ -25,7 +25,7 @@ object CassandraMetaSource {
   }
 
   def saveToCassandra(m: MetaSource, sc: SparkContext, keyspace: String, table: String): Unit = {
-    val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) => {
+    val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) =>
       CassandraRow.fromMap(Map(
         "column" -> column,
         "relationType" -> MetaRelationType.toString(metaEntry.relationType),
@@ -33,7 +33,7 @@ object CassandraMetaSource {
         "dimension" -> metaEntry.dimension.title,
         "units" -> metaEntry.units.title
       ))
-    }}.toSeq
+    }.toSeq
     sc.parallelize(cassandraRows).saveToCassandra(keyspace, table)
   }
 }

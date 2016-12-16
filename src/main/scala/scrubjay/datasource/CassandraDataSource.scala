@@ -12,15 +12,10 @@ import org.joda.time.{DateTime, Interval}
 
 import scala.reflect._
 
-class CassandraDataSource(cassandraRdd: CassandraTableScanRDD[CassandraRow],
-                          providedMetaSource: MetaSource)
-  extends DataSource {
+trait CassandraDataSource {
 
-  override lazy val metaSource = providedMetaSource.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
-  override lazy val rdd = Units.rawRDDToUnitsRDD(cassandraRdd.map(_.toMap.filter{case (k, null) => false; case _ => true}), metaSource.metaEntryMap)
-
-  val keyspace = cassandraRdd.keyspaceName
-  val table = cassandraRdd.tableName
+  val keyspace: String
+  val table: String
 
   def addSecondaryIndex(sc: SparkContext,
                         column: String): Unit = {
@@ -75,7 +70,14 @@ object CassandraDataSource {
         cassRddSelectWhereLimit
       }
 
-      new CassandraDataSource(cassandraRdd, metaSource)
+      val rawRdd = cassandraRdd.map(_.toMap.filter{case (_, null) => false; case _ => true})
+      val newMetaSource = metaSource.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
+
+      new ScrubJayRDD(rawRdd, newMetaSource) with CassandraDataSource {
+        override val keyspace: String = cassandraRdd.keyspaceName
+        override val table: String = cassandraRdd.tableName
+
+      }
     }
   }
 
@@ -103,7 +105,7 @@ object CassandraDataSource {
  }
 
   // Get columns and datatypes from the data and add meta_data for each column
-  def cassandraSchemaForDataSource(ds: DataSource): Seq[(String, String)] = {
+  def cassandraSchemaForDataSource(ds: ScrubJayRDD): Seq[(String, String)] = {
     ds.metaSource.metaEntryMap.map{case (c, me) => ("\"" + c + "\"", inferCassandraTypeString(me.units))}.toSeq
   }
 
@@ -121,16 +123,16 @@ object CassandraDataSource {
     s"CREATE TABLE $keyspace.$table ($schemaString, PRIMARY KEY (($primaryKeyString)$clusterKeyString))"
   }
 
-  def saveToCassandra(ds: DataSource,
+  def saveToCassandra(ds: ScrubJayRDD,
                       keyspace: String,
                       table: String): Unit = {
 
     // Convert rows to CassandraRow instances and save to the table
-    ds.rdd.map(row => CassandraRow.fromMap(row.map(kv => kv._1 -> kv._2.rawString)))
+    ds.map(row => CassandraRow.fromMap(row.map(kv => kv._1 -> kv._2.rawString)))
       .saveToCassandra(keyspace, table)
   }
 
-  def createCassandraTable(ds: DataSource,
+  def createCassandraTable(ds: ScrubJayRDD,
                            keyspace: String,
                            table: String,
                            primaryKeys: Seq[String],
@@ -143,7 +145,7 @@ object CassandraDataSource {
     val CQLCommand = createCassandraTableCQL(keyspace, table, schema, primaryKeys, clusterKeys)
 
     // Run the generated CQL commands
-    CassandraConnector(ds.rdd.sparkContext.getConf).withSessionDo { session =>
+    CassandraConnector(ds.sparkContext.getConf).withSessionDo { session =>
       session.execute(CQLCommand)
     }
   }

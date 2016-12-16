@@ -13,7 +13,7 @@ object UnorderedDiscrete extends UnitsTag[UnorderedDiscrete, String] {
   override def convert(value: Any, metaUnits: MetaUnits): UnorderedDiscrete = UnorderedDiscrete(value.toString)
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[UnorderedDiscrete]): (Double) => UnorderedDiscrete = {
-    (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
+    (d: Double) => xs.zip(ys).minBy{case (x, _) => Math.abs(x - d)}._2
   }
 
   override protected def typedReduce(ys: Seq[UnorderedDiscrete]): UnorderedDiscrete = {

@@ -43,7 +43,6 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
-    val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.getMillis.toDouble):_*))
     (d: Double) => DateTimeStamp(new DateTime(Math.round(d)*1000L))
   }
 

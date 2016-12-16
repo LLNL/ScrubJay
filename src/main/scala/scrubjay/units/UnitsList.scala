@@ -42,7 +42,7 @@ object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[UnitsList[_]]): (Double) => UnitsList[_] = {
-    (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
+    (d: Double) => xs.zip(ys).minBy{case (x, _) => Math.abs(x - d)}._2
   }
 
   override protected def typedReduce(ys: Seq[UnitsList[_]]): UnitsList[_] = {

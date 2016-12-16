@@ -80,7 +80,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
           assert(jobQueue.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueue.get.rdd.collect.toSet == trueJobQueue)
+          assert(jobQueue.get.collect.toSet == trueJobQueue)
         }
       }
 
@@ -89,7 +89,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
           assert(cabLayout.isDefined)
         }
         it("should match ground truth") {
-          assert(cabLayout.get.rdd.collect.toSet == trueCabLayout)
+          assert(cabLayout.get.collect.toSet == trueCabLayout)
         }
       }
     }
@@ -104,7 +104,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
           assert(jobQueueSpan.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpan.get.rdd.collect.toSet == trueJobQueueSpan)
+          assert(jobQueueSpan.get.collect.toSet == trueJobQueueSpan)
         }
       }
 
@@ -116,7 +116,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
           assert(jobQueueSpanExploded.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExploded.get.rdd.collect.toSet == trueJobQueueSpanExploded)
+          assert(jobQueueSpanExploded.get.collect.toSet == trueJobQueueSpanExploded)
         }
       }
 
@@ -128,7 +128,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
           assert(jobQueueSpanExplodedJoined.isDefined)
         }
         it("should match ground truth") {
-          assert(jobQueueSpanExplodedJoined.get.rdd.collect.toSet == trueJobQueueSpanExplodedJoined)
+          assert(jobQueueSpanExplodedJoined.get.collect.toSet == trueJobQueueSpanExplodedJoined)
         }
       }
     }

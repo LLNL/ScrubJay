@@ -26,7 +26,7 @@ abstract class UnitsTag[T <: Units[_] : ClassTag, R : ClassTag] extends Serializ
   def createInterpolator(xs: Seq[Double], ys: Seq[Units[_]]): (Double) => Units[_] = {
     val (nxs, nys) = xs.zip(ys).toMap.toSeq.unzip
     if (ys.length == 1)
-      (d: Double) => ys.head
+      (_: Double) => ys.head
     else
       createTypedInterpolator(nxs, extractSeq(nys))
   }

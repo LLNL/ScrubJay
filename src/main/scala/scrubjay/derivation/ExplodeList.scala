@@ -19,21 +19,21 @@ import org.apache.spark.rdd.RDD
  *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transformer(dso) {
+class ExplodeList(dso: Option[ScrubJayRDD], columns: Seq[String]) extends Transformer(dso) {
 
-  val isValid = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_COMPOSITE_LIST)
+  override val isValid: Boolean = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_COMPOSITE_LIST)
 
-  def derive: DataSource = new DataSource {
+  override def derive: ScrubJayRDD = {
 
     // Add column_exploded meta entry for each column
-    override lazy val metaSource = ds.metaSource.withMetaEntries(
+    val metaSource = ds.metaSource.withMetaEntries(
       columns.map(col => col + "_exploded" -> {
         val originalMetaEntry = ds.metaSource.metaEntryMap(col)
         originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
       }).toMap)
       .withoutColumns(columns)
 
-    override lazy val rdd: RDD[DataRow] = {
+    val rdd: RDD[DataRow] = {
 
       // Derivation function for flatMap returns a sequence of DataRows
       def derivation(row: DataRow, cols: Seq[String]): Seq[DataRow] = {
@@ -42,7 +42,7 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
         val explodedValues = cols.map(col => (col, row(col)))
           .map {
             case (k, ul: UnitsList[_]) => ul.value.map(u => (k + "_exploded", u.asInstanceOf[Units[_]]))
-            case (k, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
+            case (_, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: UnitList[_]\nvalue: $v")
           }
 
         // For multiple expansion columns, explode into the cartesian product
@@ -55,7 +55,9 @@ class ExplodeList(dso: Option[DataSource], columns: Seq[String]) extends Transfo
       }
 
       // Create the derived dataset
-      ds.rdd.flatMap(row => derivation(row, columns))
+      ds.flatMap(row => derivation(row, columns))
     }
+
+    new ScrubJayRDD(rdd, metaSource)
   }
 }

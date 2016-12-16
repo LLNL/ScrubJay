@@ -29,7 +29,7 @@ object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeSpan]): (Double) => DateTimeSpan = {
-    (d: Double) => xs.zip(ys).minBy{case (x, y) => Math.abs(x - d)}._2
+    (d: Double) => xs.zip(ys).minBy{case (x, _) => Math.abs(x - d)}._2
   }
 
   override protected def typedReduce(ys: Seq[DateTimeSpan]): DateTimeSpan = {

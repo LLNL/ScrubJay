@@ -8,7 +8,7 @@ import org.scalactic.source.Position
 
 object QuerySpec {
 
-  def createDataSources(sc: SparkContext): Set[DataSource] = {
+  def createDataSources(sc: SparkContext): Set[ScrubJayRDD] = {
     Set(
       sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, createLocalMetaSource(clusterLayoutMeta)),
       sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, createLocalMetaSource(nodeDataMeta)),

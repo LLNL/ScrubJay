@@ -1,65 +1,64 @@
 package scrubjay.derivation
 
-import scrubjay.DataSource
-import scrubjay.datasource.DataRow
+import scrubjay.datasource.{DataRow, ScrubJayRDD}
 import scrubjay.metabase.MetaDescriptor.DimensionSpace
 import scrubjay.metasource.MetaSource
 import scrubjay.units._
 import org.apache.spark.rdd.RDD
 import scrubjay.units.UnitsTag.DomainType
 
-class RangeJoin(dso1: Option[DataSource], dso2: Option[DataSource]) extends Joiner(dso1, dso2) {
+class RangeJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD]) extends Joiner(dso1, dso2) {
 
-  val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
-  val commonContinuousDimensions = commonDimensions.filter(d =>
+  // Determine common continuous (point, range) column pairs and and discrete dimension columns
+  private val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
+  private val commonContinuousDimensions = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.RANGE &&
     d._3.units.unitsTag.domainType == DomainType.POINT)
-  val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionSpace.DISCRETE)
+  private val commonDiscreteDimensions = commonDimensions.filter(_._1.dimensionType == DimensionSpace.DISCRETE)
 
-  // Single continuous axis for now
-  def isValid = commonContinuousDimensions.length == 1
+  private val continuousDimColumn1 = commonContinuousDimensions.flatMap { case (_, me1, _) => ds1.metaSource.columnForEntry(me1) }.head
+  private val continuousDimColumn2 = commonContinuousDimensions.flatMap { case (_, _, me2) => ds2.metaSource.columnForEntry(me2) }.head
 
-  val continuousDimColumn1 = commonContinuousDimensions.flatMap { case (d, me1, me2) => ds1.metaSource.columnForEntry(me1) }.head
-  val continuousDimColumn2 = commonContinuousDimensions.flatMap { case (d, me1, me2) => ds2.metaSource.columnForEntry(me2) }.head
+  private val discreteDimColumns1 = commonDiscreteDimensions.flatMap { case (_, me1, _) => ds1.metaSource.columnForEntry(me1) }
+  private val discreteDimColumns2 = commonDiscreteDimensions.flatMap { case (_, _, me2) => ds2.metaSource.columnForEntry(me2) }
 
-  val discreteDimColumns1 = commonDiscreteDimensions.flatMap { case (d, me1, me2) => ds1.metaSource.columnForEntry(me1) }
-  val discreteDimColumns2 = commonDiscreteDimensions.flatMap { case (d, me1, me2) => ds2.metaSource.columnForEntry(me2) }
+  // Restrict to single continuous axis for now
+  override def isValid: Boolean = commonContinuousDimensions.length == 1
 
-  def derive: DataSource = {
+  override def derive: ScrubJayRDD = {
 
-    new DataSource {
+    val metaSource = ds1.metaSource.withMetaEntries(ds2.metaSource.metaEntryMap)
+      .withoutColumns(discreteDimColumns2)
+      .withoutColumns(Seq(continuousDimColumn2))
 
-      override lazy val metaSource = ds1.metaSource.withMetaEntries(ds2.metaSource.metaEntryMap)
-        .withoutColumns(discreteDimColumns2)
-        .withoutColumns(Seq(continuousDimColumn2))
+    val rdd: RDD[DataRow] = {
 
-      override lazy val rdd: RDD[DataRow] = {
+      // Cartesian
+      val cartesian = ds1.cartesian(ds2)
 
-        // Cartesian
-        val cartesian = ds1.rdd.cartesian(ds2.rdd)
+      // Filter out all pairs where the discrete columns don't match
+      val discreteMatch = cartesian.filter { case (row1, row2) => discreteDimColumns1.map(row1) == discreteDimColumns2.map(row2) }
 
-        // Filter out all pairs where the discrete columns don't match
-        val discreteMatch = cartesian.filter { case (row1, row2) => discreteDimColumns1.map(row1) == discreteDimColumns2.map(row2) }
+      // Remove redundant discrete entries
+      val filteredDiscrete = discreteMatch.map { case (row1, row2) => (row1, row2.filterNot { case (k, _) => discreteDimColumns2.contains(k) } ) }
 
-        // Remove redundant discrete entries
-        val filteredDiscrete = discreteMatch.map { case (row1, row2) => (row1, row2.filterNot { case (k, v) => discreteDimColumns2.contains(k) } ) }
-
-        // Filter out all pairs where the POINT in ds2 does not reside in the RANGE of ds1
-        val continuousMatch = filteredDiscrete.filter { case (row1, row2) => {
-          val range = row1(continuousDimColumn1).asInstanceOf[Range]
-          val point = row2(continuousDimColumn2).asInstanceOf[Continuous]
-          range.minDouble <= point.asDouble && point.asDouble <= range.maxDouble
-        }}
-
-        // Reduce all points that fall in a range using the appropriate reducer for those units
-        val meta = ds1.rdd.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
-        val reducedMatch = continuousMatch.mapValues(_.toSeq).reduceByKey(_ ++ _)
-          .mapValues(_.groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap[String, Units[_]])
-
-        // Remove redundant continuous entries from row2 and combine results
-        reducedMatch.map { case (row1, row2) => row1 ++ row2.filterNot { case (k, v) => k == continuousDimColumn2 } }
+      // Filter out all pairs where the POINT in ds2 does not reside in the RANGE of ds1
+      val continuousMatch = filteredDiscrete.filter { case (row1, row2) =>
+        val range = row1(continuousDimColumn1).asInstanceOf[Range]
+        val point = row2(continuousDimColumn2).asInstanceOf[Continuous]
+        range.minDouble <= point.asDouble && point.asDouble <= range.maxDouble
       }
+
+      // Reduce all points that fall in a range using the appropriate reducer for those units
+      val meta = ds1.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
+      val reducedMatch = continuousMatch.mapValues(_.toSeq).reduceByKey(_ ++ _)
+        .mapValues(_.groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap[String, Units[_]])
+
+      // Remove redundant continuous entries from row2 and combine results
+      reducedMatch.map { case (row1, row2) => row1 ++ row2.filterNot { case (k, _) => k == continuousDimColumn2 } }
     }
+    
+    new ScrubJayRDD(rdd, metaSource)
   }
 }

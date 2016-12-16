@@ -16,7 +16,7 @@ object MetaDescriptor {
     type MetaRelationType = Value
     val DOMAIN, VALUE = Value
 
-    def toString(relationType: MetaRelationType) = relationType match {
+    def toString(relationType: MetaRelationType): String = relationType match {
       case DOMAIN => "domain"
       case VALUE => "value"
     }

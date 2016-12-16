@@ -9,7 +9,7 @@ import java.io._
 import org.apache.spark.rdd.RDD
 
 
-abstract class CSVDataSource extends DataSource {
+trait CSVDataSource {
   val fileName: String
 }
 
@@ -18,27 +18,27 @@ object CSVDataSource {
   def createCSVDataSource(rawRdd: RDD[RawDataRow],
                           header: Seq[String],
                           csvFileName: String,
-                          providedMetaSource: MetaSource): Option[CSVDataSource] = {
+                          providedMetaSource: MetaSource): Option[ScrubJayRDD with CSVDataSource] = {
 
     niceAttempt {
 
-      new CSVDataSource {
-        override val fileName = csvFileName
-        override lazy val metaSource = providedMetaSource.withColumns(header)
-        override lazy val rdd = Units.rawRDDToUnitsRDD(rawRdd, metaSource.metaEntryMap)
+      val newMetaSource = providedMetaSource.withColumns(header)
+
+      new ScrubJayRDD(rawRdd, newMetaSource) with CSVDataSource {
+        override val fileName: String = csvFileName
       }
 
     }
   }
 
-  def saveToCSV(ds: DataSource,
+  def saveToCSV(ds: ScrubJayRDD,
                 fileName: String,
                 wrapperChar: String,
                 delimiter: String,
                 noneString: String): Unit = {
 
     val header = ds.metaSource.columns
-    val csvRdd = ds.rdd.map(row => header.map(col => wrapperChar +
+    val csvRdd = ds.map(row => header.map(col => wrapperChar +
       row.getOrElse(col, UnorderedDiscrete(noneString)).value.toString +
       wrapperChar).mkString(delimiter))
     val bw = new BufferedWriter(new FileWriter(fileName))
