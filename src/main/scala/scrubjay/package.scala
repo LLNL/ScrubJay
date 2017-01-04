@@ -5,6 +5,8 @@
  *
  */
 
+import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.Cluster.Builder
 import scrubjay.datasource._
 import scrubjay.metabase._
 import scrubjay.metasource._
@@ -29,12 +31,19 @@ package object scrubjay {
    * Standalone functions
    */
 
-  def metaEntryFromStrings: (String, String, String, String) => MetaEntry = scrubjay.metabase.MetaEntry.metaEntryFromStrings _
+  def metaEntryFromStrings(relationType: String, meaning: String, dimension: String, units: String): MetaEntry = {
+    scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, meaning, dimension, units)
+  }
 
-  def createCSVMetaSource: (String) => MetaSource = scrubjay.metasource.CSVMetaSource.createCSVMetaSource _
-  def createLocalMetaSource: (MetaEntryMap) => MetaSource = scrubjay.metasource.LocalMetaSource.createLocalMetaSource _
-  def createCassandraMetaSource: (SparkContext, String, String) => MetaSource = scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource _
-
+  def createCSVMetaSource(filename: String): MetaSource = {
+    scrubjay.metasource.CSVMetaSource.createCSVMetaSource(filename)
+  }
+  def createLocalMetaSource(metaEntryMap: MetaEntryMap): MetaSource = {
+    scrubjay.metasource.LocalMetaSource.createLocalMetaSource(metaEntryMap)
+  }
+  def createCassandraMetaSource(sc: SparkContext, keyspace: String, table: String): MetaSource = {
+    scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource(sc, keyspace, table)
+  }
 
   /**
    * SparkContext implicit functions
@@ -42,7 +51,12 @@ package object scrubjay {
 
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
-    val metaBase = GlobalMetaBase.META_BASE
+    val metaBase: MetaBase = GlobalMetaBase.META_BASE
+    var objectBase: Map[String, ScrubJayRDD] = Map.empty
+
+    def loadAllObjects(): Unit = {
+      objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
+    }
 
     /**
      * Create a LocalDataSource from a sequence of RawDataRow, i.e. Map[String -> Any]
