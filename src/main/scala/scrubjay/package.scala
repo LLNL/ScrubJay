@@ -5,6 +5,8 @@
  *
  */
 
+import com.datastax.driver.core.Cluster
+import com.datastax.driver.core.Cluster.Builder
 import scrubjay.datasource._
 import scrubjay.metabase._
 import scrubjay.metasource._
@@ -33,15 +35,18 @@ package object scrubjay {
     scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, meaning, dimension, units)
   }
 
-
-
   /**
    * SparkContext implicit functions
    */
 
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
-    val metaBase = GlobalMetaBase.META_BASE
+    val metaBase: MetaBase = GlobalMetaBase.META_BASE
+    var objectBase: Map[String, ScrubJayRDD] = Map.empty
+
+    def loadAllObjects(): Unit = {
+      objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
+    }
 
     /**
       * MetaSource creation
