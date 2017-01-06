@@ -1,11 +1,12 @@
 package scrubjay.objectbase
 
-import com.datastax.spark.connector._
-import org.apache.spark.SparkContext
 import scrubjay.datasource.ScrubJayRDD
-
 import scrubjay.ScrubJaySessionImplicits
 import scrubjay.createCassandraMetaSource
+import com.datastax.spark.connector.cql.CassandraConnector
+import com.datastax.spark.connector._
+import com.datastax.spark.connector.rdd.CassandraTableScanRDD
+import org.apache.spark.SparkContext
 
 object ObjectBase {
 
@@ -15,41 +16,77 @@ object ObjectBase {
    *  "derived" objects are data source that were derived from other data sources (original or derived)
    *
    * It has the schema:
-   *  name, metaTable, dataTable
+   *  name, metaKeyspace, metaTable, dataKeyspace, dataTable
    *
    * For example:
-   *  "cabDat2016Temperature", "cab_dat_2016.temp_meta", "cab_dat_2016.temp"
+   *  "cabDat2016Temperature", "cab_dat_2016", "temp_meta", "cab_dat_2016", "temp_data"
    *
    */
 
-  private def loadDataObjectsFromNames(sc: SparkContext, names: Map[String, (String, String)]): Map[String, ScrubJayRDD] = {
+  final val SCRUBJAY_OBJECTS_KEYSPACE = "scrubjay_objectbases"
+  final val SCRUBJAY_ORIGINAL_OBJECTS_TABLE = "original"
+  final val SCRUBJAY_DERIVED_OBJECTS_TABLE = "derived"
+
+  final val SCRUBJAY_DATA_KEYSPACE = "scrubjay_databases"
+
+  final val SCRUBJAY_META_KEYSPACE = "scrubjay_metabases"
+
+  final val OBJECT_COLUMN_NAME = "name"
+  final val OBJECT_COLUMN_META_KEYSPACE = "metaKeyspace"
+  final val OBJECT_COLUMN_META_TABLE = "metaTable"
+  final val OBJECT_COLUMN_DATA_KEYSPACE = "dataKeyspace"
+  final val OBJECT_COLUMN_DATA_TABLE = "dataTable"
+
+  private def loadObjects(crdd: CassandraTableScanRDD[CassandraRow]): Map[String, ScrubJayRDD] = {
+
+    val sc = crdd.sparkContext
+
+    val names = crdd.map(row =>
+      ( row.getString(OBJECT_COLUMN_NAME),
+        row.getString(OBJECT_COLUMN_META_KEYSPACE),
+        row.getString(OBJECT_COLUMN_META_TABLE),
+        row.getString(OBJECT_COLUMN_DATA_KEYSPACE),
+        row.getString(OBJECT_COLUMN_DATA_TABLE)
+      )).collect.toSeq
+
     names.map{
-      case (k, (metaFullTableName, dataFullTableName)) => {
-
-        val metaSplitNames = metaFullTableName.split(".")
-        val (metaKeyspace, metaTableName) = (metaSplitNames(0), metaSplitNames(1))
-
-        val dataSplitNames = dataFullTableName.split(".")
-        val (dataKeyspace, dataTableName) = (dataSplitNames(0), dataSplitNames(1))
-
-        val metaSource = createCassandraMetaSource(sc, metaKeyspace, metaTableName)
-        (k, sc.createCassandraDataSource(dataKeyspace, dataTableName, metaSource).get.asInstanceOf[ScrubJayRDD])
+      case (k, metaKeyspace, metaTable, dataKeyspace, dataTable) => {
+        val metaSource = createCassandraMetaSource(sc, metaKeyspace, metaTable)
+        (k, sc.createCassandraDataSource(dataKeyspace, dataTable, metaSource).get.asInstanceOf[ScrubJayRDD])
       }
-    }
+    }.toMap
   }
 
   def loadOriginalObjects(sc: SparkContext): Map[String, ScrubJayRDD] = {
-    val originalSourcesRdd = sc.cassandraTable("scrubjay", "original_sources")
-    val originalSourcesNames: Map[String, (String, String)] = originalSourcesRdd.map(row =>
-      (row.get[String](0), (row.get[String](1), row.get[String](2)))).collect.toMap
-    loadDataObjectsFromNames(sc, originalSourcesNames)
+    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_ORIGINAL_OBJECTS_TABLE))
   }
 
   def loadDerivedObjects(sc: SparkContext): Map[String, ScrubJayRDD] = {
-    // "spec", "metaSourceTable", "dataSourceTable"
-    val derivedSourcesRdd = sc.cassandraTable("scrubjay", "derived_sources")
-    val derivedSourcesNames: Map[String, (String, String)] = derivedSourcesRdd.map(row =>
-      (row.get[String](0), (row.get[String](1), row.get[String](2)))).collect.toMap
-    loadDataObjectsFromNames(sc, derivedSourcesNames)
+    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_DERIVED_OBJECTS_TABLE))
+  }
+
+  def saveAsOriginalObject(ds: ScrubJayRDD, name: String,
+                           metaKeyspaceTableTuple: Option[(String, String)],
+                           dataKeyspaceTableTuple: Option[(String, String)],
+                           saveObjectReferenceOnly: Boolean = false): Unit = {
+    val sc = ds.rdd.sparkContext
+
+    val (dataKeyspace, dataTable) = dataKeyspaceTableTuple.getOrElse((SCRUBJAY_DATA_KEYSPACE, name + "_data"))
+    val (metaKeyspace, metaTable) = metaKeyspaceTableTuple.getOrElse((SCRUBJAY_META_KEYSPACE, name + "_meta"))
+
+    val CQLCommand =
+      s"INSERT INTO $SCRUBJAY_OBJECTS_KEYSPACE.$SCRUBJAY_ORIGINAL_OBJECTS_TABLE " +
+      s"($OBJECT_COLUMN_NAME, $OBJECT_COLUMN_META_KEYSPACE, $OBJECT_COLUMN_META_TABLE, $OBJECT_COLUMN_DATA_KEYSPACE, $OBJECT_COLUMN_DATA_TABLE) " +
+      s"VALUES ($name, $metaKeyspace, $metaTable, $dataKeyspace, $dataTable)"
+
+    CassandraConnector(sc.getConf).withSessionDo { session =>
+      session.execute(CQLCommand)
+    }
+
+    if (!saveObjectReferenceOnly) {
+      ds.metaSource.saveToCassandra(sc, metaKeyspace, name)
+      ds.saveToCassandra(dataKeyspace, name)
+    }
+
   }
 }
