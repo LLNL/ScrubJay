@@ -35,10 +35,10 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
     case dt: DateTime => DateTimeStamp(dt.getMillis)
-    case d: Double => DateTimeStamp(d)
-    case f: Float => DateTimeStamp(f)
-    case l: Long => DateTimeStamp(l)
-    case i: Int => DateTimeStamp(i)
+    case d: Double => DateTimeStamp(d*1000L)
+    case f: Float => DateTimeStamp(f*1000L)
+    case l: Long => DateTimeStamp(l*1000L)
+    case i: Int => DateTimeStamp(i*1000L)
     case v => dateTimeFromString(v.toString)
   }
 
