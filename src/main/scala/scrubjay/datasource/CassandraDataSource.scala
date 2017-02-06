@@ -57,7 +57,7 @@ object CassandraDataSource {
                                 metaSource: MetaSource,
                                 selectColumns: Seq[String],
                                 whereConditions: Seq[String],
-                                limit: Option[Long]): Option[CassandraDataSource] = {
+                                limit: Option[Long]): Option[ScrubJayRDD with CassandraDataSource] = {
 
     niceAttempt {
 

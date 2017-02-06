@@ -77,7 +77,7 @@ package object scrubjay {
                                   metaSource: MetaSource = MetaSource.empty,
                                   selectColumns: Seq[String] = Seq.empty,
                                   whereConditions: Seq[String] = Seq.empty,
-                                  limit: Option[Long] = None): Option[CassandraDataSource] = {
+                                  limit: Option[Long] = None): Option[ScrubJayRDD with CassandraDataSource] = {
       scrubjay.datasource.CassandraDataSource.createCassandraDataSource(sc.cassandraTable(keyspace, table), metaSource, selectColumns, whereConditions, limit)
     }
 
