@@ -1,30 +1,35 @@
 package scrubjay.units
 
+import org.joda.time.format.DateTimeFormat
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
-
 import org.joda.time.{DateTime, Interval, Period}
 
-case class DateTimeSpan(value: Interval) extends Units[Interval] with Range {
+case class DateTimeSpan(value: (Double, Double)) extends Units[(Double, Double)] with Range {
 
-  override def minDouble: Double = value.getStart.getMillis
-  override def maxDouble: Double = value.getEnd.getMillis
+  def getStart: Double = value._1
+  def getEnd: Double = value._2
+
+  override def minDouble: Double = getStart
+  override def maxDouble: Double = getEnd
 
   // TODO: read in this rawstring format
-  override def rawString: String = "('" + value.getStart.toString() + "', '" + value.getEnd.toString() + "')"
+  override def rawString: String = "('" +
+    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(getStart.toLong) +
+    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(getEnd.toLong) + "')"
 
-  def explode(step: Period): Seq[DateTimeStamp] = {
-    Iterator.iterate(value.getStart)(_.plus(step)).takeWhile(!_.isAfter(value.getEnd)).map(DateTimeStamp(_)).toSeq
+  def explode(step: Double): Seq[DateTimeStamp] = {
+    Iterator.iterate(getStart)(_ + step).takeWhile(_ < getEnd).map(DateTimeStamp(_)).toSeq
   }
 }
 
-object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
+object DateTimeSpan extends UnitsTag[DateTimeSpan, (Double, Double)] {
 
   override val domainType: DomainType = DomainType.RANGE
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeSpan = value match {
-    case (s: String, e: String) => DateTimeSpan(new Interval(DateTime.parse(s), DateTime.parse(e)))
+    case (s: String, e: String) => DateTimeSpan((DateTime.parse(s).getMillis, DateTime.parse(e).getMillis))
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
 
@@ -33,7 +38,7 @@ object DateTimeSpan extends UnitsTag[DateTimeSpan, Interval] {
   }
 
   override protected def typedReduce(ys: Seq[DateTimeSpan]): DateTimeSpan = {
-    DateTimeSpan(new Interval(ys.map(_.value.getStart.getMillis).min, ys.map(_.value.getEnd.getMillis).max))
+    DateTimeSpan((ys.map(_.getStart).min, ys.map(_.getEnd).max))
   }
 
 }

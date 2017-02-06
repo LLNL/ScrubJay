@@ -11,9 +11,9 @@ import org.joda.time.format.DateTimeFormat
 
 import scala.util.control.Exception.allCatch
 
-case class DateTimeStamp(value: DateTime) extends Units[DateTime] with Continuous {
-  override def asDouble: Double = value.getMillis.toDouble
-  override def rawString: String = "'" + DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(value) + "'"
+case class DateTimeStamp(value: Double) extends Units[Double] with Continuous {
+  override def asDouble: Double = value
+  override def rawString: String = "'" + DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(new DateTime(value.toLong)) + "'"
 }
 
 object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
@@ -30,23 +30,23 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
     if (attempts.isEmpty)
       throw new RuntimeException(s"Cannot convert $s to DateTime")
 
-    DateTimeStamp(attempts.head)
+    DateTimeStamp(attempts.head.getMillis)
   }
 
   override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
-    case dt: DateTime => DateTimeStamp(dt)
-    case d: Double => DateTimeStamp(new DateTime(Math.round(d*1000)))
-    case f: Float => DateTimeStamp(new DateTime(Math.round(f*1000).toLong))
-    case l: Long => DateTimeStamp(new DateTime(l*1000L))
-    case i: Int => DateTimeStamp(new DateTime(i*1000L))
+    case dt: DateTime => DateTimeStamp(dt.getMillis)
+    case d: Double => DateTimeStamp(d)
+    case f: Float => DateTimeStamp(f)
+    case l: Long => DateTimeStamp(l)
+    case i: Int => DateTimeStamp(i)
     case v => dateTimeFromString(v.toString)
   }
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[DateTimeStamp]): (Double) => DateTimeStamp = {
-    (d: Double) => DateTimeStamp(new DateTime(Math.round(d)*1000L))
+    (d: Double) => DateTimeStamp(d)
   }
 
   override protected def typedReduce(ys: Seq[DateTimeStamp]): DateTimeStamp = {
-    DateTimeStamp(new DateTime(Math.round(ys.map(_.value.getMillis.toDouble).sum / ys.length)))
+    DateTimeStamp(ys.map(_.value).sum / ys.length)
   }
 }

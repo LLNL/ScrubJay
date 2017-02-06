@@ -44,7 +44,7 @@ object InterpolationJoinSpec {
   val trueFlopsJoinTemp = Set(
     Map(
       "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:30+0000")),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:30+0000").getMillis),
       "flops" -> OrderedDiscrete(2000238),
       "temp" -> DegreesCelsius(45.0)
     )
@@ -53,13 +53,13 @@ object InterpolationJoinSpec {
   val trueTempJoinFlops = Set(
     Map(
       "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:00+0000")),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:00+0000").getMillis),
       "flops" -> OrderedDiscrete(2000238),
       "temp" -> DegreesCelsius(40.0)
     ),
     Map(
       "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:31:00+0000")),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:31:00+0000").getMillis),
       "flops" -> OrderedDiscrete(2000238),
       "temp" -> DegreesCelsius(50.0)
     )

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Get location of this file
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

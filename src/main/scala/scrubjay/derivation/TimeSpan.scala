@@ -24,7 +24,7 @@ class TimeSpan(dso: Option[ScrubJayRDD]) extends Transformer(dso) {
   private def addSpanToRow(startColumn: String, endColumn: String, row: DataRow): DataRow = {
     (row(startColumn), row(endColumn)) match {
       case (s: DateTimeStamp, e: DateTimeStamp) =>
-        val newDataRow: DataRow = Map("span" -> DateTimeSpan(new Interval(s.value, e.value)))
+        val newDataRow: DataRow = Map("span" -> DateTimeSpan((s.value, e.value)))
         row.filterNot(kv => Set(startColumn, endColumn).contains(kv._1)) ++ newDataRow
     }
   }

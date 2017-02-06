@@ -118,7 +118,7 @@ package object scrubjay {
       new scrubjay.derivation.ExplodeList(Some(ds), columns).apply
     }
 
-    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Period)]): Option[ScrubJayRDD] = {
+    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): Option[ScrubJayRDD] = {
       new scrubjay.derivation.ExplodeTimeSpan(Some(ds), columnsWithPeriods).apply
     }
 

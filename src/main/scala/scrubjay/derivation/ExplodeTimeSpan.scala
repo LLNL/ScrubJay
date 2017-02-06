@@ -8,7 +8,7 @@ import scrubjay.util.cartesianProduct
 import org.apache.spark.rdd.RDD
 import org.joda.time.Period
 
-class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String, Period)]) extends Transformer(dso) {
+class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String, Double)]) extends Transformer(dso) {
 
   override val isValid: Boolean = columnsWithPeriods.forall(col => ds.metaSource.metaEntryMap(col._1).units == UNITS_DATETIMESPAN)
 
@@ -25,7 +25,7 @@ class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String,
     val rdd: RDD[DataRow] = {
 
       // Derivation function for flatMap returns a sequence of DataRows
-      def derivation(row: DataRow, cols: Seq[(String, Period)]): Seq[DataRow] = {
+      def derivation(row: DataRow, cols: Seq[(String, Double)]): Seq[DataRow] = {
 
         // Get lists to explode
         val explodedValues =
