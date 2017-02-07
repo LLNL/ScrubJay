@@ -54,6 +54,7 @@ object GlobalMetaBase {
   // *******************************************************************************
   final val UNITS_UNORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", UnorderedDiscrete))
   final val UNITS_ORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", OrderedDiscrete))
+  final val UNITS_ACCUMULATION: MetaUnits = META_BASE.addUnits(MetaUnits("accumulation", "An accumulated discrete amount", Accumulation))
   final val UNITS_ORDERED_CONTINUOUS: MetaUnits = META_BASE.addUnits(MetaUnits("amount", "An amount that is ordered and continuous (real numbers)", OrderedContinuous))
 
   final val UNITS_SECONDS: MetaUnits = META_BASE.addUnits(MetaUnits("seconds", "A quantity of seconds", Seconds))
