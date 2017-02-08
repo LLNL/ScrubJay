@@ -18,8 +18,9 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
   override def convert(value: Any, metaUnits: MetaUnits): Accumulation = Accumulation(value)
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Accumulation]): (Double) => Accumulation = {
-    val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.toDouble):_*))
-    (d: Double) => Accumulation(Math.round(f(d)))
+    (d: Double) => typedReduce(ys)
+    //val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.toDouble):_*))
+    //(d: Double) => Accumulation(Math.round(f(d)))
   }
 
   override protected def typedReduce(ys: Seq[Accumulation]): Accumulation = {

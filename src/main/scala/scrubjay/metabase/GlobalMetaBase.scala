@@ -27,6 +27,10 @@ object GlobalMetaBase {
   final val DIMENSION_NODE: MetaDimension = META_BASE.addDimension(MetaDimension("node", "A single node in an HPC cluster", DimensionSpace.DISCRETE))
   final val DIMENSION_RACK: MetaDimension = META_BASE.addDimension(MetaDimension("rack", "A rack (containing nodes) in an HPC cluster", DimensionSpace.DISCRETE))
   final val DIMENSION_FLOPS: MetaDimension = META_BASE.addDimension(MetaDimension("flops", "Floating-point operations", DimensionSpace.CONTINUOUS))
+  final val DIMENSION_APERF: MetaDimension = META_BASE.addDimension(MetaDimension("aperf", "Value of APERF MSR for a CPU", DimensionSpace.DISCRETE))
+  final val DIMENSION_MPERF: MetaDimension = META_BASE.addDimension(MetaDimension("mperf", "Value of MPERF MSR for a CPU", DimensionSpace.DISCRETE))
+  final val DIMENSION_CPU_BASE_FREQUENCY: MetaDimension = META_BASE.addDimension(MetaDimension("cpu base frequency", "Base frequency of a CPU", DimensionSpace.CONTINUOUS))
+  final val DIMENSION_CPU_ACTIVE_FREQUENCY: MetaDimension = META_BASE.addDimension(MetaDimension("cpu active frequency", "Active frequency of a CPU", DimensionSpace.CONTINUOUS))
 
   // Units
   // *******************************************************************************
