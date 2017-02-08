@@ -114,6 +114,10 @@ package object scrubjay {
       new scrubjay.derivation.TimeSpan(Some(ds)).apply
     }
 
+    def deriveCoreFrequency: Option[ScrubJayRDD] = {
+      new scrubjay.derivation.CoreFrequency(Some(ds)).apply
+    }
+
     def deriveExplodeList(columns: Seq[String]): Option[ScrubJayRDD] = {
       new scrubjay.derivation.ExplodeList(Some(ds), columns).apply
     }
