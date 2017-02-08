@@ -1,7 +1,5 @@
 package scrubjay.units
 
-import breeze.interpolation.LinearInterpolator
-import breeze.linalg.DenseVector
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.units.ConversionHelpers._
 import scrubjay.units.UnitsTag.DomainType
@@ -18,12 +16,22 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
   override def convert(value: Any, metaUnits: MetaUnits): Accumulation = Accumulation(value)
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Accumulation]): (Double) => Accumulation = {
-    (d: Double) => typedReduce(ys)
-    //val f = LinearInterpolator(DenseVector(xs:_*), DenseVector(ys.map(_.value.toDouble):_*))
-    //(d: Double) => Accumulation(Math.round(f(d)))
+
+    val yValues = ys.map(_.value.toDouble)
+    val xValues = xs
+
+    val yDeltas = yValues.sliding(2).map(_.reduce((a,b) => b - a))
+    val xDeltas = xValues.sliding(2).map(_.reduce((a,b) => b - a))
+
+    val xyDeltas = xDeltas.zip(yDeltas).filter(_._2 > 0)
+
+    val deltaX = xyDeltas.map(_._1).sum
+    val deltaY = xyDeltas.map(_._2).sum
+
+    (d: Double) => Accumulation(deltaY / deltaX)
   }
 
   override protected def typedReduce(ys: Seq[Accumulation]): Accumulation = {
-    Accumulation(ys.map(_.value).max - ys.map(_.value).min)
+    ys.last
   }
 }
