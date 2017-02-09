@@ -20,7 +20,7 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
     case class SimpleVec(x: Double, y: Double) {
       def +(simpleVec: SimpleVec): SimpleVec = SimpleVec(x + simpleVec.x, y+simpleVec.y)
       def -(simpleVec: SimpleVec): SimpleVec = SimpleVec(x - simpleVec.x, y-simpleVec.y)
-      def rate: Double = y / x
+      def rate: Double = if (x != 0) y / x else 0
     }
 
     val xValues = xs
@@ -31,7 +31,7 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
     val xyDeltas = xyValues.sliding(2).map{case Seq(a,b) => (a,b)}.map{case (a: SimpleVec, b: SimpleVec) => b - a}
 
     val xyPosDeltas = xyDeltas.filter(_.y >= 0)
-    val xyDeltaSums = xyPosDeltas.reduce(_ + _)
+    val xyDeltaSums = xyPosDeltas.fold(SimpleVec(0, 0))(_ + _)
 
     (d: Double) => Accumulation(xyDeltaSums.rate)
   }
