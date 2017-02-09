@@ -17,18 +17,17 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Accumulation]): (Double) => Accumulation = {
 
-    val yValues = ys.map(_.value.toDouble)
     val xValues = xs
+    val yValues = ys.map(_.value.toDouble)
 
-    val yDeltas = yValues.sliding(2).map(_.reduce((a,b) => b - a))
-    val xDeltas = xValues.sliding(2).map(_.reduce((a,b) => b - a))
+    val xyValues = xValues.zip(yValues).sortWith(_._1 < _._1)
 
-    val xyDeltas = xDeltas.zip(yDeltas).filter(_._2 > 0)
+    val xyDeltas = xyValues.sliding(2).map{case Seq(a,b) => (a,b)}.map{case ((x1,y1), (x2,y2)) => (x2-x1, y2-y1)}
 
-    val deltaX = xyDeltas.map(_._1).sum
-    val deltaY = xyDeltas.map(_._2).sum
+    val xyPosDeltas = xyDeltas.filter(_._2 >= 0)
+    val xyDeltaSums = xyPosDeltas.reduce{case ((dx1, dy1), (dx2, dy2)) => (dx1+dx2, dy1+dy2)}
 
-    (d: Double) => Accumulation(deltaY / deltaX)
+    (d: Double) => Accumulation(xyDeltaSums._2 / xyDeltaSums._1)
   }
 
   override protected def typedReduce(ys: Seq[Accumulation]): Accumulation = {
