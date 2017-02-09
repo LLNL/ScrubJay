@@ -17,17 +17,23 @@ object Accumulation extends UnitsTag[Accumulation, Long] {
 
   override protected def createTypedInterpolator(xs: Seq[Double], ys: Seq[Accumulation]): (Double) => Accumulation = {
 
+    case class SimpleVec(x: Double, y: Double) {
+      def +(simpleVec: SimpleVec): SimpleVec = SimpleVec(x + simpleVec.x, y+simpleVec.y)
+      def -(simpleVec: SimpleVec): SimpleVec = SimpleVec(x - simpleVec.x, y-simpleVec.y)
+      def rate: Double = y / x
+    }
+
     val xValues = xs
     val yValues = ys.map(_.value.toDouble)
 
-    val xyValues = xValues.zip(yValues).sortWith(_._1 < _._1)
+    val xyValues = xValues.zip(yValues).sortWith(_._1 < _._1).map(a => SimpleVec(a._1, a._2))
 
-    val xyDeltas = xyValues.sliding(2).map{case Seq(a,b) => (a,b)}.map{case ((x1,y1), (x2,y2)) => (x2-x1, y2-y1)}
+    val xyDeltas = xyValues.sliding(2).map{case Seq(a,b) => (a,b)}.map{case (a: SimpleVec, b: SimpleVec) => b - a}
 
-    val xyPosDeltas = xyDeltas.filter(_._2 >= 0)
-    val xyDeltaSums = xyPosDeltas.reduce{case ((dx1, dy1), (dx2, dy2)) => (dx1+dx2, dy1+dy2)}
+    val xyPosDeltas = xyDeltas.filter(_.y >= 0)
+    val xyDeltaSums = xyPosDeltas.reduce(_ + _)
 
-    (d: Double) => Accumulation(xyDeltaSums._2 / xyDeltaSums._1)
+    (d: Double) => Accumulation(xyDeltaSums.rate)
   }
 
   override protected def typedReduce(ys: Seq[Accumulation]): Accumulation = {
