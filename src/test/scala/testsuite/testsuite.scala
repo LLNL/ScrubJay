@@ -79,6 +79,10 @@ package object testsuite {
     Map("node" -> 6, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 68597)
   )
 
+  /*
+   * Meta
+   */
+
   val jobQueueMeta = Map(
       "jobid" -> metaEntryFromStrings("domain", "job", "job", "identifier"),
       "nodelist" -> metaEntryFromStrings("domain", "node", "node", "list<identifier>"),
@@ -97,6 +101,10 @@ package object testsuite {
     "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
     "rack" -> metaEntryFromStrings("domain", "rack", "rack", "identifier")
   )
+
+  /*
+   * Ground truth
+   */
 
   val trueJobQueue = Set(
     Map(
