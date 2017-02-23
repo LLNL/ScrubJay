@@ -20,10 +20,14 @@ class CoreFrequency(dso: Option[ScrubJayRDD]) extends Transformer(dso) {
 
   // Helper functions
   private def addFreqToRow(aperfColumn: String, mperfColumn: String, baseFreqColumn: String, row: DataRow): DataRow = {
-    (row(aperfColumn), row(mperfColumn), row(baseFreqColumn)) match {
-      case (a: Accumulation, m: Accumulation, b: OrderedContinuous) =>
-        val newDataRow: DataRow = Map("cpu frequency" -> OrderedContinuous(b.value * (a.value.toDouble / m.value.toDouble)))
-        row.filterNot(kv => Set(aperfColumn, mperfColumn).contains(kv._1)) ++ newDataRow
+    if (Seq(aperfColumn, mperfColumn, baseFreqColumn).forall(row.keys.toList.contains)) {
+        (row(aperfColumn), row(mperfColumn), row(baseFreqColumn)) match {
+          case (a: Accumulation, m: Accumulation, b: OrderedContinuous) =>
+            val newDataRow: DataRow = Map("cpu frequency" -> OrderedContinuous(b.value * (a.value.toDouble / m.value.toDouble)))
+            row.filterNot(kv => Set(aperfColumn, mperfColumn).contains(kv._1)) ++ newDataRow
+        }
+    } else {
+        row
     }
   }
 
