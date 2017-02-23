@@ -66,8 +66,8 @@ class CSVDataSourceSpec extends ScrubJaySpec {
     clusterLayoutMetaFile.delete()
   }
 
-  lazy val jobQueueMetaSource: MetaSource = createCSVMetaSource(jobQueueMetaFile.getName)
-  lazy val clusterLayoutMetaSource: MetaSource = createCSVMetaSource(clusterLayoutMetaFile.getName)
+  lazy val jobQueueMetaSource: MetaSource = sc.createCSVMetaSource(jobQueueMetaFile.getName)
+  lazy val clusterLayoutMetaSource: MetaSource = sc.createCSVMetaSource(clusterLayoutMetaFile.getName)
 
   lazy val jobQueue: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
   lazy val cabLayout: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)

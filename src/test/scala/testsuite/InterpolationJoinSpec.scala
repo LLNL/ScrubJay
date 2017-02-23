@@ -71,12 +71,12 @@ class InterpolationJoinSpec extends ScrubJaySpec {
     lazy val temp = sc.createLocalDataSource(
       InterpolationJoinSpec.temperatureData,
       Seq("node", "time", "temp"),
-      createLocalMetaSource(InterpolationJoinSpec.temperatureMeta))
+      sc.createLocalMetaSource(InterpolationJoinSpec.temperatureMeta))
 
     lazy val flops = sc.createLocalDataSource(
       InterpolationJoinSpec.flopsData,
       Seq("node", "time", "flops"),
-      createLocalMetaSource(InterpolationJoinSpec.flopsMeta))
+      sc.createLocalMetaSource(InterpolationJoinSpec.flopsMeta))
 
     describe("Many-to-one projection") {
       lazy val interjoined = flops.get.deriveInterpolationJoin(temp, 60000)
@@ -84,7 +84,6 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       it("should be defined") {
         assert(interjoined.isDefined)
       }
-
       it("should match ground truth") {
         assert(interjoined.get.rdd.collect.toSet == InterpolationJoinSpec.trueFlopsJoinTemp)
       }
@@ -96,7 +95,6 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       it("should be defined") {
         assert(interjoined.isDefined)
       }
-
       it("should match ground truth") {
         assert(interjoined.get.rdd.collect.toSet == InterpolationJoinSpec.trueTempJoinFlops)
       }

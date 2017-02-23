@@ -29,11 +29,10 @@ package object scrubjay {
    * Standalone functions
    */
 
-  def metaEntryFromStrings: (String, String, String, String) => MetaEntry = scrubjay.metabase.MetaEntry.metaEntryFromStrings _
+  def metaEntryFromStrings(relationType: String, meaning: String, dimension: String, units: String): MetaEntry = {
+    scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, meaning, dimension, units)
+  }
 
-  def createCSVMetaSource: (String) => MetaSource = scrubjay.metasource.CSVMetaSource.createCSVMetaSource _
-  def createLocalMetaSource: (MetaEntryMap) => MetaSource = scrubjay.metasource.LocalMetaSource.createLocalMetaSource _
-  def createCassandraMetaSource: (SparkContext, String, String) => MetaSource = scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource _
 
 
   /**
@@ -43,6 +42,22 @@ package object scrubjay {
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
     val metaBase = GlobalMetaBase.META_BASE
+
+    /**
+      * MetaSource creation
+      */
+
+    def createCSVMetaSource(filename: String): MetaSource = {
+      scrubjay.metasource.CSVMetaSource.createCSVMetaSource(filename)
+    }
+
+    def createLocalMetaSource(metaEntryMap: MetaEntryMap): MetaSource = {
+      scrubjay.metasource.LocalMetaSource.createLocalMetaSource(metaEntryMap)
+    }
+
+    def createCassandraMetaSource(keyspace: String, table: String): MetaSource = {
+      scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource(sc, keyspace, table)
+    }
 
     /**
      * Create a LocalDataSource from a sequence of RawDataRow, i.e. Map[String -> Any]
@@ -160,6 +175,7 @@ package object scrubjay {
     /**
       * Create a new LocalMetaSource by interactively choosing them from the GlobalMetaBase
       */
+    /*
     def createMetaSourceInteractively: MetaSource = {
 
       createLocalMetaSource {
@@ -195,6 +211,7 @@ package object scrubjay {
         }.toMap
       }
     }
+    */
   }
 
   /**

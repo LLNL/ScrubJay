@@ -10,9 +10,9 @@ object QuerySpec {
 
   def createDataSources(sc: SparkContext): Set[ScrubJayRDD] = {
     Set(
-      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, createLocalMetaSource(clusterLayoutMeta)),
-      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, createLocalMetaSource(nodeDataMeta)),
-      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, createLocalMetaSource(jobQueueMeta))
+      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, sc.createLocalMetaSource(clusterLayoutMeta)),
+      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, sc.createLocalMetaSource(nodeDataMeta)),
+      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, sc.createLocalMetaSource(jobQueueMeta))
     ).flatten
   }
 
@@ -58,7 +58,7 @@ class QuerySpec extends ScrubJaySpec {
     lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryMetaEntries)
     lazy val solutions = query.run.toList
 
-    it("should have multiple solutions") {
+    it("should have a single solution") {
       assert(solutions.length == 1)
     }
     it("should derive the correct datasource") {
@@ -70,7 +70,7 @@ class QuerySpec extends ScrubJaySpec {
     lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryWithDerivationMetaEntries)
     lazy val solutions = query.run.toList
 
-    it("should have multiple solutions") {
+    it("should have a single solution") {
       assert(solutions.length == 1)
     }
     it("should derive the correct datasource") {

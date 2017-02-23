@@ -8,7 +8,7 @@ class DeriveTimeSpanExplodeListSpec extends ScrubJaySpec {
   lazy val jobQueue: Option[ScrubJayRDD] = sc.createLocalDataSource(jobQueueRawData, jobQueueMeta.keySet.toSeq, new MetaSource(jobQueueMeta))
   lazy val jobQueueSpan: Option[ScrubJayRDD] = jobQueue.get.deriveTimeSpan
 
-  describe("Derive Time Span") {
+  describe("Derive time span") {
     it("should be defined") {
       assert(jobQueueSpan.isDefined)
     }
@@ -19,7 +19,7 @@ class DeriveTimeSpanExplodeListSpec extends ScrubJaySpec {
 
   lazy val jobQueueSpanExploded: Option[ScrubJayRDD] = jobQueueSpan.get.deriveExplodeList(Seq("nodelist"))
 
-  describe("...with exploded node list") {
+  describe("Derive exploded time span") {
     it("should be defined") {
       assert(jobQueueSpanExploded.isDefined)
     }

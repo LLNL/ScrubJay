@@ -1,10 +1,15 @@
 package scrubjay.query
 
+import javax.management.relation.RelationType
+
 import scrubjay._
 import scrubjay.metabase._
 import scrubjay.datasource._
 import gov.llnl.ConstraintSolver._
 import scrubjay.derivation.NaturalJoin
+import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
+import scrubjay.metasource.MetaSource
+import scrubjay.units.UnitsTag.DomainType
 
 
 class Query(val dataSources: Set[ScrubJayRDD],
@@ -17,10 +22,42 @@ class Query(val dataSources: Set[ScrubJayRDD],
       val ds1 = args(0).as[ScrubJayRDD]
       val ds2 = args(1).as[ScrubJayRDD]
 
-      // TODO: return all possible joins (a,b), (b,a), natural, quanti, etc
-      Seq(
-        ds1.deriveNaturalJoin(Some(ds2))
-      ).flatten
+      // 1. Do they share a domain dimension?
+      val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = {
+        MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
+          .filter(e => Seq(e._2.relationType, e._3.relationType).forall(_ == MetaRelationType.DOMAIN))
+      }
+
+      // 2. What are the units of the shared dimensions?
+      commonDimensions.flatMap{
+
+        // Discrete, Discrete => Natural Join
+        case (_,
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _),
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _)) => {
+          ds1.deriveNaturalJoin(Some(ds2))
+        }
+
+        // Point, Point => Interpolation Join
+        case (_,
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
+        if Seq(units1, units2).forall(_.unitsTag.domainType == DomainType.POINT) => {
+          ds1.deriveInterpolationJoin(Some(ds2), 1000 /* WINDOW SIZE ??? */ )
+        }
+
+        // Point, Range | Range, Point => explode range, interpolation join
+        case (_,
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
+              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
+        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
+          // ds1.deriveInterpolationJoin(ds2.deriveExplodeList(), 1000 /* WINDOW SIZE ??? */ )
+          None
+        }
+
+        // Can't join
+        case _ => None
+      }
     })
 
     // Can we join a set of datasources dsSet?
