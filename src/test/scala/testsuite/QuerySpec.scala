@@ -30,35 +30,51 @@ object QuerySpec {
     )
   }
 
+  def createMultipleSourceQueryWithDerivationMetaEntries: Set[MetaEntry] = {
+    Set(
+      metaEntryFromStrings("domain", "job", "job", "identifier"),
+      metaEntryFromStrings("value", "cumulative", "flops", "count")
+    )
+  }
+
 }
 
 class QuerySpec extends ScrubJaySpec {
 
   describe("Query with single datasource solution") {
-
     lazy val solutions = sc.runQuery(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
       .toList
 
-    it("should have a single solution") {
+    it("should have a single") {
       assert(solutions.length == 1)
     }
-
     it("should find the correct datasource") {
       assert(solutions.head.rdd.collect.toSet == trueJobQueue)
     }
   }
 
-  describe("Query with multiple datasources solution") {
+  describe("Query with multiple datasources") {
 
     lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryMetaEntries)
     lazy val solutions = query.run.toList
 
-    it("should have a multiple solution") {
+    it("should have multiple solutions") {
       assert(solutions.length == 1)
     }
-
-    it("should find the correct datasource") {
+    it("should derive the correct datasource") {
       assert(solutions.head.rdd.collect.toSet == trueNodeDataJoinedWithClusterLayout)
+    }
+  }
+
+  describe("Query with multiple datasources and single derivations") {
+    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryWithDerivationMetaEntries)
+    lazy val solutions = query.run.toList
+
+    it("should have multiple solutions") {
+      assert(solutions.length == 1)
+    }
+    it("should derive the correct datasource") {
+      assert(solutions.head.rdd.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
     }
   }
 }
