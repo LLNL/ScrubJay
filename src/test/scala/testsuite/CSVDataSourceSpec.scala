@@ -1,14 +1,16 @@
 package testsuite
 
 import scrubjay._
-
 import org.scalactic.source.Position
 import java.io._
+
+import scrubjay.datasource.CSVDataSource
 
 class CSVDataSourceSpec extends ScrubJaySpec {
 
   val jobQueueMetaFile = new File("jobqueuemeta.csv")
   val clusterLayoutMetaFile = new File("clusterlayoutmeta.csv")
+
   val jobQueueDataFile = new File("jobqueue.csv")
   val clusterLayoutDataFile = new File("clusterlayout.csv")
 
@@ -64,73 +66,27 @@ class CSVDataSourceSpec extends ScrubJaySpec {
     clusterLayoutMetaFile.delete()
   }
 
-  describe("CSVDataSource") {
+  lazy val jobQueueMetaSource: MetaSource = createCSVMetaSource(jobQueueMetaFile.getName)
+  lazy val clusterLayoutMetaSource: MetaSource = createCSVMetaSource(clusterLayoutMetaFile.getName)
 
-    lazy val jobQueueMetaSource = createCSVMetaSource(jobQueueMetaFile.getName)
-    lazy val clusterLayoutMetaSource = createCSVMetaSource(clusterLayoutMetaFile.getName)
-    lazy val jobQueue = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
-    lazy val cabLayout = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
+  lazy val jobQueue: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
+  lazy val cabLayout: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
 
-    describe("Creation") {
-
-      // Create DataSources
-
-      describe("CSV sourced job queue data") {
-        it("should be defined") {
-          assert(jobQueue.isDefined)
-        }
-        it("should match ground truth") {
-          assert(jobQueue.get.collect.toSet == trueJobQueue)
-        }
-      }
-
-      describe("Locally generated cab layout data") {
-        it("should be defined") {
-          assert(cabLayout.isDefined)
-        }
-        it("should match ground truth") {
-          assert(cabLayout.get.collect.toSet == trueCabLayout)
-        }
-      }
+  describe("CSV sourced job queue data") {
+    it("should be defined") {
+      assert(jobQueue.isDefined)
     }
+    it("should match ground truth") {
+      assert(jobQueue.get.collect.toSet == trueJobQueue)
+    }
+  }
 
-    describe("Derivations") {
-
-      // Time span
-      lazy val jobQueueSpan = jobQueue.get.deriveTimeSpan
-
-      describe("Job queue with derived time span") {
-        it("should be defined") {
-          assert(jobQueueSpan.isDefined)
-        }
-        it("should match ground truth") {
-          assert(jobQueueSpan.get.collect.toSet == trueJobQueueSpan)
-        }
-      }
-
-      // Exploded node list
-      lazy val jobQueueSpanExploded = jobQueueSpan.get.deriveExplodeList(List("nodelist"))
-
-      describe("Job queue with derived time span AND exploded node list") {
-        it("should be defined") {
-          assert(jobQueueSpanExploded.isDefined)
-        }
-        it("should match ground truth") {
-          assert(jobQueueSpanExploded.get.collect.toSet == trueJobQueueSpanExploded)
-        }
-      }
-
-      // Joined with cab layout
-      lazy val jobQueueSpanExplodedJoined = jobQueueSpanExploded.get.deriveNaturalJoin(cabLayout)
-
-      describe("Job queue with derived time span AND exploded node list AND joined with cab layout") {
-        it("should be defined") {
-          assert(jobQueueSpanExplodedJoined.isDefined)
-        }
-        it("should match ground truth") {
-          assert(jobQueueSpanExplodedJoined.get.collect.toSet == trueJobQueueSpanExplodedJoined)
-        }
-      }
+  describe("Locally generated cab layout data") {
+    it("should be defined") {
+      assert(cabLayout.isDefined)
+    }
+    it("should match ground truth") {
+      assert(cabLayout.get.collect.toSet == trueCabLayout)
     }
   }
 }

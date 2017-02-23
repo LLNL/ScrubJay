@@ -6,7 +6,6 @@ import org.joda.time.DateTime
 import org.scalactic.source.Position
 
 
-
 object InterpolationJoinSpec {
   val temperatureData = Seq(
     Map(
