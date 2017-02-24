@@ -12,7 +12,7 @@ object QuerySpec {
     Set(
       sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, sc.createLocalMetaSource(clusterLayoutMeta)),
       sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, sc.createLocalMetaSource(nodeDataMeta)),
-      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, sc.createLocalMetaSource(jobQueueMeta))
+      sc.createLocalDataSource(jobQueueSpanRawData, jobQueueSpanColumns, sc.createLocalMetaSource(jobQueueSpanMeta))
     ).flatten
   }
 
@@ -49,7 +49,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.length == 1)
     }
     it("should find the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueJobQueue)
+      assert(solutions.head.rdd.collect.toSet == trueJobQueueSpan)
     }
   }
 

@@ -17,6 +17,13 @@ package object testsuite {
     "end"
   )
 
+  val jobQueueSpanColumns = Seq(
+    "jobid",
+    "nodelist",
+    "elapsed",
+    "span"
+  )
+
   val clusterLayoutColumns = Seq(
     "node",
     "rack"
@@ -46,6 +53,21 @@ package object testsuite {
        "elapsed"  -> 45,
        "start"    -> "2016-08-11T3:30:00+0000",
        "end"      -> "2016-08-11T3:32:00+0000"
+     )
+  )
+
+  val jobQueueSpanRawData = Seq(
+     Map(
+       "jobid"    -> "123",
+       "nodelist" -> "1,2,3",
+       "elapsed"  -> "23",
+       "span" -> ("2016-08-11T3:30:00+0000","2016-08-11T3:31:00+0000")
+     ),
+     Map(
+       "jobid"    -> 456,
+       "nodelist" -> List(4, 5, 6),
+       "elapsed"  -> 45,
+       "span" -> ("2016-08-11T3:30:00+0000","2016-08-11T3:32:00+0000")
      )
   )
 
@@ -90,6 +112,13 @@ package object testsuite {
       "start" -> metaEntryFromStrings("domain", "start", "time", "datetimestamp"),
       "end" -> metaEntryFromStrings("domain", "end", "time", "datetimestamp")
     )
+
+  val jobQueueSpanMeta = Map(
+    "jobid" -> metaEntryFromStrings("domain", "job", "job", "identifier"),
+    "nodelist" -> metaEntryFromStrings("domain", "node", "node", "list<identifier>"),
+    "elapsed" -> metaEntryFromStrings("value", "duration", "time", "seconds"),
+    "span" -> metaEntryFromStrings("domain", "timespan", "time", "datetimespan")
+  )
 
   val nodeDataMeta = Map(
     "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),

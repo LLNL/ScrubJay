@@ -7,9 +7,11 @@ import scrubjay.metabase._
 import scrubjay.datasource._
 import gov.llnl.ConstraintSolver._
 import scrubjay.derivation.NaturalJoin
+import scrubjay.metabase.MetaDescriptor.DimensionSpace.DimensionSpace
 import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
 import scrubjay.metasource.MetaSource
 import scrubjay.units.UnitsTag.DomainType
+import scrubjay.units.UnitsTag.DomainType.DomainType
 
 
 class Query(val dataSources: Set[ScrubJayRDD],
@@ -29,43 +31,61 @@ class Query(val dataSources: Set[ScrubJayRDD],
       }
 
       // 2. What are the units of the shared dimensions?
-      commonDimensions.flatMap{
+      implicit class sharedProperties(meTuple: (MetaEntry, MetaEntry)) {
+        def dimensionTypes(dimType1: DimensionSpace, dimType2: DimensionSpace): Boolean = {
+          meTuple._1.dimension.dimensionType == dimType1 &&
+          meTuple._2.dimension.dimensionType == dimType2
+        }
+        def domainTypes(domType1: DomainType, domType2: DomainType): Boolean = {
+          meTuple._1.units.unitsTag.domainType == domType1 &&
+            meTuple._2.units.unitsTag.domainType == domType2
+        }
+      }
 
-        // Discrete, Discrete => Natural Join
-        case (_,
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _),
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _)) => {
-          ds1.deriveNaturalJoin(Some(ds2))
+      commonDimensions.flatMap {
+
+        // Discrete, Discrete
+        case (_, me1, me2) if (me1, me2).dimensionTypes(DimensionSpace.DISCRETE, DimensionSpace.DISCRETE) => {
+
+          (me1, me2) match {
+
+            // Discrete Point, Discrete Point
+            case me12 if me12.domainTypes(DomainType.POINT, DomainType.POINT) =>
+              ds1.deriveNaturalJoin(Some(ds2))
+
+            // Discrete Point, Discrete Range
+            case me12 if me12.domainTypes(DomainType.POINT, DomainType.RANGE) =>
+              ds1.deriveNaturalJoin(ds2.deriveExplodeList(ds2.metaSource.columnForEntry(me2).toSeq))
+
+            // Discrete Range, Discrete Point
+            case me12 if me12.domainTypes(DomainType.RANGE, DomainType.POINT) =>
+              ds2.deriveNaturalJoin(ds1.deriveExplodeList(ds1.metaSource.columnForEntry(me1).toSeq))
+
+            case _ => None
+          }
         }
 
-        // Point, Point => Interpolation Join
-        case (_,
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if Seq(units1, units2).forall(_.unitsTag.domainType == DomainType.POINT) => {
-          ds1.deriveInterpolationJoin(Some(ds2), 1000 /* WINDOW SIZE ??? */ )
-        }
+        // Continuous, Continuous
+        case (_, me1, me2) if (me1, me2).dimensionTypes(DimensionSpace.CONTINUOUS, DimensionSpace.CONTINUOUS) => {
 
-        // Point, Range => explode range, interpolation join
-        case (_,
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-              me2 @ MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
-          ds1.deriveInterpolationJoin(ds2.deriveExplodeList(Seq(ds2.metaSource.columnForEntry(me2)).flatten), 1000 /* WINDOW SIZE ??? */ )
-          None
-        }
+          // TODO: Get window size from meta information
+          (me1, me2) match {
 
-        // Range, Point => explode range, interpolation join
-        case (_,
-          me1 @ MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-          MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
-          ds2.deriveInterpolationJoin(ds1.deriveExplodeList(Seq(ds1.metaSource.columnForEntry(me1)).flatten), 1000 /* WINDOW SIZE ??? */ )
-          None
-        }
+            // Continuous Point, Continuous Point
+            case me12 if me12.domainTypes(DomainType.POINT, DomainType.POINT) =>
+              ds1.deriveInterpolationJoin(Some(ds2), 1000)
 
-        // Can't join
-        case _ => None
+            // Continuous Point, Continuous Range
+            case me12 if me12.domainTypes(DomainType.POINT, DomainType.RANGE) =>
+              ds1.deriveInterpolationJoin(ds2.deriveExplodeTimeSpan(Seq((ds2.metaSource.columnForEntry(me2).get, 1000))), 1000)
+
+            // Continuous Range, Continuous Point
+            case me12 if me12.domainTypes(DomainType.RANGE, DomainType.POINT) =>
+              ds2.deriveInterpolationJoin(ds1.deriveExplodeTimeSpan(Seq((ds1.metaSource.columnForEntry(me1).get, 1000))), 1000)
+
+            case _ => None
+          }
+        }
       }
     })
 
