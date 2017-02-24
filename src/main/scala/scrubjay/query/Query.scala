@@ -46,12 +46,21 @@ class Query(val dataSources: Set[ScrubJayRDD],
           ds1.deriveInterpolationJoin(Some(ds2), 1000 /* WINDOW SIZE ??? */ )
         }
 
-        // Point, Range | Range, Point => explode range, interpolation join
+        // Point, Range => explode range, interpolation join
         case (_,
               MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-              MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
+              me2 @ MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
         if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
-          // ds1.deriveInterpolationJoin(ds2.deriveExplodeList(), 1000 /* WINDOW SIZE ??? */ )
+          ds1.deriveInterpolationJoin(ds2.deriveExplodeList(Seq(ds2.metaSource.columnForEntry(me2)).flatten), 1000 /* WINDOW SIZE ??? */ )
+          None
+        }
+
+        // Range, Point => explode range, interpolation join
+        case (_,
+          me1 @ MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
+          MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
+        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
+          ds2.deriveInterpolationJoin(ds1.deriveExplodeList(Seq(ds1.metaSource.columnForEntry(me1)).flatten), 1000 /* WINDOW SIZE ??? */ )
           None
         }
 
