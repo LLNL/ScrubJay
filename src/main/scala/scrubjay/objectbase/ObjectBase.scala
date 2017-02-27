@@ -2,7 +2,6 @@ package scrubjay.objectbase
 
 import scrubjay.datasource.ScrubJayRDD
 import scrubjay.ScrubJaySessionImplicits
-import scrubjay.createCassandraMetaSource
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
@@ -51,7 +50,7 @@ object ObjectBase {
 
     names.map{
       case (k, metaKeyspace, metaTable, dataKeyspace, dataTable) => {
-        val metaSource = createCassandraMetaSource(sc, metaKeyspace, metaTable)
+        val metaSource = sc.createCassandraMetaSource(metaKeyspace, metaTable)
         (k, sc.createCassandraDataSource(dataKeyspace, dataTable, metaSource).get.asInstanceOf[ScrubJayRDD])
       }
     }.toMap
