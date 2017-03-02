@@ -1,6 +1,6 @@
 package scrubjay.objectbase
 
-import scrubjay.datasource.ScrubJayRDD
+import scrubjay.datasource.{DataSourceID, ScrubJayRDD}
 import scrubjay.ScrubJaySessionImplicits
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector._
@@ -64,27 +64,26 @@ object ObjectBase {
     loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_DERIVED_OBJECTS_TABLE))
   }
 
-  def saveAsOriginalObject(ds: ScrubJayRDD, name: String,
+  def saveAsOriginalObject(dsID: DataSourceID,
                            metaKeyspaceTableTuple: Option[(String, String)],
                            dataKeyspaceTableTuple: Option[(String, String)],
                            saveObjectReferenceOnly: Boolean = false): Unit = {
-    val sc = ds.rdd.sparkContext
-
-    val (dataKeyspace, dataTable) = dataKeyspaceTableTuple.getOrElse((SCRUBJAY_DATA_KEYSPACE, name + "_data"))
-    val (metaKeyspace, metaTable) = metaKeyspaceTableTuple.getOrElse((SCRUBJAY_META_KEYSPACE, name + "_meta"))
+    val (dataKeyspace, dataTable) = dataKeyspaceTableTuple.getOrElse((SCRUBJAY_DATA_KEYSPACE, /* FIXME + */ "_data"))
+    val (metaKeyspace, metaTable) = metaKeyspaceTableTuple.getOrElse((SCRUBJAY_META_KEYSPACE, /* FIXME + */ "_meta"))
 
     val CQLCommand =
       s"INSERT INTO $SCRUBJAY_OBJECTS_KEYSPACE.$SCRUBJAY_ORIGINAL_OBJECTS_TABLE " +
       s"($OBJECT_COLUMN_NAME, $OBJECT_COLUMN_META_KEYSPACE, $OBJECT_COLUMN_META_TABLE, $OBJECT_COLUMN_DATA_KEYSPACE, $OBJECT_COLUMN_DATA_TABLE) " +
-      s"VALUES ($name, $metaKeyspace, $metaTable, $dataKeyspace, $dataTable)"
+      s"VALUES (name, $metaKeyspace, $metaTable, $dataKeyspace, $dataTable)" /* FIXME */
 
-    CassandraConnector(sc.getConf).withSessionDo { session =>
+    CassandraConnector(SparkContext.getOrCreate().getConf).withSessionDo { session =>
       session.execute(CQLCommand)
     }
 
     if (!saveObjectReferenceOnly) {
-      ds.metaSource.saveToCassandra(sc, metaKeyspace, name)
-      ds.saveToCassandra(dataKeyspace, name)
+      // FIXME
+      //dsID.metaSource.saveToCassandra(sc, metaKeyspace, name)
+      //ds.saveToCassandra(dataKeyspace, name)
     }
 
   }

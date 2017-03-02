@@ -12,7 +12,7 @@ package object metasource {
 
   implicit class MetaSourceImplicits(metaSource: MetaSource) extends Serializable {
 
-    val ID: String = metaSource.pickle.value
+    //val ID: String = metaSource.pickle.value
     val columns: Seq[String] = metaSource.keys.toSeq
 
     def columnForEntry(me: MetaEntry): Option[String] = {

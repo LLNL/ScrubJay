@@ -69,15 +69,15 @@ class CSVDataSourceSpec extends ScrubJaySpec {
   lazy val jobQueueMetaSource: MetaSource = sc.createCSVMetaSource(jobQueueMetaFile.getName)
   lazy val clusterLayoutMetaSource: MetaSource = sc.createCSVMetaSource(clusterLayoutMetaFile.getName)
 
-  lazy val jobQueue: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
-  lazy val cabLayout: Option[ScrubJayRDD with CSVDataSource] = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
+  lazy val jobQueue: Option[DataSourceID] = sc.createCSVDataSource(jobQueueDataFile.getName, jobQueueMetaSource)
+  lazy val cabLayout: Option[DataSourceID] = sc.createCSVDataSource(clusterLayoutDataFile.getName, clusterLayoutMetaSource)
 
   describe("CSV sourced job queue data") {
     it("should be defined") {
       assert(jobQueue.isDefined)
     }
     it("should match ground truth") {
-      assert(jobQueue.get.collect.toSet == trueJobQueue)
+      assert(jobQueue.get.realize.collect.toSet == trueJobQueue)
     }
   }
 
@@ -86,7 +86,7 @@ class CSVDataSourceSpec extends ScrubJaySpec {
       assert(cabLayout.isDefined)
     }
     it("should match ground truth") {
-      assert(cabLayout.get.collect.toSet == trueCabLayout)
+      assert(cabLayout.get.realize.collect.toSet == trueCabLayout)
     }
   }
 }

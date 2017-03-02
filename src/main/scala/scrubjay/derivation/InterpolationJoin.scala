@@ -3,41 +3,45 @@ package scrubjay.derivation
 import scrubjay.units._
 import scrubjay.metasource._
 import scrubjay.datasource._
-import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaRelationType}
+import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
 
 import scala.language.existentials
 import org.apache.spark.rdd.RDD
+import scrubjay.metabase.MetaEntry
 import scrubjay.units.UnitsTag.DomainType
 
-class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], window: Double) extends Joiner(dso1, dso2) {
+class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double) extends DataSourceID(Seq(dsID1, dsID2))(Seq(window)) {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  private val commonDimensions = MetaObject.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
-  private val commonContinuousDimensions = commonDimensions.filter(d =>
+  def commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
+  def commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.units.unitsTag.domainType == DomainType.POINT &&
     d._3.relationType == MetaRelationType.DOMAIN)
-  private val commonDiscreteDimensions = commonDimensions.filter(d =>
+  def commonDiscreteDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.DISCRETE &&
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.relationType == MetaRelationType.DOMAIN)
 
   // Single continuous axis for now
-  override def isValid: Boolean = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
+  def isValid: Boolean = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
 
-  override def derive: ScrubJayRDD = {
+  val metaSource: MetaSource = dsID2.metaSource.withMetaEntries(dsID1.metaSource)
 
-    val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource)
+  def realize: ScrubJayRDD = {
+
+    val ds1 = dsID1.realize
+    val ds2 = dsID2.realize
 
     val rdd: RDD[DataRow] = {
 
-      val continuousDimColumn1 = commonContinuousDimensions.flatMap { case (_, me1, _) => ds1.metaSource.columnForEntry(me1) }.head
-      val continuousDimColumn2 = commonContinuousDimensions.flatMap { case (_, _, me2) => ds2.metaSource.columnForEntry(me2) }.head
+      val continuousDimColumn1 = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }.head
+      val continuousDimColumn2 = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }.head
 
-      val discreteDimColumns1 = commonDiscreteDimensions.flatMap { case (_, me1, _) => ds1.metaSource.columnForEntry(me1) }
-      val discreteDimColumns2 = commonDiscreteDimensions.flatMap { case (_, _, me2) => ds2.metaSource.columnForEntry(me2) }
+      val discreteDimColumns1 = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }
+      val discreteDimColumns2 = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }
 
       // Bin by overlapping bins of size 2*window
       // -- Guarantees that union of bins will contain all points within `window`
@@ -80,7 +84,7 @@ class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], wi
         .aggregateByKey(Set[DataRow]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
 
       // Lift the heavies here
-      val ds2MetaEntries = cogrouped.sparkContext.broadcast(ds2.metaSource)
+      val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.metaSource)
 
       def projection(row: DataRow, keyColumn: String, mappedRows: Set[DataRow], mappedKeyColumn: String): DataRow = {
 
@@ -110,6 +114,16 @@ class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], wi
       cogrouped.map { case (k, l2) => projection(k, continuousDimColumn1, l2, continuousDimColumn2) }
     }
 
-    new ScrubJayRDD(rdd, metaSource)
+    new ScrubJayRDD(rdd)
+  }
+}
+
+object InterpolationJoin {
+  def apply(dsID1: DataSourceID, dsID2: DataSourceID, window: Double): Option[DataSourceID] = {
+    val derivedID = new InterpolationJoin(dsID1, dsID2, window)
+    if(derivedID.isValid)
+      Some(derivedID)
+    else
+      None
   }
 }

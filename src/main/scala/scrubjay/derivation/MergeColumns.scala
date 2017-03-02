@@ -1,22 +1,25 @@
 package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
-import scrubjay.datasource.{DataRow, ScrubJayRDD}
+import scrubjay.MetaEntry
+import scrubjay.datasource.{DataRow, DataSourceID, ScrubJayRDD}
 import scrubjay.metasource._
 
-class MergeColumns(dso: Option[ScrubJayRDD], columns: Seq[String]) extends Transformer(dso) {
+class MergeColumns(dsID: DataSourceID, columns: Seq[String]) extends DataSourceID(Seq(dsID))(Seq(columns)) {
 
-  private val newColumn = columns.mkString("_")
-  private val metaEntry = ds.metaSource(columns.head)
+  def newColumn: String = columns.mkString("_")
+  def metaEntry: MetaEntry = dsID.metaSource(columns.head)
 
-  override val isValid: Boolean = columns.nonEmpty &&
-    columns.forall(ds.metaSource.columns contains _) &&
-    columns.forall(c => ds.metaSource(c).units == ds.metaSource(columns.head).units)
+  def isValid: Boolean = columns.nonEmpty &&
+    columns.forall(dsID.metaSource.columns contains _) &&
+    columns.forall(c => dsID.metaSource(c).units == dsID.metaSource(columns.head).units)
 
-  override def derive: ScrubJayRDD = {
+  val metaSource: MetaSource = dsID.metaSource.withMetaEntries(Map(newColumn -> metaEntry))
+    .withoutColumns(columns)
 
-    val metaSource = ds.metaSource.withMetaEntries(Map(newColumn -> metaEntry))
-      .withoutColumns(columns)
+  def realize: ScrubJayRDD = {
+
+    val ds = dsID.realize
 
     val rdd: RDD[DataRow] = {
 
@@ -28,6 +31,16 @@ class MergeColumns(dso: Option[ScrubJayRDD], columns: Seq[String]) extends Trans
       })
     }
 
-    new ScrubJayRDD(rdd, metaSource)
+    new ScrubJayRDD(rdd)
+  }
+}
+
+object MergeColumns {
+  def apply(dsID: DataSourceID, columns: Seq[String]): Option[DataSourceID] = {
+    val derivedID = new MergeColumns(dsID, columns)
+    if(derivedID.isValid)
+      Some(derivedID)
+    else
+      None
   }
 }

@@ -1,17 +1,24 @@
 package scrubjay.datasource
 
+import org.apache.spark.SparkContext
 import scrubjay.metasource._
-import scrubjay.util.niceAttempt
 
-import org.apache.spark.rdd.RDD
+class LocalDataSource(rawData: Seq[RawDataRow],
+                      columns: Seq[String],
+                      providedMetaSource: MetaSource) extends DataSourceID()(Seq(rawData, columns)) {
+
+  val metaSource: MetaSource = providedMetaSource.withColumns(columns)
+
+  def realize: ScrubJayRDD = {
+    val rawRDD = SparkContext.getOrCreate().parallelize(rawData)
+    new ScrubJayRDD(rawRDD, metaSource)
+  }
+}
 
 object LocalDataSource {
-
-  def createLocalDataSource(rawRdd: RDD[RawDataRow],
-                            columns: Seq[String],
-                            providedMetaSource: MetaSource): Option[ScrubJayRDD] = {
-    niceAttempt {
-      new ScrubJayRDD(rawRdd, providedMetaSource.withColumns(columns))
-    }
+  def apply(rawData: Seq[RawDataRow],
+            columns: Seq[String],
+            providedMetaSource: MetaSource): Option[LocalDataSource] = {
+    Some(new LocalDataSource(rawData, columns, providedMetaSource))
   }
 }

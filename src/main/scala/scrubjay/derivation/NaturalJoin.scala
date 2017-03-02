@@ -3,7 +3,8 @@ package scrubjay.derivation
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.metasource.MetaSource
+import scrubjay.metabase.MetaEntry
+import scrubjay.metasource._
 
 /*
  * NaturalJoin 
@@ -16,23 +17,25 @@ import scrubjay.metasource.MetaSource
  *  The inner join of the two dataSources, based on their common columns
  */
 
-class NaturalJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD]) extends Joiner(dso1, dso2) {
+class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID) extends DataSourceID(Seq(dsID1, dsID2))() {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  private val validEntries = MetaSource.commonMetaEntries(ds1.metaSource, ds2.metaSource)
+  def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.metaSource, dsID2.metaSource)
     .filter(me => me.units == UNITS_UNORDERED_DISCRETE && me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
-  private val keyColumns1 = validEntries.flatMap(ds1.metaSource.columnForEntry)
-  private val keyColumns2 = validEntries.flatMap(ds2.metaSource.columnForEntry)
+  def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.metaSource.columnForEntry)
+  def keyColumns2: Seq[String] = validEntries.flatMap(dsID2.metaSource.columnForEntry)
 
-  override def isValid: Boolean = validEntries.nonEmpty
+  def isValid: Boolean = validEntries.nonEmpty
 
-  override def derive: ScrubJayRDD = {
+  val metaSource: MetaSource = dsID2.metaSource.withMetaEntries(dsID1.metaSource)
+    .withoutColumns(keyColumns2)
 
-    // Implementations of abstract members
-    val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
-      .withoutColumns(keyColumns2)
+  def realize: ScrubJayRDD = {
+
+    val ds1 = dsID1.realize
+    val ds2 = dsID2.realize
 
     // RDD derivation defined here
     val rdd: RDD[DataRow] = {
@@ -47,6 +50,16 @@ class NaturalJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD]) extends 
       keyedRDD1.join(keyedRDD2).map { case (_, (v1, v2)) => v1 ++ v2 }
     }
 
-    new ScrubJayRDD(rdd, metaSource)
+    new ScrubJayRDD(rdd)
+  }
+}
+
+object NaturalJoin {
+  def apply(dsID1: DataSourceID, dsID2: DataSourceID): Option[DataSourceID] = {
+    val derivedID = new NaturalJoin(dsID1, dsID2)
+    if (derivedID.isValid)
+      Some(derivedID)
+    else
+      None
   }
 }

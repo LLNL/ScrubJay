@@ -7,21 +7,22 @@ import scrubjay.metasource._
 import scrubjay.util.cartesianProduct
 
 import org.apache.spark.rdd.RDD
-import org.joda.time.Period
 
-class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String, Double)]) {
+class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Double)])
+  extends DataSourceID(Seq(dsID))(Seq(columnsWithPeriods)) {
 
-  override val isValid: Boolean = columnsWithPeriods.forall(col => ds.metaSource(col._1).units == UNITS_DATETIMESPAN)
+  // Add column_exploded meta entry for each column
+  val metaSource: MetaSource = dsID.metaSource.withMetaEntries(
+    columnsWithPeriods.map(col => col._1 + "_exploded" -> {
+      val originalMetaEntry = dsID.metaSource(col._1)
+      originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
+    }).toMap)
+    .withoutColumns(columnsWithPeriods.map(_._1))
 
-  override def derive: ScrubJayRDD = {
 
-    // Add column_exploded meta entry for each column
-    val metaSource = ds.metaSource.withMetaEntries(
-      columnsWithPeriods.map(col => col._1 + "_exploded" -> {
-        val originalMetaEntry = ds.metaSource(col._1)
-        originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
-      }).toMap)
-      .withoutColumns(columnsWithPeriods.map(_._1))
+  def realize: ScrubJayRDD = {
+
+    val ds = dsID.realize
 
     val rdd: RDD[DataRow] = {
 
@@ -49,7 +50,16 @@ class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String,
       ds.flatMap(row => derivation(row, columnsWithPeriods))
     }
 
-    new ScrubJayRDD(rdd, metaSource)
+    new ScrubJayRDD(rdd)
   }
 }
 
+object ExplodeTimeSpan {
+  def apply(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Double)]): Option[DataSourceID] = {
+    val isValid: Boolean = columnsWithPeriods.forall(col => dsID.metaSource(col._1).units == UNITS_DATETIMESPAN)
+    if (isValid)
+      Some(new ExplodeTimeSpan(dsID, columnsWithPeriods))
+    else
+      None
+  }
+}

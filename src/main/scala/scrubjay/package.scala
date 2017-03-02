@@ -26,6 +26,7 @@ package object scrubjay {
   type MetaSource = metasource.MetaSource
   type MetaEntry = scrubjay.metabase.MetaEntry
   type Query = scrubjay.query.Query
+  type DataSourceID = scrubjay.datasource.DataSourceID
 
   /**
    * Standalone functions
@@ -56,10 +57,6 @@ package object scrubjay {
       scrubjay.metasource.CSVMetaSource.createCSVMetaSource(filename)
     }
 
-    def createLocalMetaSource(metaEntryMap: MetaEntryMap): MetaSource = {
-      scrubjay.metasource.LocalMetaSource.createLocalMetaSource(metaEntryMap)
-    }
-
     def createCassandraMetaSource(keyspace: String, table: String): MetaSource = {
       scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource(sc, keyspace, table)
     }
@@ -70,8 +67,8 @@ package object scrubjay {
 
     def createLocalDataSource(rawData: Seq[RawDataRow],
                               columns: Seq[String],
-                              metaSource: MetaSource = MetaSource.empty): Option[ScrubJayRDD] = {
-      scrubjay.datasource.LocalDataSource.createLocalDataSource(sc.parallelize(rawData), columns, metaSource)
+                              metaSource: MetaSource = MetaSource.empty): Option[DataSourceID] = {
+      scrubjay.datasource.LocalDataSource(rawData, columns, metaSource)
     }
 
     /**
@@ -83,8 +80,8 @@ package object scrubjay {
                                   metaSource: MetaSource = MetaSource.empty,
                                   selectColumns: Seq[String] = Seq.empty,
                                   whereConditions: Seq[String] = Seq.empty,
-                                  limit: Option[Long] = None): Option[ScrubJayRDD with CassandraDataSource] = {
-      scrubjay.datasource.CassandraDataSource.createCassandraDataSource(sc.cassandraTable(keyspace, table), metaSource, selectColumns, whereConditions, limit)
+                                  limit: Option[Long] = None): Option[DataSourceID] = {
+      scrubjay.datasource.CassandraDataSource(keyspace, table, selectColumns, whereConditions, limit, metaSource)
     }
 
     /**
@@ -92,22 +89,11 @@ package object scrubjay {
      */
 
     def createCSVDataSource(csvFileName: String,
-                            metaSource: MetaSource = MetaSource.empty): Option[ScrubJayRDD with CSVDataSource] = {
-
-      // Unfortunately, this code needs to be here to avoid passing the SparkContext to any
-      // underlying function that may be serialized
-      import au.com.bytecode.opencsv.CSVReader
-      import scala.collection.JavaConversions._
-      import java.io._
-
-      val reader = new CSVReader(new FileReader(csvFileName))
-      val header = reader.readNext.map(_.trim)
-      val rawData = reader.readAll.map(row => header.zip(row.map(_.trim)).toMap).toList
-
-      scrubjay.datasource.CSVDataSource.createCSVDataSource(sc.parallelize(rawData), header, csvFileName, metaSource)
+                            metaSource: MetaSource = MetaSource.empty): Option[DataSourceID] = {
+      scrubjay.datasource.CSVDataSource(csvFileName, metaSource)
     }
 
-    def runQuery(dataSources: Set[ScrubJayRDD], metaEntries: Set[MetaEntry]): Iterator[ScrubJayRDD] = {
+    def runQuery(dataSources: Set[DataSourceID], metaEntries: Set[MetaEntry]): Iterator[DataSourceID] = {
       new Query(dataSources, metaEntries).run
     }
   }
@@ -116,46 +102,46 @@ package object scrubjay {
    * ScrubJayRDD implicit functions
    */
 
-  implicit class DataSourceImplicits(ds: ScrubJayRDD) {
+  implicit class DataSourceImplicits(dsID: DataSourceID) {
 
     /**
      * Derivations
      */
 
-    def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.TransformColumn(Some(ds), column, fn, newMetaEntry).apply
+    //def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): Option[DataSourceID] = {
+    //  scrubjay.derivation.TransformColumn(dsID, column, fn, newMetaEntry)
+    //}
+
+    def deriveMergeColumns(columns: Seq[String]): Option[DataSourceID] = {
+      scrubjay.derivation.MergeColumns(dsID, columns)
     }
 
-    def deriveMergeColumns(columns: Seq[String]): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.MergeColumns(Some(ds), columns).apply
+    def deriveTimeSpan: Option[DataSourceID] = {
+      scrubjay.derivation.TimeSpan(dsID)
     }
 
-    def deriveTimeSpan: Option[ScrubJayRDD] = {
-      new scrubjay.derivation.TimeSpan(Some(ds)).apply
+    def deriveCoreFrequency: Option[DataSourceID] = {
+      scrubjay.derivation.CoreFrequency(dsID)
     }
 
-    def deriveCoreFrequency: Option[ScrubJayRDD] = {
-      new scrubjay.derivation.CoreFrequency(Some(ds)).apply
+    def deriveExplodeList(columns: Seq[String]): Option[DataSourceID] = {
+      scrubjay.derivation.ExplodeList(dsID, columns)
     }
 
-    def deriveExplodeList(columns: Seq[String]): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.ExplodeList(Some(ds), columns).apply
+    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): Option[DataSourceID] = {
+      scrubjay.derivation.ExplodeTimeSpan(dsID, columnsWithPeriods)
     }
 
-    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.ExplodeTimeSpan(Some(ds), columnsWithPeriods).apply
+    def deriveNaturalJoin(dsID2: DataSourceID): Option[DataSourceID] = {
+      scrubjay.derivation.NaturalJoin(dsID, dsID2)
     }
 
-    def deriveNaturalJoin(ds2: Option[ScrubJayRDD]): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.NaturalJoin(Some(ds), ds2).apply
+    def deriveInterpolationJoin(dsID2: DataSourceID, window: Double): Option[DataSourceID] = {
+      scrubjay.derivation.InterpolationJoin(dsID, dsID2, window)
     }
 
-    def deriveInterpolationJoin(ds2: Option[ScrubJayRDD], window: Double): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.InterpolationJoin(Some(ds), ds2, window).apply
-    }
-
-    def deriveRangeJoin(ds2: Option[ScrubJayRDD]): Option[ScrubJayRDD] = {
-      new scrubjay.derivation.RangeJoin(Some(ds), ds2).apply
+    def deriveRangeJoin(dsID2: DataSourceID): Option[DataSourceID] = {
+      scrubjay.derivation.RangeJoin(dsID, dsID2)
     }
 
     /**
@@ -163,18 +149,18 @@ package object scrubjay {
      */
 
     def saveToCassandra(keyspace: String, table: String): Unit = {
-      scrubjay.datasource.CassandraDataSource.saveToCassandra(ds, keyspace, table)
+      scrubjay.datasource.CassandraDataSource.saveToCassandra(dsID, keyspace, table)
     }
 
     def createCassandraTable(keyspace: String, table: String, primaryKeys: Seq[String], clusterKeys: Seq[String]): Unit = {
-      scrubjay.datasource.CassandraDataSource.createCassandraTable(ds, keyspace, table, primaryKeys, clusterKeys)
+      scrubjay.datasource.CassandraDataSource.createCassandraTable(dsID, keyspace, table, primaryKeys, clusterKeys)
     }
 
     def saveToCSV(filename: String,
                   wrapperChar: String = "\"",
                   delimiter: String = ",",
                   noneString: String = "null"): Unit = {
-      scrubjay.datasource.CSVDataSource.saveToCSV(ds, filename, wrapperChar, delimiter, noneString)
+      scrubjay.datasource.CSVDataSource.saveToCSV(dsID, filename, wrapperChar, delimiter, noneString)
     }
 
     /**

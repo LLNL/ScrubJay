@@ -3,7 +3,7 @@ package scrubjay.metasource
 import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor.MetaDimension
 
-object MetaObject {
+object MetaSource {
 
   def empty: MetaSource = {
     Map[String, MetaEntry]()

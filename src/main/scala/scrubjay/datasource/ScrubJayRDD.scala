@@ -7,7 +7,7 @@ import scrubjay.objectbase._
 import scrubjay.units.Units
 
 
-class ScrubJayRDD(fromRdd: ParsedRDD, val metaSource: MetaSource, val ID: DataSourceID) extends RDD[DataRow](fromRdd) {
+class ScrubJayRDD(fromRdd: ParsedRDD) extends RDD[DataRow](fromRdd) {
 
   // TODO: Derivation Provenance
 
@@ -30,8 +30,8 @@ class ScrubJayRDD(fromRdd: ParsedRDD, val metaSource: MetaSource, val ID: DataSo
     ???
   }
 
-  def this(fromRawRdd: RawRDD, metaSource: MetaSource, ID: DataSourceID) {
-    this(Units.rawRDDToUnitsRDD(fromRawRdd, metaSource), metaSource, ID)
+  def this(fromRawRdd: RawRDD, metaSource: MetaSource) {
+    this(Units.rawRDDToUnitsRDD(fromRawRdd, metaSource))
   }
 
   override protected def getPartitions: Array[Partition] = {

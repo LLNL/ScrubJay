@@ -18,14 +18,14 @@ object CassandraMetaSource {
 
   def createCassandraMetaSource(sc: SparkContext, keyspace: String, table: String): MetaSource = {
     val data = sc.cassandraTable(keyspace, table).map(_.toMap.map{case (k, v) => (k, v.toString)}.toMap).collect
-    val metaEntryMap = data.map(row =>
+    val metaSource = data.map(row =>
       (row("column"), MetaEntry.metaEntryFromStrings(row("relationType"), row("meaning"), row("dimension"), row("units")))).toMap
 
-    new MetaSource(metaEntryMap)
+    metaSource
   }
 
   def saveToCassandra(m: MetaSource, sc: SparkContext, keyspace: String, table: String): Unit = {
-    val cassandraRows = m.metaEntryMap.map{case (column, metaEntry) =>
+    val cassandraRows = m.map{case (column, metaEntry) =>
       CassandraRow.fromMap(Map(
         "column" -> column,
         "relationType" -> MetaRelationType.toString(metaEntry.relationType),

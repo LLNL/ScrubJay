@@ -8,11 +8,11 @@ import org.scalactic.source.Position
 
 object QuerySpec {
 
-  def createDataSources(sc: SparkContext): Set[ScrubJayRDD] = {
+  def createDataSources(sc: SparkContext): Set[DataSourceID] = {
     Set(
-      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, sc.createLocalMetaSource(clusterLayoutMeta)),
-      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, sc.createLocalMetaSource(nodeDataMeta)),
-      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, sc.createLocalMetaSource(jobQueueMeta))
+      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, clusterLayoutMeta),
+      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, nodeDataMeta),
+      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, jobQueueMeta)
     ).flatten
   }
 
@@ -49,7 +49,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.length == 1)
     }
     it("should find the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueJobQueue)
+      assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
   }
 
@@ -62,7 +62,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.length == 1)
     }
     it("should derive the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueNodeDataJoinedWithClusterLayout)
+      assert(solutions.head.realize.collect.toSet == trueNodeDataJoinedWithClusterLayout)
     }
   }
 
@@ -74,7 +74,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.length == 1)
     }
     it("should derive the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
+      assert(solutions.head.realize.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
     }
   }
 }

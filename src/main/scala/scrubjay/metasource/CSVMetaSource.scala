@@ -23,10 +23,10 @@ object CSVMetaSource {
     val reader = new CSVReader(new FileReader(filename))
     val header = reader.readNext.map(_.trim)
     val data = reader.readAll.map(row => header.zip(row.map(_.trim)).toMap)
-    val metaEntryMap = data.map(row =>
+    val metaSource = data.map(row =>
       (row("column"), MetaEntry.metaEntryFromStrings(row("relationType"), row("meaning"), row("dimension"), row("units")))).toMap
 
-    new MetaSource(metaEntryMap)
+    metaSource
   }
 
   def saveToCSV(m: MetaSource, fileName: String): Unit = {
@@ -36,7 +36,7 @@ object CSVMetaSource {
     bw.write("column, relationType, meaning, dimension, units")
     bw.newLine()
 
-    m.metaEntryMap.foreach{case (column, metaEntry) =>
+    m.foreach{case (column, metaEntry) =>
       val rowString = Seq(
         column,
         MetaRelationType.toString(metaEntry.relationType),
