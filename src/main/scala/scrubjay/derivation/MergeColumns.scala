@@ -2,15 +2,16 @@ package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource.{DataRow, ScrubJayRDD}
+import scrubjay.metasource._
 
 class MergeColumns(dso: Option[ScrubJayRDD], columns: Seq[String]) extends Transformer(dso) {
 
   private val newColumn = columns.mkString("_")
-  private val metaEntry = ds.metaSource.metaEntryMap(columns.head)
+  private val metaEntry = ds.metaSource(columns.head)
 
   override val isValid: Boolean = columns.nonEmpty &&
     columns.forall(ds.metaSource.columns contains _) &&
-    columns.forall(c => ds.metaSource.metaEntryMap(c).units == ds.metaSource.metaEntryMap(columns.head).units)
+    columns.forall(c => ds.metaSource(c).units == ds.metaSource(columns.head).units)
 
   override def derive: ScrubJayRDD = {
 

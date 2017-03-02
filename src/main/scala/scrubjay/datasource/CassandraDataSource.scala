@@ -1,9 +1,8 @@
 package scrubjay.datasource
 
 import scrubjay.util.niceAttempt
+import scrubjay.metasource._
 import scrubjay.metabase.MetaDescriptor._
-import scrubjay.metasource.MetaSource
-import scrubjay.units.Units
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
@@ -106,7 +105,7 @@ object CassandraDataSource {
 
   // Get columns and datatypes from the data and add meta_data for each column
   def cassandraSchemaForDataSource(ds: ScrubJayRDD): Seq[(String, String)] = {
-    ds.metaSource.metaEntryMap.map{case (c, me) => ("\"" + c + "\"", inferCassandraTypeString(me.units))}.toSeq
+    ds.metaSource.map{case (c, me) => ("\"" + c + "\"", inferCassandraTypeString(me.units))}.toSeq
   }
 
   // The CQL command to create a Cassandra table with the specified schema

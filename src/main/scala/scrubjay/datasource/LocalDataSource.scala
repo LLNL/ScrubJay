@@ -1,8 +1,8 @@
 package scrubjay.datasource
 
+import scrubjay.metasource._
 import scrubjay.util.niceAttempt
-import scrubjay.units.Units
-import scrubjay.metasource.MetaSource
+
 import org.apache.spark.rdd.RDD
 
 object LocalDataSource {

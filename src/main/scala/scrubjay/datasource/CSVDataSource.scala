@@ -2,11 +2,11 @@ package scrubjay.datasource
 
 import scrubjay.units._
 import scrubjay.util.niceAttempt
-import scrubjay.metasource.MetaSource
-
+import scrubjay.metasource._
 import java.io._
 
 import org.apache.spark.rdd.RDD
+import DataSourceID
 
 
 trait CSVDataSource {
@@ -24,7 +24,7 @@ object CSVDataSource {
 
       val newMetaSource = providedMetaSource.withColumns(header)
 
-      new ScrubJayRDD(rawRdd, newMetaSource) with CSVDataSource {
+      new ScrubJayRDD(rawRdd, newMetaSource, DataSourceID("csv")()(newMetaSource.ID)) with CSVDataSource {
         override val fileName: String = csvFileName
       }
 

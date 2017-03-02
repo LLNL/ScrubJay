@@ -3,21 +3,22 @@ package scrubjay.derivation
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
+import scrubjay.metasource._
 import scrubjay.util.cartesianProduct
 
 import org.apache.spark.rdd.RDD
 import org.joda.time.Period
 
-class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String, Double)]) extends Transformer(dso) {
+class ExplodeTimeSpan(dso: Option[ScrubJayRDD], columnsWithPeriods: Seq[(String, Double)]) {
 
-  override val isValid: Boolean = columnsWithPeriods.forall(col => ds.metaSource.metaEntryMap(col._1).units == UNITS_DATETIMESPAN)
+  override val isValid: Boolean = columnsWithPeriods.forall(col => ds.metaSource(col._1).units == UNITS_DATETIMESPAN)
 
   override def derive: ScrubJayRDD = {
 
     // Add column_exploded meta entry for each column
     val metaSource = ds.metaSource.withMetaEntries(
       columnsWithPeriods.map(col => col._1 + "_exploded" -> {
-        val originalMetaEntry = ds.metaSource.metaEntryMap(col._1)
+        val originalMetaEntry = ds.metaSource(col._1)
         originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
       }).toMap)
       .withoutColumns(columnsWithPeriods.map(_._1))

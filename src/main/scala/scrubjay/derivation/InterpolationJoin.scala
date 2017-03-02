@@ -12,7 +12,7 @@ import scrubjay.units.UnitsTag.DomainType
 class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], window: Double) extends Joiner(dso1, dso2) {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  private val commonDimensions = MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
+  private val commonDimensions = MetaObject.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
   private val commonContinuousDimensions = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
@@ -29,7 +29,7 @@ class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], wi
 
   override def derive: ScrubJayRDD = {
 
-    val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource.metaEntryMap)
+    val metaSource = ds2.metaSource.withMetaEntries(ds1.metaSource)
 
     val rdd: RDD[DataRow] = {
 
@@ -80,7 +80,7 @@ class InterpolationJoin(dso1: Option[ScrubJayRDD], dso2: Option[ScrubJayRDD], wi
         .aggregateByKey(Set[DataRow]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
 
       // Lift the heavies here
-      val ds2MetaEntries = cogrouped.sparkContext.broadcast(ds2.metaSource.metaEntryMap)
+      val ds2MetaEntries = cogrouped.sparkContext.broadcast(ds2.metaSource)
 
       def projection(row: DataRow, keyColumn: String, mappedRows: Set[DataRow], mappedKeyColumn: String): DataRow = {
 

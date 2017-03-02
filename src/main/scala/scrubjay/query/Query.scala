@@ -4,11 +4,13 @@ import javax.management.relation.RelationType
 
 import scrubjay._
 import scrubjay.metabase._
+import scrubjay.metasource._
 import scrubjay.datasource._
 import gov.llnl.ConstraintSolver._
 import scrubjay.derivation.NaturalJoin
 import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
-import scrubjay.metasource.MetaSource
+import scrubjay.metasource.MetaObject
+import DataSourceID
 import scrubjay.units.UnitsTag.DomainType
 
 
@@ -24,7 +26,7 @@ class Query(val dataSources: Set[ScrubJayRDD],
 
       // 1. Do they share a domain dimension?
       val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = {
-        MetaSource.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
+        MetaObject.commonDimensionEntries(ds1.metaSource, ds2.metaSource)
           .filter(e => Seq(e._2.relationType, e._3.relationType).forall(_ == MetaRelationType.DOMAIN))
       }
 
@@ -35,6 +37,7 @@ class Query(val dataSources: Set[ScrubJayRDD],
         case (_,
               MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _),
               MetaEntry(_, _, MetaDimension(_, _, DimensionSpace.DISCRETE), _)) => {
+          //DataSourceID("natural join")(Seq(ds1.ID, ds2.ID))
           ds1.deriveNaturalJoin(Some(ds2))
         }
 
@@ -109,7 +112,7 @@ class Query(val dataSources: Set[ScrubJayRDD],
       val dsSet = args(1).as[Set[ScrubJayRDD]]
 
       // Fun case: queried meta entries exist in a data source derived from multiple data sources
-      val dsMeta = dsSet.toSeq.map(_.metaSource.metaEntryMap.values.toSet).reduce(_ union _)
+      val dsMeta = dsSet.toSeq.map(_.metaSource.values.toSet).reduce(_ union _)
       val metaSatisfied = query.intersect(dsMeta).size == query.size
 
       if (metaSatisfied)

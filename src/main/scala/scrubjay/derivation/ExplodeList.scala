@@ -4,6 +4,7 @@ import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
 import scrubjay.util.cartesianProduct
+import scrubjay.metasource._
 
 import org.apache.spark.rdd.RDD
 
@@ -19,16 +20,16 @@ import org.apache.spark.rdd.RDD
  *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExplodeList(dso: Option[ScrubJayRDD], columns: Seq[String]) extends Transformer(dso) {
+class ExplodeList(ds: Option[ScrubJayRDD], columns: Seq[String]) {
 
-  override val isValid: Boolean = columns.forall(ds.metaSource.metaEntryMap(_).units == UNITS_COMPOSITE_LIST)
+  override val isValid: Boolean = columns.forall(ds.metaSource(_).units == UNITS_COMPOSITE_LIST)
 
   override def derive: ScrubJayRDD = {
 
     // Add column_exploded meta entry for each column
     val metaSource = ds.metaSource.withMetaEntries(
       columns.map(col => col + "_exploded" -> {
-        val originalMetaEntry = ds.metaSource.metaEntryMap(col)
+        val originalMetaEntry = ds.metaSource(col)
         originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
       }).toMap)
       .withoutColumns(columns)

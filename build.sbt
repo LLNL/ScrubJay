@@ -39,6 +39,9 @@ libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
 // Msgpack (serialization)
 libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
+// JSON serialization
+libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
+
 // Misc
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 

@@ -1,16 +1,15 @@
 package scrubjay.datasource
 
 import org.apache.spark.{Partition, TaskContext}
-import scrubjay.metasource.MetaSource
+import scrubjay.metasource._
 import org.apache.spark.rdd.RDD
-import scrubjay.objectbase.ObjectBase
+import scrubjay.objectbase._
 import scrubjay.units.Units
 
 
-class ScrubJayRDD(fromRdd: ParsedRDD, val metaSource: MetaSource) extends RDD[DataRow](fromRdd) {
+class ScrubJayRDD(fromRdd: ParsedRDD, val metaSource: MetaSource, val ID: DataSourceID) extends RDD[DataRow](fromRdd) {
 
   // TODO: Derivation Provenance
-
 
   // Original?
 
@@ -31,8 +30,8 @@ class ScrubJayRDD(fromRdd: ParsedRDD, val metaSource: MetaSource) extends RDD[Da
     ???
   }
 
-  def this(fromRawRdd: RawRDD, metaSource: MetaSource) {
-    this(Units.rawRDDToUnitsRDD(fromRawRdd, metaSource.metaEntryMap), metaSource)
+  def this(fromRawRdd: RawRDD, metaSource: MetaSource, ID: DataSourceID) {
+    this(Units.rawRDDToUnitsRDD(fromRawRdd, metaSource), metaSource, ID)
   }
 
   override protected def getPartitions: Array[Partition] = {

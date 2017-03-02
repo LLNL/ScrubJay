@@ -3,6 +3,7 @@ package scrubjay.derivation
 import scrubjay.datasource._
 import scrubjay.metabase.MetaEntry
 import scrubjay.metabase.GlobalMetaBase._
+import scrubjay.metasource._
 import scrubjay.units._
 import org.apache.spark.rdd.RDD
 
@@ -11,11 +12,11 @@ import scrubjay.metabase.MetaDescriptor.MetaRelationType
 class CoreFrequency(dso: Option[ScrubJayRDD]) extends Transformer(dso) {
 
   // Find aperf and mperf time entries
-  private val aperfEntry = ds.metaSource.metaEntryMap.find(me =>
+  private val aperfEntry = ds.metaSource.find(me =>
       me._2.dimension == DIMENSION_APERF)
-  private val mperfEntry = ds.metaSource.metaEntryMap.find(me =>
+  private val mperfEntry = ds.metaSource.find(me =>
       me._2.dimension == DIMENSION_MPERF)
-  private val baseFreqEntry = ds.metaSource.metaEntryMap.find(me =>
+  private val baseFreqEntry = ds.metaSource.find(me =>
       me._2.dimension == DIMENSION_CPU_BASE_FREQUENCY)
 
   // Helper functions
