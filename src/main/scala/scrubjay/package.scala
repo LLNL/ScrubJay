@@ -67,7 +67,7 @@ package object scrubjay {
 
     def createLocalDataSource(rawData: Seq[RawDataRow],
                               columns: Seq[String],
-                              metaSource: MetaSource = MetaSource.empty): Option[DataSourceID] = {
+                              metaSource: MetaSource = MetaSource.empty): DataSourceID = {
       scrubjay.datasource.LocalDataSource(rawData, columns, metaSource)
     }
 
@@ -80,7 +80,7 @@ package object scrubjay {
                                   metaSource: MetaSource = MetaSource.empty,
                                   selectColumns: Seq[String] = Seq.empty,
                                   whereConditions: Seq[String] = Seq.empty,
-                                  limit: Option[Long] = None): Option[DataSourceID] = {
+                                  limit: Option[Long] = None): DataSourceID = {
       scrubjay.datasource.CassandraDataSource(keyspace, table, selectColumns, whereConditions, limit, metaSource)
     }
 
@@ -89,7 +89,7 @@ package object scrubjay {
      */
 
     def createCSVDataSource(csvFileName: String,
-                            metaSource: MetaSource = MetaSource.empty): Option[DataSourceID] = {
+                            metaSource: MetaSource = MetaSource.empty): DataSourceID = {
       scrubjay.datasource.CSVDataSource(csvFileName, metaSource)
     }
 
@@ -108,39 +108,39 @@ package object scrubjay {
      * Derivations
      */
 
-    //def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): Option[DataSourceID] = {
+    //def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): DataSourceID = {
     //  scrubjay.derivation.TransformColumn(dsID, column, fn, newMetaEntry)
     //}
 
-    def deriveMergeColumns(columns: Seq[String]): Option[DataSourceID] = {
+    def deriveMergeColumns(columns: Seq[String]): DataSourceID = {
       scrubjay.derivation.MergeColumns(dsID, columns)
     }
 
-    def deriveTimeSpan: Option[DataSourceID] = {
+    def deriveTimeSpan: DataSourceID = {
       scrubjay.derivation.TimeSpan(dsID)
     }
 
-    def deriveCoreFrequency: Option[DataSourceID] = {
+    def deriveCoreFrequency: DataSourceID = {
       scrubjay.derivation.CoreFrequency(dsID)
     }
 
-    def deriveExplodeList(columns: Seq[String]): Option[DataSourceID] = {
+    def deriveExplodeList(columns: Seq[String]): DataSourceID = {
       scrubjay.derivation.ExplodeList(dsID, columns)
     }
 
-    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): Option[DataSourceID] = {
+    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): DataSourceID = {
       scrubjay.derivation.ExplodeTimeSpan(dsID, columnsWithPeriods)
     }
 
-    def deriveNaturalJoin(dsID2: DataSourceID): Option[DataSourceID] = {
+    def deriveNaturalJoin(dsID2: DataSourceID): DataSourceID = {
       scrubjay.derivation.NaturalJoin(dsID, dsID2)
     }
 
-    def deriveInterpolationJoin(dsID2: DataSourceID, window: Double): Option[DataSourceID] = {
+    def deriveInterpolationJoin(dsID2: DataSourceID, window: Double): DataSourceID = {
       scrubjay.derivation.InterpolationJoin(dsID, dsID2, window)
     }
 
-    def deriveRangeJoin(dsID2: DataSourceID): Option[DataSourceID] = {
+    def deriveRangeJoin(dsID2: DataSourceID): DataSourceID = {
       scrubjay.derivation.RangeJoin(dsID, dsID2)
     }
 

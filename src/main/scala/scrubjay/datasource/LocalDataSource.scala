@@ -3,11 +3,14 @@ package scrubjay.datasource
 import org.apache.spark.SparkContext
 import scrubjay.metasource._
 
-class LocalDataSource(rawData: Seq[RawDataRow],
-                      columns: Seq[String],
-                      providedMetaSource: MetaSource) extends DataSourceID()(Seq(rawData, columns)) {
+case class LocalDataSource(rawData: Seq[RawDataRow],
+                           columns: Seq[String],
+                           providedMetaSource: MetaSource)
+  extends DataSourceID {
 
   val metaSource: MetaSource = providedMetaSource.withColumns(columns)
+
+  def isValid: Boolean = true
 
   def realize: ScrubJayRDD = {
     val rawRDD = SparkContext.getOrCreate().parallelize(rawData)
@@ -15,10 +18,3 @@ class LocalDataSource(rawData: Seq[RawDataRow],
   }
 }
 
-object LocalDataSource {
-  def apply(rawData: Seq[RawDataRow],
-            columns: Seq[String],
-            providedMetaSource: MetaSource): Option[LocalDataSource] = {
-    Some(new LocalDataSource(rawData, columns, providedMetaSource))
-  }
-}

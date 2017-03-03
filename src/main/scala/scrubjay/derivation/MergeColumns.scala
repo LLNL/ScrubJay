@@ -5,7 +5,8 @@ import scrubjay.MetaEntry
 import scrubjay.datasource.{DataRow, DataSourceID, ScrubJayRDD}
 import scrubjay.metasource._
 
-class MergeColumns(dsID: DataSourceID, columns: Seq[String]) extends DataSourceID(Seq(dsID))(Seq(columns)) {
+case class MergeColumns(dsID: DataSourceID, columns: Seq[String])
+  extends DataSourceID {
 
   def newColumn: String = columns.mkString("_")
   def metaEntry: MetaEntry = dsID.metaSource(columns.head)
@@ -32,15 +33,5 @@ class MergeColumns(dsID: DataSourceID, columns: Seq[String]) extends DataSourceI
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object MergeColumns {
-  def apply(dsID: DataSourceID, columns: Seq[String]): Option[DataSourceID] = {
-    val derivedID = new MergeColumns(dsID, columns)
-    if(derivedID.isValid)
-      Some(derivedID)
-    else
-      None
   }
 }

@@ -51,7 +51,7 @@ object ObjectBase {
     names.map{
       case (k, metaKeyspace, metaTable, dataKeyspace, dataTable) => {
         val metaSource = sc.createCassandraMetaSource(metaKeyspace, metaTable)
-        (k, sc.createCassandraDataSource(dataKeyspace, dataTable, metaSource).get.asInstanceOf[ScrubJayRDD])
+        (k, sc.createCassandraDataSource(dataKeyspace, dataTable, metaSource).asInstanceOf[ScrubJayRDD])
       }
     }.toMap
   }

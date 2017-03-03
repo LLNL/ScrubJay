@@ -10,7 +10,8 @@ import org.apache.spark.rdd.RDD
 import scrubjay.metabase.MetaEntry
 import scrubjay.units.UnitsTag.DomainType
 
-class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double) extends DataSourceID(Seq(dsID1, dsID2))(Seq(window)) {
+case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double)
+  extends DataSourceID {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
   def commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
@@ -115,15 +116,5 @@ class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object InterpolationJoin {
-  def apply(dsID1: DataSourceID, dsID2: DataSourceID, window: Double): Option[DataSourceID] = {
-    val derivedID = new InterpolationJoin(dsID1, dsID2, window)
-    if(derivedID.isValid)
-      Some(derivedID)
-    else
-      None
   }
 }

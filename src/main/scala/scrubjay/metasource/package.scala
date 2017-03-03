@@ -3,16 +3,12 @@ package scrubjay
 
 import scrubjay.metabase._
 
-import scala.pickling.Defaults._
-import scala.pickling.json._
-
 package object metasource {
 
   type MetaSource = Map[String, MetaEntry]
 
   implicit class MetaSourceImplicits(metaSource: MetaSource) extends Serializable {
 
-    //val ID: String = metaSource.pickle.value
     val columns: Seq[String] = metaSource.keys.toSeq
 
     def columnForEntry(me: MetaEntry): Option[String] = {

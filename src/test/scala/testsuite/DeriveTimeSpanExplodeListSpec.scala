@@ -5,26 +5,26 @@ import scrubjay._
 
 class DeriveTimeSpanExplodeListSpec extends ScrubJaySpec {
 
-  lazy val jobQueue: Option[DataSourceID] = sc.createLocalDataSource(jobQueueRawData, jobQueueMeta.keySet.toSeq, jobQueueMeta)
-  lazy val jobQueueSpan: Option[DataSourceID] = jobQueue.get.deriveTimeSpan
+  lazy val jobQueue: DataSourceID = sc.createLocalDataSource(jobQueueRawData, jobQueueMeta.keySet.toSeq, jobQueueMeta)
+  lazy val jobQueueSpan: DataSourceID = jobQueue.deriveTimeSpan
 
   describe("Derive time span") {
     it("should be defined") {
-      assert(jobQueueSpan.isDefined)
+      assert(jobQueueSpan.isValid)
     }
     it("should match ground truth") {
-      assert(jobQueueSpan.get.realize.collect.toSet == trueJobQueueSpan)
+      assert(jobQueueSpan.realize.collect.toSet == trueJobQueueSpan)
     }
   }
 
-  lazy val jobQueueSpanExploded: Option[DataSourceID] = jobQueueSpan.get.deriveExplodeList(Seq("nodelist"))
+  lazy val jobQueueSpanExploded: DataSourceID = jobQueueSpan.deriveExplodeList(Seq("nodelist"))
 
   describe("Derive exploded time span") {
     it("should be defined") {
-      assert(jobQueueSpanExploded.isDefined)
+      assert(jobQueueSpanExploded.isValid)
     }
     it("should match ground truth") {
-      assert(jobQueueSpanExploded.get.realize.collect.toSet == trueJobQueueSpanExploded)
+      assert(jobQueueSpanExploded.realize.collect.toSet == trueJobQueueSpanExploded)
     }
   }
 }

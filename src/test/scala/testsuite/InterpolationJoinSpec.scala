@@ -79,24 +79,24 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       InterpolationJoinSpec.flopsMeta)
 
     describe("Many-to-one projection") {
-      lazy val interjoined = flops.get.deriveInterpolationJoin(temp.get, 60000)
+      lazy val interjoined = flops.deriveInterpolationJoin(temp, 60000)
 
       it("should be defined") {
-        assert(interjoined.isDefined)
+        assert(interjoined.isValid)
       }
       it("should match ground truth") {
-        assert(interjoined.get.realize.collect.toSet == InterpolationJoinSpec.trueFlopsJoinTemp)
+        assert(interjoined.realize.collect.toSet == InterpolationJoinSpec.trueFlopsJoinTemp)
       }
     }
 
     describe("One-to-many projection") {
-      lazy val interjoined = temp.get.deriveInterpolationJoin(flops.get, 60000)
+      lazy val interjoined = temp.deriveInterpolationJoin(flops, 60000)
 
       it("should be defined") {
-        assert(interjoined.isDefined)
+        assert(interjoined.isValid)
       }
       it("should match ground truth") {
-        assert(interjoined.get.realize.collect.toSet == InterpolationJoinSpec.trueTempJoinFlops)
+        assert(interjoined.realize.collect.toSet == InterpolationJoinSpec.trueTempJoinFlops)
       }
     }
   }

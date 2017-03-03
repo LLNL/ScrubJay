@@ -41,6 +41,7 @@ libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
 // JSON serialization
 libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
+//libraryDependencies += "com.github.fommil" %% "spray-json-shapeless" % "1.3.0"
 
 // Hashing
 libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"

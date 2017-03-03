@@ -8,8 +8,8 @@ import scrubjay.util.cartesianProduct
 
 import org.apache.spark.rdd.RDD
 
-class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Double)])
-  extends DataSourceID(Seq(dsID))(Seq(columnsWithPeriods)) {
+case class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Double)])
+  extends DataSourceID {
 
   // Add column_exploded meta entry for each column
   val metaSource: MetaSource = dsID.metaSource.withMetaEntries(
@@ -19,6 +19,7 @@ class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Doubl
     }).toMap)
     .withoutColumns(columnsWithPeriods.map(_._1))
 
+  def isValid: Boolean = columnsWithPeriods.forall(col => dsID.metaSource(col._1).units == UNITS_DATETIMESPAN)
 
   def realize: ScrubJayRDD = {
 
@@ -51,15 +52,5 @@ class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Doubl
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object ExplodeTimeSpan {
-  def apply(dsID: DataSourceID, columnsWithPeriods: Seq[(String, Double)]): Option[DataSourceID] = {
-    val isValid: Boolean = columnsWithPeriods.forall(col => dsID.metaSource(col._1).units == UNITS_DATETIMESPAN)
-    if (isValid)
-      Some(new ExplodeTimeSpan(dsID, columnsWithPeriods))
-    else
-      None
   }
 }

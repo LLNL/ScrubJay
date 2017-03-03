@@ -20,8 +20,8 @@ import org.apache.spark.rdd.RDD
  *  creates a new row with identical attributes <a1, a2, i1>, <a1, a2, i2>, etc ...
  */
 
-class ExplodeList(dsID: DataSourceID, columns: Seq[String])
-  extends DataSourceID(Seq(dsID))(Seq(columns)) {
+case class ExplodeList(dsID: DataSourceID, columns: Seq[String])
+  extends DataSourceID {
 
   // Add column_exploded meta entry for each column
   val metaSource: MetaSource = dsID.metaSource.withMetaEntries(
@@ -30,6 +30,8 @@ class ExplodeList(dsID: DataSourceID, columns: Seq[String])
       originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
     }).toMap)
     .withoutColumns(columns)
+
+  def isValid: Boolean = columns.forall(dsID.metaSource(_).units == UNITS_COMPOSITE_LIST)
 
   def realize: ScrubJayRDD = {
 
@@ -61,15 +63,5 @@ class ExplodeList(dsID: DataSourceID, columns: Seq[String])
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object ExplodeList {
-  def apply(dsID: DataSourceID, columns: Seq[String]): Option[DataSourceID] = {
-    val isValid: Boolean = columns.forall(dsID.metaSource(_).units == UNITS_COMPOSITE_LIST)
-    if (isValid)
-      Some(new ExplodeList(dsID, columns))
-    else
-      None
   }
 }

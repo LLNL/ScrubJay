@@ -1,9 +1,9 @@
 package testsuite
 
 import scrubjay._
-
 import org.apache.spark.SparkContext
 import org.scalactic.source.Position
+import scrubjay.datasource.DataSourceID
 
 
 object QuerySpec {
@@ -13,7 +13,7 @@ object QuerySpec {
       sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, clusterLayoutMeta),
       sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, nodeDataMeta),
       sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, jobQueueMeta)
-    ).flatten
+    )
   }
 
   def createSingleSourceQueryMetaEntries: Set[MetaEntry] = {
@@ -45,9 +45,13 @@ class QuerySpec extends ScrubJaySpec {
     lazy val solutions = sc.runQuery(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
       .toList
 
-    it("should have a single") {
+    it("should have a single solution") {
       assert(solutions.length == 1)
     }
+    //it("should have the correct derivation chain") {
+    //  println(DataSourceID.toJsonString(solutions.head))
+    //  assert(true)
+    //}
     it("should find the correct datasource") {
       assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
@@ -61,9 +65,17 @@ class QuerySpec extends ScrubJaySpec {
     it("should have a single solution") {
       assert(solutions.length == 1)
     }
+    //it("should have the correct derivation chain") {
+    //  println(DataSourceID.toJsonString(solutions.head))
+    //  assert(true)
+    //}
     it("should derive the correct datasource") {
       assert(solutions.head.realize.collect.toSet == trueNodeDataJoinedWithClusterLayout)
     }
+    //it("should pickle and unpickle correctly") {
+    //  val unpickled = DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head))
+    //  assert(unpickled.realize.collect.toSet == trueNodeDataJoinedWithClusterLayout)
+    //}
   }
 
   describe("Query with multiple datasources and single derivations") {

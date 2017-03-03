@@ -17,7 +17,8 @@ import scrubjay.metasource._
  *  The inner join of the two dataSources, based on their common columns
  */
 
-class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID) extends DataSourceID(Seq(dsID1, dsID2))() {
+case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
+  extends DataSourceID {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
   def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.metaSource, dsID2.metaSource)
@@ -54,12 +55,3 @@ class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID) extends DataSourceID
   }
 }
 
-object NaturalJoin {
-  def apply(dsID1: DataSourceID, dsID2: DataSourceID): Option[DataSourceID] = {
-    val derivedID = new NaturalJoin(dsID1, dsID2)
-    if (derivedID.isValid)
-      Some(derivedID)
-    else
-      None
-  }
-}

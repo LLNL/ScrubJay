@@ -8,7 +8,8 @@ import org.apache.spark.rdd.RDD
 import scrubjay.metabase.MetaEntry
 import scrubjay.units.UnitsTag.DomainType
 
-class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID) extends DataSourceID(Seq(dsID1, dsID2))() {
+case class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID)
+  extends DataSourceID {
 
   // Determine common continuous (point, range) column pairs and and discrete dimension columns
   def commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
@@ -67,12 +68,3 @@ class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID) extends DataSourceID(S
   }
 }
 
-object RangeJoin {
-  def apply(dsID1: DataSourceID, dsID2: DataSourceID): Option[DataSourceID] = {
-    val derivedID = new RangeJoin(dsID1, dsID2)
-    if (derivedID.isValid)
-      Some(derivedID)
-    else
-      None
-  }
-}

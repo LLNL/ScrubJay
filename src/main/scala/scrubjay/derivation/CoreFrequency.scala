@@ -9,8 +9,8 @@ import org.apache.spark.rdd.RDD
 import scrubjay.MetaEntry
 import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
-class CoreFrequency(dsID: DataSourceID)
-  extends DataSourceID(Seq(dsID))() {
+case class CoreFrequency(dsID: DataSourceID)
+  extends DataSourceID {
 
   // Find aperf and mperf time entries
   def aperfEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>
@@ -43,6 +43,7 @@ class CoreFrequency(dsID: DataSourceID)
   // Create a sequence of possible functions that create a row with a time span from an existing row
   def allSpans: Seq[Option[(DataRow) => DataRow]] = Seq(spanFromStartEnd(aperfEntry.map(_._1), mperfEntry.map(_._1), baseFreqEntry.map(_._1)))
 
+  val isValid: Boolean = allSpans.exists(_.isDefined)
 
   val metaSource: MetaSource = dsID.metaSource
     .withMetaEntries(Map("cpu frequency" -> MetaEntry(MetaRelationType.VALUE, MEANING_UNKNOWN, DIMENSION_CPU_ACTIVE_FREQUENCY, UNITS_ORDERED_CONTINUOUS)))
@@ -57,16 +58,5 @@ class CoreFrequency(dsID: DataSourceID)
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object CoreFrequency {
-  def apply(dsID: DataSourceID): Option[DataSourceID] = {
-    val derivedID = new CoreFrequency(dsID)
-    val isValid: Boolean = derivedID.allSpans.exists(_.isDefined)
-    if(isValid)
-      Some(derivedID)
-    else
-      None
   }
 }

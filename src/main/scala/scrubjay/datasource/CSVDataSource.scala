@@ -7,11 +7,13 @@ import java.io._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-class CSVDataSource(csvFileName: String, providedMetaSource: MetaSource)
-  extends DataSourceID()(Seq(csvFileName)) {
+case class CSVDataSource(csvFileName: String, providedMetaSource: MetaSource)
+  extends DataSourceID {
 
   // FIXME: with which columns?
   val metaSource: MetaSource = providedMetaSource//.withColumns(header)
+
+  def isValid: Boolean = true
 
   def realize: ScrubJayRDD = {
 
@@ -30,10 +32,6 @@ class CSVDataSource(csvFileName: String, providedMetaSource: MetaSource)
 
 
 object CSVDataSource {
-
-  def apply(csvFileName: String, providedMetaSource: MetaSource): Option[DataSourceID] = {
-    Some(new CSVDataSource(csvFileName, providedMetaSource))
-  }
 
   def saveToCSV(dsID: DataSourceID,
                 fileName: String,

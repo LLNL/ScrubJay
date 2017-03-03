@@ -10,7 +10,8 @@ import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 import org.apache.spark.rdd.RDD
 
-class TimeSpan(dsID: DataSourceID) extends DataSourceID(Seq(dsID))() {
+case class TimeSpan(dsID: DataSourceID)
+  extends DataSourceID {
 
   // Find start and end time entries
   def startEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>
@@ -56,15 +57,5 @@ class TimeSpan(dsID: DataSourceID) extends DataSourceID(Seq(dsID))() {
     }
 
     new ScrubJayRDD(rdd)
-  }
-}
-
-object TimeSpan {
-  def apply(dsID: DataSourceID): Option[DataSourceID] = {
-    val derivedID = new TimeSpan(dsID)
-    if (derivedID.isValid)
-      Some(derivedID)
-    else
-      None
   }
 }

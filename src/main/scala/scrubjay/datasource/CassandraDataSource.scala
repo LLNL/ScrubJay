@@ -1,11 +1,9 @@
 package scrubjay.datasource
 
-import scrubjay.util.niceAttempt
 import scrubjay.metasource._
 import scrubjay.metabase.MetaDescriptor._
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.cql.CassandraConnector
-import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.SparkContext
 import org.joda.time.{DateTime, Interval}
 
@@ -52,16 +50,18 @@ trait CassandraDataSource {
 }
 */
 
-class CassandraDataSource(keyspace: String,
-                          table: String,
-                          selectColumns: Seq[String],
-                          whereConditions: Seq[String],
-                          limit: Option[Long],
-                          providedMetaSource: MetaSource)
-  extends DataSourceID()(Seq(keyspace, table, selectColumns, whereConditions, limit)) {
+case class CassandraDataSource(keyspace: String,
+                               table: String,
+                               selectColumns: Seq[String],
+                               whereConditions: Seq[String],
+                               limit: Option[Long],
+                               providedMetaSource: MetaSource)
+  extends DataSourceID {
 
   // TODO: figure out which columns to include
   val metaSource: MetaSource = providedMetaSource//.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
+
+  def isValid: Boolean = true
 
   def realize: ScrubJayRDD = {
     val selectStatement: Option[String] = if (selectColumns.nonEmpty) Some(selectColumns.mkString(", ")) else None
@@ -82,16 +82,6 @@ class CassandraDataSource(keyspace: String,
 }
 
 object CassandraDataSource {
-
-  def apply(keyspace: String,
-            table: String,
-            selectColumns: Seq[String],
-            whereConditions: Seq[String],
-            limit: Option[Long],
-            providedMetaSource: MetaSource): Option[DataSourceID] = {
-    Some(new CassandraDataSource(keyspace, table, selectColumns, whereConditions, limit, providedMetaSource))
-  }
-
 
   // Match Scala type to Cassandra type string
   def inferCassandraTypeString(metaUnits: MetaUnits): String = {
