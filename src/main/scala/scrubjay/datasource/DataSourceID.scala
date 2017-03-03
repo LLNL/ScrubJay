@@ -4,7 +4,6 @@ package scrubjay.datasource
 import scrubjay.metasource._
 import com.roundeights.hasher.Implicits._
 
-import scala.pickling.functions
 
 abstract class DataSourceID extends Serializable {
   val metaSource: MetaSource
@@ -20,6 +19,7 @@ abstract class DataSourceID extends Serializable {
 
 object DataSourceID {
 
+  import scala.pickling.functions
   import scala.pickling.Defaults._
   import scala.pickling.json._
 
