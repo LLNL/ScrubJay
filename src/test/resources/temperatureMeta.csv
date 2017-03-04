@@ -1,4 +1,4 @@
-column,relationType,meaning,dimension,units
-node,domain,node,node,identifier
-time,domain,instant,time,datetimestamp
-temp,value,instant,temperature,degrees Celsius
+column, relationType, meaning, dimension, units
+node, domain, node, node, identifier
+time, domain, instant, time, datetimestamp
+temp, value, instant, temperature, degrees Celsius

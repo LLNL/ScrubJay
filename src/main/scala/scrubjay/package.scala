@@ -47,16 +47,8 @@ package object scrubjay {
      * Derivations
      */
 
-    //def deriveTransformColumn(column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): DataSourceID = {
-    //  scrubjay.derivation.TransformColumn(dsID, column, fn, newMetaEntry)
-    //}
-
     def deriveMergeColumns(columns: Seq[String]): DataSourceID = {
       scrubjay.derivation.MergeColumns(dsID, columns)
-    }
-
-    def deriveTimeSpan: DataSourceID = {
-      scrubjay.derivation.TimeSpan(dsID)
     }
 
     def deriveCoreFrequency: DataSourceID = {

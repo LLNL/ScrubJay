@@ -13,10 +13,6 @@ trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
     val conf = new SparkConf()
       .setMaster("local[*]")
       .setAppName("ScrubJayTest")
-      .setAll(Seq(
-        ("spark.serializer", "org.apache.spark.serializer.KryoSerializer"),
-        ("spark.kryo.registrator", "scrubjay.registrator.KryoRegistrator")
-      ))
     sc = new SparkContext(conf)
     sc.setLogLevel("WARN")
   }

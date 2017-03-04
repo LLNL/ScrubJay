@@ -76,7 +76,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.length == 1)
     }
     ignore("should derive the correct datasource") {
-      assert(solutions.head.realize.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
+      assert(solutions.head.realize.collect.toSet == trueJobQueueExplodedJoinedFlops)
     }
     ignore("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)

@@ -24,12 +24,18 @@ case class ExplodeList(dsID: DataSourceID, columns: Seq[String])
   extends DataSourceID {
 
   // Add column_exploded meta entry for each column
-  val metaSource: MetaSource = dsID.metaSource.withMetaEntries(
-    columns.map(col => col + "_exploded" -> {
-      val originalMetaEntry = dsID.metaSource(col)
-      originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
-    }).toMap)
-    .withoutColumns(columns)
+  val metaSource: MetaSource = {
+    if (isValid) {
+      dsID.metaSource.withMetaEntries(
+        columns.map(col => col + "_exploded" -> {
+          val originalMetaEntry = dsID.metaSource(col)
+          originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
+        }).toMap)
+        .withoutColumns(columns)
+    }
+    else
+      dsID.metaSource
+  }
 
   def isValid: Boolean = columns.forall(dsID.metaSource(_).units == UNITS_COMPOSITE_LIST)
 

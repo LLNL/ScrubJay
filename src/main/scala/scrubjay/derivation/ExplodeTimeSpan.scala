@@ -34,7 +34,7 @@ case class ExplodeTimeSpan(dsID: DataSourceID, columnsWithPeriods: Seq[(String, 
         val explodedValues =
         cols.map(col => (col._1, col._2, row(col._1)))
           .map {
-            case (k, p, span: DateTimeSpan) => span.explode(p).map(stamp => (k + "_exploded", stamp))
+            case (k, p, span: DateTimeSpan) => span.explode(p).map(stamp => (k + "_exploded", stamp)).toSeq
             case (_, _, v) => throw new RuntimeException(s"Runtime type mismatch: \nexpected: DateTimeSpan\nvalue: $v")
           }
 

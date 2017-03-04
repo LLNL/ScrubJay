@@ -33,7 +33,8 @@ object DateTimeStamp extends UnitsTag[DateTimeStamp, DateTime] {
     DateTimeStamp(attempts.head.getMillis)
   }
 
-  override def convert(value: Any, metaUnits: MetaUnits): DateTimeStamp = value match {
+  // FIXME: remove null
+  override def convert(value: Any, metaUnits: MetaUnits = null): DateTimeStamp = value match {
     case dt: DateTime => DateTimeStamp(dt.getMillis)
     case d: Double => DateTimeStamp(d*1000L)
     case f: Float => DateTimeStamp(f*1000L)

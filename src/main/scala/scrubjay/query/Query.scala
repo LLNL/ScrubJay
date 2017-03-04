@@ -1,18 +1,8 @@
 package scrubjay.query
 
-import javax.management.relation.RelationType
-
-import scrubjay._
 import scrubjay.metabase._
-import scrubjay.metasource._
-import scrubjay.metasource.MetaSourceImplicits
 import scrubjay.datasource._
 import gov.llnl.ConstraintSolver._
-import scrubjay.derivation._
-import scrubjay.util._
-import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
-import scrubjay.metasource.MetaSource
-import scrubjay.units.UnitsTag.DomainType
 
 
 case class Query(dataSources: Set[DataSourceID],

@@ -13,15 +13,13 @@ class LocalDataSourceSpec extends ScrubJaySpec {
       "jobid"    -> "123",
       "nodelist" -> "1,2,3",
       "elapsed"  -> "23",
-      "start"    -> "2016-08-11T3:30:00+0000",
-      "end"      -> "2016-08-11T3:31:00+0000"
+      "timespan" -> "2016-08-11T3:30:00+0000,2016-08-11T3:31:00+0000"
     ),
     Map(
       "jobid"    -> 456,
       "nodelist" -> List(4, 5, 6),
       "elapsed"  -> 45,
-      "start"    -> "2016-08-11T3:30:00+0000",
-      "end"      -> "2016-08-11T3:32:00+0000"
+      "timespan" -> "2016-08-11T3:30:00+0000,2016-08-11T3:32:00+0000"
     )
   )
 
@@ -29,8 +27,7 @@ class LocalDataSourceSpec extends ScrubJaySpec {
     ("jobid", "domain", "job", "job", "identifier"),
     ("nodelist", "domain", "node", "node", "list<identifier>"),
     ("elapsed", "value", "duration", "time", "seconds"),
-    ("start", "domain", "start", "time", "datetimestamp"),
-    ("end", "domain", "end", "time", "datetimestamp")
+    ("timespan", "domain", "unk", "time", "datetimespan")
   )
 
   lazy val jobQueue: DataSourceID = LocalDataSource(jobQueueData, LocalMetaSource(jobQueueMeta))

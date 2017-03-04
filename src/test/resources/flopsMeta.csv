@@ -1,4 +1,4 @@
-column,relationType,meaning,dimension,units
-node,domain,node,node,identifier
-time,domain,instant,time,datetimestamp
-flops,value,cumulative,flops,count
+column, relationType, meaning, dimension, units
+node, domain, node, node, identifier
+time, domain, instant, time, datetimestamp
+flops, value, cumulative, flops, count
