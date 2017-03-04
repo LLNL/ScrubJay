@@ -58,6 +58,9 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.head.realize.collect.toSet == trueNodeDataJoinedWithClusterLayout)
     }
     it("should pickle/unpickle correctly") {
+      //println(solutions.head)
+      //println(DataSourceID.toJsonString(solutions.head))
+      //println(DataSourceID.toHash(solutions.head))
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
     }
   }
@@ -66,13 +69,13 @@ class QuerySpec extends ScrubJaySpec {
     lazy val query = new Query(dataSources, jobFlopsQuery)
     lazy val solutions = query.run.toList
 
-    it("should have a single solution") {
+    ignore("should have a single solution") {
       assert(solutions.length == 1)
     }
-    it("should derive the correct datasource") {
+    ignore("should derive the correct datasource") {
       assert(solutions.head.realize.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
     }
-    it("should pickle/unpickle correctly") {
+    ignore("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
     }
   }
