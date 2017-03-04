@@ -32,7 +32,8 @@ class QuerySpec extends ScrubJaySpec {
   )
 
   describe("Query with single datasource solution") {
-    lazy val solutions = sc.runQuery(dataSources, jobTimeQuery)
+    lazy val solutions = Query(dataSources, jobTimeQuery)
+      .solutions
       .toList
 
     it("should have a single solution") {
@@ -48,8 +49,9 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with multiple datasources") {
 
-    lazy val query = new Query(dataSources, rackFlopsQuery)
-    lazy val solutions = query.run.toList
+    lazy val solutions = Query(dataSources, rackFlopsQuery)
+      .solutions
+      .toList
 
     it("should have a single solution") {
       assert(solutions.length == 1)
@@ -66,8 +68,9 @@ class QuerySpec extends ScrubJaySpec {
   }
 
   describe("Query with multiple datasources and single derivations") {
-    lazy val query = new Query(dataSources, jobFlopsQuery)
-    lazy val solutions = query.run.toList
+    lazy val solutions = Query(dataSources, jobFlopsQuery)
+      .solutions
+      .toList
 
     ignore("should have a single solution") {
       assert(solutions.length == 1)
@@ -77,6 +80,18 @@ class QuerySpec extends ScrubJaySpec {
     }
     ignore("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+    }
+  }
+
+  describe("Enumerate all possible derivations") {
+    lazy val solutions = Query(dataSources, jobFlopsQuery)
+      .allDerivations
+      .toList
+
+    it("should do things") {
+      //solutions.foreach(solution => println(solution.metaSource.values.map(_.dimension.title)))
+      //println(solutions.length)
+      assert(true)
     }
   }
 }

@@ -14,14 +14,14 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
   extends DataSourceID {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  def commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
-  def commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
+  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource).toSeq
+  val commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.units.unitsTag.domainType == DomainType.POINT &&
     d._3.relationType == MetaRelationType.DOMAIN)
-  def commonDiscreteDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
+  val commonDiscreteDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.DISCRETE &&
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.relationType == MetaRelationType.DOMAIN)

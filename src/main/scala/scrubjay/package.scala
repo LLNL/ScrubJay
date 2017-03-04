@@ -35,9 +35,6 @@ package object scrubjay {
       objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
     }
 
-    def runQuery(dataSources: Set[DataSourceID], metaEntries: Set[MetaEntry]): Iterator[DataSourceID] = {
-      new Query(dataSources, metaEntries).run
-    }
   }
 
   /**
