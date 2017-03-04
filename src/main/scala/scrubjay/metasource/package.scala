@@ -58,7 +58,6 @@ package object metasource {
         val rowString = Seq(
           column,
           MetaRelationType.toString(metaEntry.relationType),
-          metaEntry.meaning.title,
           metaEntry.dimension.title,
           metaEntry.units.title
         ).mkString(",")

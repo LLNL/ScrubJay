@@ -20,7 +20,7 @@ case class CassandraMetaSource(keyspace: String, table: String) extends MetaSour
     val sc = SparkContext.getOrCreate()
     val data = sc.cassandraTable(keyspace, table).map(_.toMap.map{case (k, v) => (k, v.toString)}.toMap).collect
     val metaSource = data.map(row =>
-      (row("column"), MetaEntry.metaEntryFromStrings(row("relationType"), row("meaning"), row("dimension"), row("units")))).toMap
+      (row("column"), MetaEntry.metaEntryFromStrings(row("relationType"), row("dimension"), row("units")))).toMap
 
     metaSource
   }
@@ -33,7 +33,6 @@ object CassandraMetaSource {
       CassandraRow.fromMap(Map(
         "column" -> column,
         "relationType" -> MetaRelationType.toString(metaEntry.relationType),
-        "meaning" -> metaEntry.meaning.title,
         "dimension" -> metaEntry.dimension.title,
         "units" -> metaEntry.units.title
       ))

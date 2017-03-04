@@ -19,7 +19,7 @@ package object scrubjay {
    */
 
   def metaEntryFromStrings(relationType: String, meaning: String, dimension: String, units: String): MetaEntry = {
-    scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, meaning, dimension, units)
+    scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, dimension, units)
   }
 
   /**

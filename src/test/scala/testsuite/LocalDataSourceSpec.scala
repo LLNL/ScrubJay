@@ -24,10 +24,10 @@ class LocalDataSourceSpec extends ScrubJaySpec {
   )
 
   val jobQueueMeta = Seq(
-    ("jobid", "domain", "job", "job", "identifier"),
-    ("nodelist", "domain", "node", "node", "list<identifier>"),
-    ("elapsed", "value", "duration", "time", "seconds"),
-    ("timespan", "domain", "unk", "time", "datetimespan")
+    ("jobid", "domain", "job", "identifier"),
+    ("nodelist", "domain", "node", "list<identifier>"),
+    ("elapsed", "value", "time", "seconds"),
+    ("timespan", "domain", "time", "datetimespan")
   )
 
   lazy val jobQueue: DataSourceID = LocalDataSource(jobQueueData, LocalMetaSource(jobQueueMeta))

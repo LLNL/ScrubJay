@@ -1,3 +1,3 @@
-column, relationType, meaning, dimension, units
-node, domain, node, node, identifier
-rack, domain, rack, rack, identifier
+column, relationType, dimension, units
+node, domain, node, identifier
+rack, domain, rack, identifier

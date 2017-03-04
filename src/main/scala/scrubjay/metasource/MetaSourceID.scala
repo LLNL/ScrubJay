@@ -5,5 +5,5 @@ abstract class MetaSourceID {
 }
 
 object MetaSourceID {
-  def empty: MetaSourceID =  LocalMetaSource(Seq[(String, String, String, String, String)]())
+  def empty: MetaSourceID =  LocalMetaSource(Seq[(String, String, String, String)]())
 }

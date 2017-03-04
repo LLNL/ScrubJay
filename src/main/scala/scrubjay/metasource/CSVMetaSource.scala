@@ -23,7 +23,7 @@ case class CSVMetaSource(filename: String) extends MetaSourceID {
     val header = reader.readNext.map (_.trim)
     val data = reader.readAll.map (row => header.zip (row.map (_.trim) ).toMap)
     val metaSource = data.map (row =>
-      (row ("column"), MetaEntry.metaEntryFromStrings (row ("relationType"), row ("meaning"), row ("dimension"), row ("units") ) ) ).toMap
+      (row ("column"), MetaEntry.metaEntryFromStrings (row ("relationType"), row ("dimension"), row ("units") ) ) ).toMap
 
     metaSource
   }
