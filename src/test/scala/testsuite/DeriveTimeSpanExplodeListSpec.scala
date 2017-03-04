@@ -2,7 +2,6 @@ package testsuite
 
 import scrubjay.datasource._
 import scrubjay.metasource._
-
 import scrubjay.derivation.{ExplodeList, TimeSpan}
 
 
