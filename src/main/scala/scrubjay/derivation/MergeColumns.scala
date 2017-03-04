@@ -1,7 +1,7 @@
 package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
-import scrubjay.MetaEntry
+import scrubjay.metabase._
 import scrubjay.datasource.{DataRow, DataSourceID, ScrubJayRDD}
 import scrubjay.metasource._
 

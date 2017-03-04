@@ -6,7 +6,7 @@ import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.metasource._
 import scrubjay.units._
 import org.apache.spark.rdd.RDD
-import scrubjay.MetaEntry
+import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 case class CoreFrequency(dsID: DataSourceID)

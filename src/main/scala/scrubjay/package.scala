@@ -5,38 +5,14 @@
  *
  */
 
-import com.datastax.driver.core.Cluster
-import com.datastax.driver.core.Cluster.Builder
 import scrubjay.datasource._
 import scrubjay.metabase._
-import scrubjay.metasource._
 import scrubjay.query._
-import com.datastax.spark.connector._
+
 import org.apache.spark._
-import org.joda.time.Period
-import scrubjay.units.Units
+
 
 package object scrubjay {
-
-  /**
-   * Types
-   */
-
-  type ScrubJayRDD = scrubjay.datasource.ScrubJayRDD
-  type MetaSource = metasource.MetaSource
-  type MetaEntry = scrubjay.metabase.MetaEntry
-  type Query = scrubjay.query.Query
-
-  type MetaSourceID = scrubjay.metasource.MetaSourceID
-  type DataSourceID = scrubjay.datasource.DataSourceID
-
-  type LocalMetaSource = scrubjay.metasource.LocalMetaSource
-  type CSVMetaSource = scrubjay.metasource.CSVMetaSource
-  type CassandraMetaSource = scrubjay.metasource.CassandraMetaSource
-
-  type LocalDataSource = scrubjay.datasource.LocalDataSource
-  type CSVDataSource = scrubjay.datasource.CSVDataSource
-  type CassandraDataSource = scrubjay.datasource.CassandraDataSource
 
   /**
    * Standalone functions

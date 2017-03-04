@@ -5,7 +5,7 @@ import scrubjay.metasource._
 import scrubjay.metabase.MetaEntry
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.units._
-import scrubjay.MetaEntry
+import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 import org.apache.spark.rdd.RDD

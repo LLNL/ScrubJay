@@ -8,6 +8,7 @@ package object testsuite {
   /*
    * Test CSV file paths from test resources directory
    */
+
   val temperatureMetaFilename: String = getClass.getResource("/temperatureMeta.csv").getPath
   val temperatureFilename: String = getClass.getResource("/temperature.csv").getPath
 
@@ -17,102 +18,11 @@ package object testsuite {
   val jobQueueMetaFilename: String = getClass.getResource("/jobQueueMeta.csv").getPath
   val jobQueueFilename: String = getClass.getResource("/jobQueue.csv").getPath
 
-  /*
-   * Columns
-   */
+  val nodeFlopsMetaFilename: String = getClass.getResource("/nodeFlopsMeta.csv").getPath
+  val nodeFlopsFilename: String = getClass.getResource("/nodeFlops.csv").getPath
 
-  val jobQueueColumns = Seq(
-    "jobid",
-    "nodelist",
-    "elapsed",
-    "start",
-    "end"
-  )
-
-  val clusterLayoutColumns = Seq(
-    "node",
-    "rack"
-  )
-
-  val nodeDataColumns = Seq(
-    "node",
-    "time",
-    "flops"
-  )
-
-  /*
-   * Raw data
-   */
-
-  val jobQueueRawData = Seq(
-     Map(
-       "jobid"    -> "123",
-       "nodelist" -> "1,2,3",
-       "elapsed"  -> "23",
-       "start"    -> "2016-08-11T3:30:00+0000",
-       "end"      -> "2016-08-11T3:31:00+0000"
-     ),
-     Map(
-       "jobid"    -> 456,
-       "nodelist" -> List(4, 5, 6),
-       "elapsed"  -> 45,
-       "start"    -> "2016-08-11T3:30:00+0000",
-       "end"      -> "2016-08-11T3:32:00+0000"
-     )
-  )
-
-  val clusterLayoutRawData = Seq(
-    Map("node" -> 1, "rack" -> 1),
-    Map("node" -> 2, "rack" -> 1),
-    Map("node" -> 3, "rack" -> 1),
-    Map("node" -> 4, "rack" -> 2),
-    Map("node" -> 5, "rack" -> 2),
-    Map("node" -> 6, "rack" -> 2)
-  )
-
-  val nodeDataRawData = Seq(
-    Map("node" -> 1, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 23334),
-    Map("node" -> 1, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 45523),
-    Map("node" -> 1, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 219126),
-    Map("node" -> 2, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 35225),
-    Map("node" -> 2, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 45417),
-    Map("node" -> 2, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 89912),
-    Map("node" -> 3, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 1099),
-    Map("node" -> 3, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 25437),
-    Map("node" -> 3, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 66482),
-    Map("node" -> 4, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 92864),
-    Map("node" -> 4, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 142092),
-    Map("node" -> 4, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 177369),
-    Map("node" -> 5, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 22884),
-    Map("node" -> 5, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 52343),
-    Map("node" -> 5, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 102535),
-    Map("node" -> 6, "time" -> "2016-08-11T3:30:00+0000", "flops" -> 5465),
-    Map("node" -> 6, "time" -> "2016-08-11T3:31:20+0000", "flops" -> 36378),
-    Map("node" -> 6, "time" -> "2016-08-11T3:32:20+0000", "flops" -> 68597)
-  )
-
-  /*
-   * Meta
-   */
-
-  val jobQueueMeta = Seq(
-      ("jobid", "domain", "job", "job", "identifier"),
-      ("nodelist", "domain", "node", "node", "list<identifier>"),
-      ("elapsed", "value", "duration", "time", "seconds"),
-      ("start", "domain", "start", "time", "datetimestamp"),
-      ("end", "domain", "end", "time", "datetimestamp")
-    )
-
-  val nodeDataMeta = Seq(
-    ("node", "domain", "node", "node", "identifier"),
-    ("time", "domain", "instant", "time", "datetimestamp"),
-    ("flops", "value", "cumulative", "flops", "count")
-  )
-
-  val clusterLayoutMeta = Seq(
-    ("node", "domain", "node", "node", "identifier"),
-    ("rack", "domain", "rack", "rack", "identifier")
-  )
+  val clusterLayoutMetaFilename: String = getClass.getResource("/clusterLayoutMeta.csv").getPath
+  val clusterLayoutFilename: String = getClass.getResource("/clusterLayout.csv").getPath
 
   /*
    * Ground truth
