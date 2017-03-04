@@ -46,7 +46,7 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
 // Hashing
 libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"
 
-// Misc
+// Log4j
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 
 // Fix dependency relocation for xml-apis

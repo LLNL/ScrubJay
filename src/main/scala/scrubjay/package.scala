@@ -26,7 +26,17 @@ package object scrubjay {
   type MetaSource = metasource.MetaSource
   type MetaEntry = scrubjay.metabase.MetaEntry
   type Query = scrubjay.query.Query
+
+  type MetaSourceID = scrubjay.metasource.MetaSourceID
   type DataSourceID = scrubjay.datasource.DataSourceID
+
+  type LocalMetaSource = scrubjay.metasource.LocalMetaSource
+  type CSVMetaSource = scrubjay.metasource.CSVMetaSource
+  type CassandraMetaSource = scrubjay.metasource.CassandraMetaSource
+
+  type LocalDataSource = scrubjay.datasource.LocalDataSource
+  type CSVDataSource = scrubjay.datasource.CSVDataSource
+  type CassandraDataSource = scrubjay.datasource.CassandraDataSource
 
   /**
    * Standalone functions
@@ -47,50 +57,6 @@ package object scrubjay {
 
     def loadAllObjects(): Unit = {
       objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
-    }
-
-    /**
-      * MetaSource creation
-      */
-
-    def createCSVMetaSource(filename: String): MetaSource = {
-      scrubjay.metasource.CSVMetaSource.createCSVMetaSource(filename)
-    }
-
-    def createCassandraMetaSource(keyspace: String, table: String): MetaSource = {
-      scrubjay.metasource.CassandraMetaSource.createCassandraMetaSource(sc, keyspace, table)
-    }
-
-    /**
-     * Create a LocalDataSource from a sequence of RawDataRow, i.e. Map[String -> Any]
-     */
-
-    def createLocalDataSource(rawData: Seq[RawDataRow],
-                              columns: Seq[String],
-                              metaSource: MetaSource = MetaSource.empty): DataSourceID = {
-      scrubjay.datasource.LocalDataSource(rawData, columns, metaSource)
-    }
-
-    /**
-     * Create a CassandraDataSource from an existing Cassandra table
-     */
-
-    def createCassandraDataSource(keyspace: String,
-                                  table: String,
-                                  metaSource: MetaSource = MetaSource.empty,
-                                  selectColumns: Seq[String] = Seq.empty,
-                                  whereConditions: Seq[String] = Seq.empty,
-                                  limit: Option[Long] = None): DataSourceID = {
-      scrubjay.datasource.CassandraDataSource(keyspace, table, selectColumns, whereConditions, limit, metaSource)
-    }
-
-    /**
-     * Create a CSVDataSource from a CSV file with a header
-     */
-
-    def createCSVDataSource(csvFileName: String,
-                            metaSource: MetaSource = MetaSource.empty): DataSourceID = {
-      scrubjay.datasource.CSVDataSource(csvFileName, metaSource)
     }
 
     def runQuery(dataSources: Set[DataSourceID], metaEntries: Set[MetaEntry]): Iterator[DataSourceID] = {
@@ -204,25 +170,4 @@ package object scrubjay {
     }
     */
   }
-
-  /**
-   * MetaSource implicit functions
-   */
-
-  implicit class MetaSourceImplicits(metaSource: MetaSource) {
-
-    /**
-      * Save formats
-      */
-
-    def saveToCSV(fileName: String): Unit = {
-      scrubjay.metasource.CSVMetaSource.saveToCSV(metaSource, fileName)
-    }
-
-    def saveToCassandra(sc: SparkContext, keyspace: String, table: String): Unit = {
-      scrubjay.metasource.CassandraMetaSource.saveToCassandra(metaSource, sc, keyspace, table)
-    }
-
-  }
-
 }

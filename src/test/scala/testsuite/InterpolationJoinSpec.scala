@@ -1,102 +1,43 @@
 package testsuite
 
-import scrubjay._
-import scrubjay.units._
-import org.joda.time.DateTime
+import scrubjay.metasource._
+import scrubjay.datasource._
+import scrubjay.derivation.InterpolationJoin
+
 import org.scalactic.source.Position
 
-
-object InterpolationJoinSpec {
-  val temperatureData = Seq(
-    Map(
-      "node" -> 1,
-      "time" -> "2016-08-11T3:30:00+0000",
-      "temp" -> 40.0
-    ),
-    Map(
-      "node" -> 1,
-      "time" -> "2016-08-11T3:31:00+0000",
-      "temp" -> 50.0
-    )
-  )
-
-  val flopsData = Seq(
-    Map(
-      "node" -> 1,
-      "time" -> "2016-08-11T3:30:30+0000",
-      "flops" -> 2000238
-    )
-  )
-
-  val temperatureMeta = Map(
-    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
-    "temp" -> metaEntryFromStrings("value", "instant", "temperature", "degrees Celsius")
-  )
-
-  val flopsMeta = Map(
-    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
-    "flops" -> metaEntryFromStrings("value", "cumulative", "flops", "count")
-  )
-
-  val trueFlopsJoinTemp = Set(
-    Map(
-      "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:30+0000").getMillis),
-      "flops" -> OrderedDiscrete(2000238),
-      "temp" -> DegreesCelsius(45.0)
-    )
-  )
-
-  val trueTempJoinFlops = Set(
-    Map(
-      "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:00+0000").getMillis),
-      "flops" -> OrderedDiscrete(2000238),
-      "temp" -> DegreesCelsius(40.0)
-    ),
-    Map(
-      "node" -> UnorderedDiscrete("1"),
-      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:31:00+0000").getMillis),
-      "flops" -> OrderedDiscrete(2000238),
-      "temp" -> DegreesCelsius(50.0)
-    )
-  )
-}
 
 class InterpolationJoinSpec extends ScrubJaySpec {
 
   describe("InterpolationJoin") {
-    lazy val temp = sc.createLocalDataSource(
-      InterpolationJoinSpec.temperatureData,
-      Seq("node", "time", "temp"),
-      InterpolationJoinSpec.temperatureMeta)
-
-    lazy val flops = sc.createLocalDataSource(
-      InterpolationJoinSpec.flopsData,
-      Seq("node", "time", "flops"),
-      InterpolationJoinSpec.flopsMeta)
+    lazy val temp = CSVDataSource(temperatureFilename, CSVMetaSource(temperatureMetaFilename))
+    lazy val flops = CSVDataSource(flopsFilename, CSVMetaSource(flopsMetaFilename))
 
     describe("Many-to-one projection") {
-      lazy val interjoined = flops.deriveInterpolationJoin(temp, 60000)
+      lazy val interjoined = InterpolationJoin(flops, temp, 60000)
 
       it("should be defined") {
         assert(interjoined.isValid)
       }
       it("should match ground truth") {
-        assert(interjoined.realize.collect.toSet == InterpolationJoinSpec.trueFlopsJoinTemp)
+        assert(interjoined.realize.collect.toSet == trueFlopsJoinTemp)
+      }
+      it("should pickle/unpickle correctly") {
+        assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(interjoined)) == interjoined)
       }
     }
 
     describe("One-to-many projection") {
-      lazy val interjoined = temp.deriveInterpolationJoin(flops, 60000)
+      lazy val interjoined = InterpolationJoin(temp, flops, 60000)
 
       it("should be defined") {
         assert(interjoined.isValid)
       }
       it("should match ground truth") {
-        assert(interjoined.realize.collect.toSet == InterpolationJoinSpec.trueTempJoinFlops)
+        assert(interjoined.realize.collect.toSet == trueTempJoinFlops)
+      }
+      it("should pickle/unpickle correctly") {
+        assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(interjoined)) == interjoined)
       }
     }
   }

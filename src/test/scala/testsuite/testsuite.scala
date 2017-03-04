@@ -6,6 +6,18 @@ import org.joda.time.{DateTime, Interval}
 package object testsuite {
 
   /*
+   * Test CSV file paths from test resources directory
+   */
+  val temperatureMetaFilename: String = getClass.getResource("/temperatureMeta.csv").getPath
+  val temperatureFilename: String = getClass.getResource("/temperature.csv").getPath
+
+  val flopsMetaFilename: String = getClass.getResource("/flopsMeta.csv").getPath
+  val flopsFilename: String = getClass.getResource("/flops.csv").getPath
+
+  val jobQueueMetaFilename: String = getClass.getResource("/jobQueueMeta.csv").getPath
+  val jobQueueFilename: String = getClass.getResource("/jobQueue.csv").getPath
+
+  /*
    * Columns
    */
 
@@ -83,23 +95,23 @@ package object testsuite {
    * Meta
    */
 
-  val jobQueueMeta = Map(
-      "jobid" -> metaEntryFromStrings("domain", "job", "job", "identifier"),
-      "nodelist" -> metaEntryFromStrings("domain", "node", "node", "list<identifier>"),
-      "elapsed" -> metaEntryFromStrings("value", "duration", "time", "seconds"),
-      "start" -> metaEntryFromStrings("domain", "start", "time", "datetimestamp"),
-      "end" -> metaEntryFromStrings("domain", "end", "time", "datetimestamp")
+  val jobQueueMeta = Seq(
+      ("jobid", "domain", "job", "job", "identifier"),
+      ("nodelist", "domain", "node", "node", "list<identifier>"),
+      ("elapsed", "value", "duration", "time", "seconds"),
+      ("start", "domain", "start", "time", "datetimestamp"),
+      ("end", "domain", "end", "time", "datetimestamp")
     )
 
-  val nodeDataMeta = Map(
-    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
-    "time" -> metaEntryFromStrings("domain", "instant", "time", "datetimestamp"),
-    "flops" -> metaEntryFromStrings("value", "cumulative", "flops", "count")
+  val nodeDataMeta = Seq(
+    ("node", "domain", "node", "node", "identifier"),
+    ("time", "domain", "instant", "time", "datetimestamp"),
+    ("flops", "value", "cumulative", "flops", "count")
   )
 
-  val clusterLayoutMeta = Map(
-    "node" -> metaEntryFromStrings("domain", "node", "node", "identifier"),
-    "rack" -> metaEntryFromStrings("domain", "rack", "rack", "identifier")
+  val clusterLayoutMeta = Seq(
+    ("node", "domain", "node", "node", "identifier"),
+    ("rack", "domain", "rack", "rack", "identifier")
   )
 
   /*
@@ -177,6 +189,30 @@ package object testsuite {
       "jobid" -> UnorderedDiscrete("123"),
       "elapsed" -> Seconds(23.0),
       "nodelist_exploded" -> UnorderedDiscrete("3"))
+  )
+
+  val trueFlopsJoinTemp = Set(
+    Map(
+      "node" -> UnorderedDiscrete("1"),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:30+0000").getMillis),
+      "flops" -> OrderedDiscrete(2000238),
+      "temp" -> DegreesCelsius(45.0)
+    )
+  )
+
+  val trueTempJoinFlops = Set(
+    Map(
+      "node" -> UnorderedDiscrete("1"),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:30:00+0000").getMillis),
+      "flops" -> OrderedDiscrete(2000238),
+      "temp" -> DegreesCelsius(40.0)
+    ),
+    Map(
+      "node" -> UnorderedDiscrete("1"),
+      "time" -> DateTimeStamp(DateTime.parse("2016-08-11T3:31:00+0000").getMillis),
+      "flops" -> OrderedDiscrete(2000238),
+      "temp" -> DegreesCelsius(50.0)
+    )
   )
 
   val trueJobQueueSpanExplodedJoined = Set(

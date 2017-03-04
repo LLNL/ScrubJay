@@ -52,14 +52,14 @@ trait CassandraDataSource {
 
 case class CassandraDataSource(keyspace: String,
                                table: String,
-                               selectColumns: Seq[String],
-                               whereConditions: Seq[String],
-                               limit: Option[Long],
-                               providedMetaSource: MetaSource)
+                               metaSourceID: MetaSourceID = MetaSourceID.empty,
+                               selectColumns: Seq[String] = Seq.empty,
+                               whereConditions: Seq[String] = Seq.empty,
+                               limit: Option[Long] = None)
   extends DataSourceID {
 
   // TODO: figure out which columns to include
-  val metaSource: MetaSource = providedMetaSource//.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
+  val metaSource: MetaSource = metaSourceID.realize//.withColumns(cassandraRdd.selectedColumnRefs.map(_.toString))
 
   def isValid: Boolean = true
 

@@ -7,11 +7,11 @@ import java.io._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
-case class CSVDataSource(csvFileName: String, providedMetaSource: MetaSource)
+case class CSVDataSource(csvFileName: String, metaSourceID: MetaSourceID)
   extends DataSourceID {
 
   // FIXME: with which columns?
-  val metaSource: MetaSource = providedMetaSource//.withColumns(header)
+  val metaSource: MetaSource = metaSourceID.realize//.withColumns(header)
 
   def isValid: Boolean = true
 

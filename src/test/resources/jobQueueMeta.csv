@@ -1,0 +1,6 @@
+column,relationType,meaning,dimension,units
+jobid,domain,job,job,identifier
+nodelist,domain,node,node,list<identifier>
+elapsed,value,duration,time,seconds
+start,domain,start,time,datetimestamp
+end,domain,end,time,datetimestamp

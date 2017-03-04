@@ -1,8 +1,9 @@
 package testsuite
 
 import org.apache.spark._
-import org.scalactic.source.Position
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
+
+import org.scalactic.source.Position
 
 trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 

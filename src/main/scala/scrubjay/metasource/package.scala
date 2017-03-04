@@ -44,5 +44,31 @@ package object metasource {
       metaSource.filterNot { case (k, _) => oldColumns.contains(k) }
     }
 
+    def saveToCSV(fileName: String): Unit = {
+
+      import java.io.{BufferedWriter, FileWriter}
+      import scrubjay.metabase.MetaDescriptor.MetaRelationType
+
+      val bw = new BufferedWriter(new FileWriter(fileName))
+
+      bw.write("column, relationType, meaning, dimension, units")
+      bw.newLine()
+
+      metaSource.foreach{case (column, metaEntry) =>
+        val rowString = Seq(
+          column,
+          MetaRelationType.toString(metaEntry.relationType),
+          metaEntry.meaning.title,
+          metaEntry.dimension.title,
+          metaEntry.units.title
+        ).mkString(",")
+
+        bw.write(rowString)
+        bw.newLine()
+      }
+
+      bw.close()
+    }
+
   }
 }

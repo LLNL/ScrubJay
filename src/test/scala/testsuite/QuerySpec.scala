@@ -3,16 +3,17 @@ package testsuite
 import scrubjay._
 import org.apache.spark.SparkContext
 import org.scalactic.source.Position
-import scrubjay.datasource.DataSourceID
+import scrubjay.datasource.{DataSourceID, LocalDataSource}
+import scrubjay.metasource.LocalMetaSource
 
 
 object QuerySpec {
 
   def createDataSources(sc: SparkContext): Set[DataSourceID] = {
     Set(
-      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, clusterLayoutMeta),
-      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, nodeDataMeta),
-      sc.createLocalDataSource(jobQueueRawData, jobQueueColumns, jobQueueMeta)
+      LocalDataSource(clusterLayoutRawData, LocalMetaSource(clusterLayoutMeta)),
+      LocalDataSource(nodeDataRawData, LocalMetaSource(nodeDataMeta)),
+      LocalDataSource(jobQueueRawData, LocalMetaSource(jobQueueMeta))
     )
   }
 
