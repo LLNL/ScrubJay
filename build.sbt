@@ -39,7 +39,14 @@ libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
 // Msgpack (serialization)
 libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
-// Misc
+// JSON serialization
+libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
+//libraryDependencies += "com.github.fommil" %% "spray-json-shapeless" % "1.3.0"
+
+// Hashing
+libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"
+
+// Log4j
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 
 // Fix dependency relocation for xml-apis

@@ -1,80 +1,118 @@
 package testsuite
 
 import scrubjay._
+import scrubjay.datasource._
+import scrubjay.metasource._
+import scrubjay.query._
 
-import org.apache.spark.SparkContext
 import org.scalactic.source.Position
 
 
-object QuerySpec {
-
-  def createDataSources(sc: SparkContext): Set[ScrubJayRDD] = {
-    Set(
-      sc.createLocalDataSource(clusterLayoutRawData, clusterLayoutColumns, sc.createLocalMetaSource(clusterLayoutMeta)),
-      sc.createLocalDataSource(nodeDataRawData, nodeDataColumns, sc.createLocalMetaSource(nodeDataMeta)),
-      sc.createLocalDataSource(jobQueueSpanRawData, jobQueueSpanColumns, sc.createLocalMetaSource(jobQueueSpanMeta))
-    ).flatten
-  }
-
-  def createSingleSourceQueryMetaEntries: Set[MetaEntry] = {
-    Set(
-      metaEntryFromStrings("domain", "job", "job", "identifier"),
-      metaEntryFromStrings("value", "duration", "time", "seconds")
-    )
-  }
-
-  def createMultipleSourceQueryMetaEntries: Set[MetaEntry] = {
-    Set(
-      metaEntryFromStrings("domain", "rack", "rack", "identifier"),
-      metaEntryFromStrings("value", "cumulative", "flops", "count")
-    )
-  }
-
-  def createMultipleSourceQueryWithDerivationMetaEntries: Set[MetaEntry] = {
-    Set(
-      metaEntryFromStrings("domain", "job", "job", "identifier"),
-      metaEntryFromStrings("value", "cumulative", "flops", "count")
-    )
-  }
-
-}
-
 class QuerySpec extends ScrubJaySpec {
 
+  val dataSources: Set[DataSourceID] = Set(
+    CSVDataSource(clusterLayoutFilename, CSVMetaSource(clusterLayoutMetaFilename)),
+    CSVDataSource(nodeFlopsFilename, CSVMetaSource(nodeFlopsMetaFilename)),
+    CSVDataSource(temperatureFilename, CSVMetaSource(temperatureMetaFilename)),
+    CSVDataSource(jobQueueFilename, CSVMetaSource(jobQueueMetaFilename))
+  )
+
+  val jobTimeQuery = Set(
+    metaEntryFromStrings("domain", "job", "identifier"),
+    metaEntryFromStrings("value", "time", "seconds")
+  )
+
+  val rackFlopsQuery = Set(
+    metaEntryFromStrings("domain", "rack", "identifier"),
+    metaEntryFromStrings("value", "flops", "count")
+  )
+
+  val jobFlopsQuery = Set(
+    metaEntryFromStrings("domain", "job", "identifier"),
+    metaEntryFromStrings("value", "flops", "count")
+  )
+
+  val jobFlopsTemperatureQuery = Set(
+    metaEntryFromStrings("domain", "job", "identifier"),
+    metaEntryFromStrings("value", "temperature", "degrees Celsius"),
+    metaEntryFromStrings("value", "flops", "count")
+  )
+
   describe("Query with single datasource solution") {
-    lazy val solutions = sc.runQuery(QuerySpec.createDataSources(sc), QuerySpec.createSingleSourceQueryMetaEntries)
+    lazy val solutions = Query(dataSources, jobTimeQuery)
+      .solutions
       .toList
 
-    it("should have a single") {
-      assert(solutions.length == 1)
+    it("should have at least one solution") {
+      assert(solutions.nonEmpty)
     }
     it("should find the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueJobQueueSpan)
+      assert(solutions.head.realize.collect.toSet == trueJobQueue)
+    }
+    it("should pickle/unpickle correctly") {
+      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
   describe("Query with multiple datasources") {
 
-    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryMetaEntries)
-    lazy val solutions = query.run.toList
+    lazy val solutions = Query(dataSources, rackFlopsQuery)
+      .solutions
+      .toList
 
-    it("should have a single solution") {
-      assert(solutions.length == 1)
+    it("should have at least one solution") {
+      assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueNodeDataJoinedWithClusterLayout)
+      assert(solutions.head.realize.collect.toSet == trueNodeRackTimeFlops)
+    }
+    it("should pickle/unpickle correctly") {
+      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
   describe("Query with multiple datasources and single derivations") {
-    lazy val query = new Query(QuerySpec.createDataSources(sc), QuerySpec.createMultipleSourceQueryWithDerivationMetaEntries)
-    lazy val solutions = query.run.toList
+    lazy val solutions = Query(dataSources, jobFlopsQuery)
+      .solutions
+      .toList
 
-    it("should have a single solution") {
-      assert(solutions.length == 1)
+    it("should have at least one solution") {
+      assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      assert(solutions.head.rdd.collect.toSet == trueJobQueueSpanExplodedJoinedFlops)
+      assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
+    }
+    it("should pickle/unpickle correctly") {
+      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+    }
+  }
+
+  describe("Crazy query") {
+    lazy val solutions = Query(dataSources, jobFlopsTemperatureQuery)
+      .solutions
+      .toList
+
+    it("should have at least one solution") {
+      assert(solutions.nonEmpty)
+    }
+    it("should derive the correct datasource") {
+      solutions.head.saveToCSV("crazy.csv")
+      //assert(solutions.head.realize.collect.toSet == trueNodeRackTimeJobFlops)
+    }
+    it("should pickle/unpickle correctly") {
+      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+    }
+  }
+
+  describe("Enumerate all possible derivations") {
+    lazy val solutions = Query(dataSources, jobFlopsQuery)
+      .allDerivations
+      .toList
+
+    it("should do things") {
+      //solutions.foreach(solution => println(solution.metaSource.values.map(_.dimension.title)))
+      //println(solutions.length)
+      assert(true)
     }
   }
 }

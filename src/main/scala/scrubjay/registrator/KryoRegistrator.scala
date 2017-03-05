@@ -32,7 +32,6 @@ class KryoRegistrator extends org.apache.spark.serializer.KryoRegistrator {
     kryo.register(classOf[MetaEntry])
     kryo.register(classOf[MetaDimension])
     kryo.register(classOf[MetaUnits])
-    kryo.register(classOf[MetaMeaning])
 
     // Enumerations
     kryo.addDefaultSerializer(classOf[scala.Enumeration#Value], classOf[EnumerationSerializer])

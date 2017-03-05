@@ -1,8 +1,9 @@
 package testsuite
 
 import org.apache.spark._
-import org.scalactic.source.Position
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
+
+import org.scalactic.source.Position
 
 trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 
@@ -12,10 +13,6 @@ trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
     val conf = new SparkConf()
       .setMaster("local[*]")
       .setAppName("ScrubJayTest")
-      .setAll(Seq(
-        ("spark.serializer", "org.apache.spark.serializer.KryoSerializer"),
-        ("spark.kryo.registrator", "scrubjay.registrator.KryoRegistrator")
-      ))
     sc = new SparkContext(conf)
     sc.setLogLevel("WARN")
   }

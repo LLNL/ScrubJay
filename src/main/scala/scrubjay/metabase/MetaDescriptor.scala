@@ -28,8 +28,6 @@ object MetaDescriptor {
     }
   }
 
-  case class MetaMeaning(title: String, description: String)
-
   case class MetaDimension(title: String, description: String, dimensionType: DimensionSpace.DimensionSpace)
 
   case class MetaUnits(title: String, description: String,

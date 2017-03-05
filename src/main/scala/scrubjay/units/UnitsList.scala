@@ -5,9 +5,12 @@ import scrubjay.units.Units._
 import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 
+import scala.language.higherKinds
+
 // FIXME: T should be <: Units[_]
-case class UnitsList[T](value: List[T]) extends Units[List[T]] {
-  override def rawString: String = "'" + value.map(_.asInstanceOf[Units[_]].rawString).mkString(",") + "'"
+case class UnitsList[T](value: List[T]) extends Units[List[T]] with DiscreteRange {
+  override def rawString: String = "'" + value.map(_.toString).mkString(",") + "'"
+  override def explode: Iterator[Units[_]] = value.asInstanceOf[List[Units[_]]].toIterator
 }
 
 object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
@@ -36,7 +39,10 @@ object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
   }
 
   override def convert(value: Any, metaUnits: MetaUnits): UnitsList[_] = value match {
-    case l: List[Any] => UnitsList(l.map(raw2Units(_, metaUnits.unitsChildren.head)))
+    case l: List[Any] => {
+      val unitsList = l.map(raw2Units(_, metaUnits.unitsChildren.head))
+      UnitsList(unitsList)
+    }
     case s: String => UnitsList(s.split(",").map(raw2Units(_, metaUnits.unitsChildren.head)).toList)
     case v => throw new RuntimeException(s"Cannot convert $v to $metaUnits")
   }
@@ -46,6 +52,6 @@ object UnitsList extends UnitsTag[UnitsList[_], List[_]] {
   }
 
   override protected def typedReduce(ys: Seq[UnitsList[_]]): UnitsList[_] = {
-    UnitsList(ys.map(_.value).reduce(_ ++ _))
+    ys.head.copy(ys.map(_.value).reduce(_ ++ _))
   }
 }

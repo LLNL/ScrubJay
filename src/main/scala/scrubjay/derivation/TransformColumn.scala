@@ -1,18 +1,22 @@
 package scrubjay.derivation
 
 import org.apache.spark.rdd.RDD
-import scrubjay.MetaEntry
-import scrubjay.datasource.{DataRow, ScrubJayRDD}
+import scrubjay.metasource._
+import scrubjay.datasource._
+import scrubjay.metabase.MetaEntry
 import scrubjay.units.Units
 
-class TransformColumn(dso: Option[ScrubJayRDD], column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry)
-  extends Transformer(dso) {
+/*
+class TransformColumn(dsID: DataSourceID, column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry)
+  extends DataSourceID(Seq(dsID))(Seq(column, fn, newMetaEntry)) {
 
-  val isValid: Boolean = ds.metaSource.columns contains column
+  val isValid: Boolean = dsID.metaSource.columns contains column
 
-  def derive: ScrubJayRDD = {
+  val metaSource: MetaSource = dsID.metaSource.withMetaEntries(Map(column -> newMetaEntry), overwrite = true)
 
-    val metaSource = ds.metaSource.withMetaEntries(Map(column -> newMetaEntry), overwrite = true)
+  def realize: ScrubJayRDD = {
+
+    val ds = dsID.realize
 
     val rdd: RDD[DataRow] = {
       ds.map(row => {
@@ -20,6 +24,17 @@ class TransformColumn(dso: Option[ScrubJayRDD], column: String, fn: Units[_] => 
       })
     }
 
-    new ScrubJayRDD(rdd, metaSource)
+    new ScrubJayRDD(rdd)
   }
 }
+
+object TransformColumn {
+  def apply(dsID: DataSourceID, column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry): Option[TransformColumn] = {
+    val derivedID = new TransformColumn(dsID, column, fn, newMetaEntry)
+    if (derivedID.isValid)
+      Some(derivedID)
+    else
+      None
+  }
+}
+*/

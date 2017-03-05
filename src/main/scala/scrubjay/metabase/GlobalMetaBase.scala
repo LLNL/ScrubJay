@@ -10,16 +10,7 @@ object GlobalMetaBase {
 
   // Unknowns - REQUIRED
   final val DIMENSION_UNKNOWN: MetaDimension = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionSpace.DISCRETE))
-  final val MEANING_UNKNOWN: MetaMeaning = META_BASE.addMeaning(MetaMeaning("unknown", "Life"))
   final val UNITS_UNKNOWN: MetaUnits = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", UnorderedDiscrete))
-
-  // Meanings
-  final val MEANING_IDENTITY: MetaMeaning = META_BASE.addMeaning(MetaMeaning("identity", "A single identity"))
-  final val MEANING_START: MetaMeaning = META_BASE.addMeaning(MetaMeaning("start", "The beginning of something"))
-  final val MEANING_END: MetaMeaning = META_BASE.addMeaning(MetaMeaning("end", "The end of something"))
-  final val MEANING_DURATION: MetaMeaning = META_BASE.addMeaning(MetaMeaning("duration", "A quantity of time"))
-  final val MEANING_SPAN: MetaMeaning = META_BASE.addMeaning(MetaMeaning("span", "A span of time"))
-  final val MEANING_CUMULATIVE: MetaMeaning = META_BASE.addMeaning(MetaMeaning("cumulative", "An atomically increasing value representing some thing since some point of origin"))
 
   // Dimensions
   final val DIMENSION_TIME: MetaDimension = META_BASE.addDimension(MetaDimension("time", "The time dimension", DimensionSpace.CONTINUOUS))
