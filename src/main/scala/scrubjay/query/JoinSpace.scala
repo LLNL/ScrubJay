@@ -12,48 +12,34 @@ case class JoinSpace(dsID1: DataSourceID, dsID2: DataSourceID) {
 
   def enumerate: Iterator[DataSourceID] = {
 
-    // 1. Do they share a domain dimension?
+    // Get shared domain dimensions
     val commonDimensions: Iterator[(MetaDimension, MetaEntry, MetaEntry)] = {
       MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
         .filter(e => Seq(e._2.relationType, e._3.relationType).forall(_ == MetaRelationType.DOMAIN))
     }
 
-    // 2. What are the units of the shared dimensions?
+    // Try to join on all pairs of shared domain dimensions
     commonDimensions.flatMap{
+      case (dimension, me1, me2) => {
+        Seq(
 
-      // Discrete, Discrete => Natural Join
-      case (_,
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.DISCRETE), _),
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.DISCRETE), _)) => {
-        NaturalJoin(dsID1, dsID2).asOption
+          // Natural
+          NaturalJoin(dsID1, dsID2).asOption,
+          NaturalJoin(dsID2, dsID1).asOption,
+
+          // Explode one, then natural join
+          NaturalJoin(dsID2, ExplodeDiscreteRange(dsID1, dsID1.metaSource.columnForEntry(me1).get)).asOption,
+          NaturalJoin(dsID1, ExplodeDiscreteRange(dsID2, dsID2.metaSource.columnForEntry(me2).get)).asOption,
+
+          // Interpolative
+          InterpolationJoin(dsID1, dsID2, 1000 /* WINDOW SIZE ??? */).asOption,
+          InterpolationJoin(dsID2, dsID1, 1000 /* WINDOW SIZE ??? */).asOption,
+
+          // Expl
+          InterpolationJoin(dsID1, ExplodeDiscreteRange(dsID2, dsID2.metaSource.columnForEntry(me2).get), 1000 /* WINDOW SIZE ??? */).asOption,
+          InterpolationJoin(dsID2, ExplodeDiscreteRange(dsID1, dsID1.metaSource.columnForEntry(me1).get), 1000 /* WINDOW SIZE ??? */).asOption
+        ).flatten
       }
-
-      // Point, Point => Interpolation Join
-      case (_,
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if Seq(units1, units2).forall(_.unitsTag.domainType == DomainType.POINT) => {
-        InterpolationJoin(dsID1, dsID2, 1000 /* WINDOW SIZE ??? */ ).asOption
-      }
-
-      // Point, Range => explode range, interpolation join
-      case (_,
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-      me2 @ MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
-        InterpolationJoin(dsID1, ExplodeList(dsID2, Seq(dsID2.metaSource.columnForEntry(me2)).flatten), 1000 /* WINDOW SIZE ??? */ ).asOption
-      }
-
-      // Range, Point => explode range, interpolation join
-      case (_,
-      me1 @ MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units1),
-      MetaEntry(_, MetaDimension(_, _, DimensionSpace.CONTINUOUS), units2))
-        if units1.unitsTag.domainType == DomainType.POINT && units2.unitsTag.domainType == DomainType.RANGE => {
-        InterpolationJoin(dsID2, ExplodeList(dsID1, Seq(dsID1.metaSource.columnForEntry(me1)).flatten), 1000 /* WINDOW SIZE ??? */ ).asOption
-      }
-
-      // Can't join
-      case _ => None
     }
   }
 }

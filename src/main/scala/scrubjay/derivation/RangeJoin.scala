@@ -50,7 +50,7 @@ case class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID)
 
       // Filter out all pairs where the POINT in ds2 does not reside in the RANGE of ds1
       val continuousMatch = filteredDiscrete.filter { case (row1, row2) =>
-        val range = row1(continuousDimColumn1).asInstanceOf[Range[_, _]]
+        val range = row1(continuousDimColumn1).asInstanceOf[ContinuousRange[_]]
         val point = row2(continuousDimColumn2).asInstanceOf[Continuous]
         range.min.asInstanceOf[Continuous].asDouble <= point.asDouble && point.asDouble <= range.asInstanceOf[Continuous].asDouble
       }

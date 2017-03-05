@@ -6,14 +6,14 @@ import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units.UnitsTag.DomainType.DomainType
 import org.joda.time.{DateTime, Interval, Period}
 
-case class DateTimeSpan(value: (DateTimeStamp, DateTimeStamp)) extends Units[(DateTimeStamp, DateTimeStamp)] with Range[DateTimeStamp, Double] {
+case class DateTimeSpan(value: (DateTimeStamp, DateTimeStamp)) extends Units[(DateTimeStamp, DateTimeStamp)] with ContinuousRange[Double] {
 
   override def min: DateTimeStamp = value._1
   override def max: DateTimeStamp = value._2
 
-  override def rawString: String = "('" +
-    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(min.asDouble.toLong) +
-    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(max.asDouble.toLong) + "')"
+  override def rawString: String =
+    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(min.value.toLong) + "," +
+    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(max.value.toLong)
 
   override def explode(period: Double): Iterator[DateTimeStamp] = {
     Iterator.iterate(min)(current => DateTimeStamp(current.asDouble + period)).takeWhile(_.asDouble < max.asDouble)

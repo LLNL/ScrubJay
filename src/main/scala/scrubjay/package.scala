@@ -18,7 +18,7 @@ package object scrubjay {
    * Standalone functions
    */
 
-  def metaEntryFromStrings(relationType: String, meaning: String, dimension: String, units: String): MetaEntry = {
+  def metaEntryFromStrings(relationType: String, dimension: String, units: String): MetaEntry = {
     scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, dimension, units)
   }
 
@@ -55,12 +55,12 @@ package object scrubjay {
       scrubjay.derivation.CoreFrequency(dsID)
     }
 
-    def deriveExplodeList(columns: Seq[String]): DataSourceID = {
-      scrubjay.derivation.ExplodeList(dsID, columns)
+    def deriveExplodeList(column: String): DataSourceID = {
+      scrubjay.derivation.ExplodeDiscreteRange(dsID, column)
     }
 
-    def deriveExplodeTimeSpan(columnsWithPeriods: Seq[(String, Double)]): DataSourceID = {
-      scrubjay.derivation.ExplodeTimeSpan(dsID, columnsWithPeriods)
+    def deriveExplodeTimeSpan(column: String, period: Double): DataSourceID = {
+      scrubjay.derivation.ExplodeContinuousRange(dsID, column, period)
     }
 
     def deriveNaturalJoin(dsID2: DataSourceID): DataSourceID = {

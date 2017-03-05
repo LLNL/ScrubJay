@@ -18,10 +18,14 @@ trait Continuous {
   def asDouble: Double
 }
 
-trait Range[T, P] {
-  def min: T
-  def max: T
-  def explode(period: P): Iterator[T]
+trait ContinuousRange[P] {
+  def min: Units[_]
+  def max: Units[_]
+  def explode(period: P): Iterator[Units[_]]
+}
+
+trait DiscreteRange {
+  def explode: Iterator[Units[_]]
 }
 
 object Units {
