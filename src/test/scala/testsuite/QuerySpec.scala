@@ -96,7 +96,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      solutions.head.saveToCSV("crazy.csv")
+      //solutions.head.saveToCSV("crazy.csv")
       //assert(solutions.head.realize.collect.toSet == trueNodeRackTimeJobFlops)
     }
     it("should pickle/unpickle correctly") {
