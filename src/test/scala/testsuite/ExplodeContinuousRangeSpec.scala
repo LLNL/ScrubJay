@@ -8,17 +8,17 @@ import scrubjay.derivation.ExplodeContinuousRange
 class ExplodeContinuousRangeSpec extends ScrubJaySpec {
 
   lazy val jobQueue: DataSourceID = CSVDataSource(jobQueueFilename, CSVMetaSource(jobQueueMetaFilename))
-  lazy val jobQueueExploded: DataSourceID = ExplodeContinuousRange(jobQueue, "timespan", 1000)
+  lazy val jobQueueExplodedTime: DataSourceID = ExplodeContinuousRange(jobQueue, "timespan", 60000)
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      assert(jobQueueExploded.isValid)
+      assert(jobQueueExplodedTime.isValid)
     }
     it("should match ground truth") {
-      assert(jobQueueExploded.realize.collect.toSet == trueJobQueueExplodedList)
+      assert(jobQueueExplodedTime.realize.collect.toSet == trueJobQueueExplodedTime)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(jobQueueExploded)) == jobQueueExploded)
+      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(jobQueueExplodedTime)) == jobQueueExplodedTime)
     }
   }
 }

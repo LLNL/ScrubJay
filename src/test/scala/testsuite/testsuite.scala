@@ -51,6 +51,12 @@ package object testsuite {
     Map("timespan" -> DateTimeSpan.convert("2016-08-11T03:30:00.000Z,2016-08-11T03:31:00.000Z"), "jobid" -> UnorderedDiscrete("123"), "elapsed" -> Seconds(23.0), "nodelist_exploded" -> UnorderedDiscrete("3"))
   )
 
+  val trueJobQueueExplodedTime = Set(
+    Map("jobid" -> UnorderedDiscrete("123"), "nodelist" -> UnitsList(List(UnorderedDiscrete("1"), UnorderedDiscrete("2"), UnorderedDiscrete("3"))), "elapsed" -> Seconds(23.0), "timespan_exploded" -> DateTimeStamp.convert("2016-08-11T03:30:00.000Z")),
+    Map("jobid" -> UnorderedDiscrete("456"), "nodelist" -> UnitsList(List(UnorderedDiscrete("4"), UnorderedDiscrete("5"), UnorderedDiscrete("6"))), "elapsed" -> Seconds(45.0), "timespan_exploded" -> DateTimeStamp.convert("2016-08-11T03:30:00.000Z")),
+    Map("jobid" -> UnorderedDiscrete("456"), "nodelist" -> UnitsList(List(UnorderedDiscrete("4"), UnorderedDiscrete("5"), UnorderedDiscrete("6"))), "elapsed" -> Seconds(45.0), "timespan_exploded" -> DateTimeStamp.convert("2016-08-11T03:31:00.000Z"))
+  )
+
   val trueFlopsJoinTemp = Set(
     Map( "node" -> UnorderedDiscrete("1"), "time" -> DateTimeStamp.convert("2016-08-11T3:30:30+0000"), "flops" -> OrderedDiscrete(2000238), "temp" -> DegreesCelsius(45.0) )
   )
