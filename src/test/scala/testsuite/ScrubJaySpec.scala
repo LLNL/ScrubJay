@@ -1,24 +1,26 @@
 package testsuite
 
-import org.apache.spark._
+import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 
 import org.scalactic.source.Position
 
 trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 
-  var sc: SparkContext = _
+  var spark: SparkSession = _
 
-  override protected def beforeAll {
-    val conf = new SparkConf()
-      .setMaster("local[*]")
-      .setAppName("ScrubJayTest")
-    sc = new SparkContext(conf)
-    sc.setLogLevel("WARN")
+  override protected def beforeAll: Unit = {
+    spark = SparkSession
+      .builder()
+      .appName("ScrubJayTests")
+      .master("local[*]")
+      .getOrCreate()
+
+    spark.sparkContext.setLogLevel("WARN")
   }
 
-  override protected def afterAll {
-    sc.stop()
+  override protected def afterAll: Unit = {
+    spark.stop()
   }
 }
 

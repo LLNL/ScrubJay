@@ -36,12 +36,7 @@ case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Do
         val explodedValues: Iterator[Units[_]] = valueToExplode.asInstanceOf[ContinuousRange[Double]].explode(period)
         val rowWithoutColumn: Map[String, Units[_]] = row.filterNot(kv => column == kv._1)
 
-        // For each combination of exploded values, add a row
-        val newRows = for (elem <- explodedValues) yield {
-          rowWithoutColumn ++ Map(newColumn -> elem)
-        }
-
-        newRows.toSeq
+        explodedValues.map(newValue => rowWithoutColumn ++ Map(newColumn -> newValue)).toSeq
       }
 
       // Create the derived dataset

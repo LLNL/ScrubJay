@@ -9,7 +9,7 @@ import scala.language.higherKinds
 
 // FIXME: T should be <: Units[_]
 case class UnitsList[T](value: List[T]) extends Units[List[T]] with DiscreteRange {
-  override def rawString: String = "'" + value.map(_.toString).mkString(",") + "'"
+  override def rawString: String = "'" + value.map(_.asInstanceOf[Units[_]].rawString).mkString(",") + "'"
   override def explode: Iterator[Units[_]] = value.asInstanceOf[List[Units[_]]].toIterator
 }
 

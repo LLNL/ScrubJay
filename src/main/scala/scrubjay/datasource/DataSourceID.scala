@@ -15,6 +15,11 @@ abstract class DataSourceID extends Serializable {
     else
       None
   }
+  def describe(): Unit = {
+    println(DataSourceID.toJsonString(this))
+    println(this)
+    this.toDataFrame.show(false)
+  }
 }
 
 object DataSourceID {
