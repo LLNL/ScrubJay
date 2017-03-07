@@ -16,8 +16,9 @@ case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Do
   val metaSource: MetaSource = {
     val originalMetaEntry = dsID.metaSource(column)
     val newMeta = originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
-    dsID.metaSource.withMetaEntries(Map(newColumn -> newMeta))
+    dsID.metaSource
       .withoutColumns(Seq(column))
+      .withMetaEntries(Map(newColumn -> newMeta))
   }
 
   def isValid: Boolean = dsID.metaSource(column).units == UNITS_DATETIMESPAN

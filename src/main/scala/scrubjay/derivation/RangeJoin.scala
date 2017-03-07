@@ -28,9 +28,10 @@ case class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID)
   // Restrict to single continuous axis for now
   def isValid: Boolean = commonContinuousDimensions.length == 1
 
-  val metaSource: MetaSource = dsID1.metaSource.withMetaEntries(dsID2.metaSource)
+  val metaSource: MetaSource = dsID1.metaSource
     .withoutColumns(discreteDimColumns2)
     .withoutColumns(Seq(continuousDimColumn2))
+    .withMetaEntries(dsID2.metaSource)
 
   def realize: ScrubJayRDD = {
 

@@ -46,8 +46,8 @@ case class CoreFrequency(dsID: DataSourceID)
   val isValid: Boolean = allSpans.exists(_.isDefined)
 
   val metaSource: MetaSource = dsID.metaSource
-    .withMetaEntries(Map("cpu frequency" -> MetaEntry(MetaRelationType.VALUE, DIMENSION_CPU_ACTIVE_FREQUENCY, UNITS_ORDERED_CONTINUOUS)))
     .withoutColumns(Seq(aperfEntry.get._1, mperfEntry.get._1, baseFreqEntry.get._1))
+    .withMetaEntries(Map("cpu frequency" -> MetaEntry(MetaRelationType.VALUE, DIMENSION_CPU_ACTIVE_FREQUENCY, UNITS_ORDERED_CONTINUOUS)))
 
   def realize: ScrubJayRDD = {
 

@@ -30,7 +30,9 @@ case class ExplodeDiscreteRange(dsID: DataSourceID, column: String)
     if (isValid) {
       val originalMetaEntry = dsID.metaSource(column)
       val newMetaEntry = originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
-      dsID.metaSource.withMetaEntries(Map(newColumn -> newMetaEntry)).withoutColumns(Seq(column))
+      dsID.metaSource
+        .withoutColumns(Seq(column))
+        .withMetaEntries(Map(newColumn -> newMetaEntry))
     }
     else
       dsID.metaSource

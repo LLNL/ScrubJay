@@ -3,6 +3,7 @@ package scrubjay.derivation
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
+import scrubjay.metabase.MetaDescriptor.MetaRelationType
 import scrubjay.metabase.MetaEntry
 import scrubjay.metasource._
 
@@ -22,7 +23,10 @@ case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
   def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.metaSource, dsID2.metaSource)
-    .filter(me => me.units == UNITS_UNORDERED_DISCRETE && me.dimension != DIMENSION_UNKNOWN)
+    .filter(me =>
+      me.relationType == MetaRelationType.DOMAIN &&
+      me.units == UNITS_UNORDERED_DISCRETE &&
+      me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
   def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.metaSource.columnForEntry)
@@ -30,8 +34,9 @@ case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
 
   def isValid: Boolean = validEntries.nonEmpty
 
-  val metaSource: MetaSource = dsID2.metaSource.withMetaEntries(dsID1.metaSource)
+  val metaSource: MetaSource = dsID2.metaSource
     .withoutColumns(keyColumns2)
+    .withMetaEntries(dsID1.metaSource)
 
   def realize: ScrubJayRDD = {
 

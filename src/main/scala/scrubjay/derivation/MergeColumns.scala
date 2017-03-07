@@ -15,8 +15,9 @@ case class MergeColumns(dsID: DataSourceID, columns: Seq[String])
     columns.forall(dsID.metaSource.columns contains _) &&
     columns.forall(c => dsID.metaSource(c).units == dsID.metaSource(columns.head).units)
 
-  val metaSource: MetaSource = dsID.metaSource.withMetaEntries(Map(newColumn -> metaEntry))
+  val metaSource: MetaSource = dsID.metaSource
     .withoutColumns(columns)
+    .withMetaEntries(Map(newColumn -> metaEntry))
 
   def realize: ScrubJayRDD = {
 

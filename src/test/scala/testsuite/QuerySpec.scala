@@ -76,6 +76,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
+      solutions.head.describe()
       assert(solutions.head.realize.collect.toSet == trueNodeRackTimeFlops)
     }
     it("should pickle/unpickle correctly") {
@@ -98,9 +99,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      println(DataSourceID.toJsonString(solutions.head))
-      println(solutions.head)
-      solutions.head.toDataFrame.show(false)
+      solutions.head.describe()
       assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
     }
     it("should pickle/unpickle correctly") {
