@@ -16,22 +16,6 @@ class QuerySpec extends ScrubJaySpec {
     CSVDataSource(jobQueueFilename, CSVMetaSource(jobQueueMetaFilename))
   )
 
-  val rackFlopsQuery = Set(
-    metaEntryFromStrings("domain", "rack", "identifier"),
-    metaEntryFromStrings("value", "flops", "count")
-  )
-
-  val jobFlopsQuery = Set(
-    metaEntryFromStrings("domain", "job", "identifier"),
-    metaEntryFromStrings("value", "flops", "count")
-  )
-
-  val jobFlopsTemperatureQuery = Set(
-    metaEntryFromStrings("domain", "job", "identifier"),
-    metaEntryFromStrings("value", "temperature", "degrees Celsius"),
-    metaEntryFromStrings("value", "flops", "count")
-  )
-
   describe("Query with single datasource solution") {
 
     val jobTimeQuery = Set(
@@ -47,8 +31,6 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should find the correct datasource") {
-      //solutions.head.describe()
-      solutions.foreach(_.describe())
       assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
     it("should pickle/unpickle correctly") {
@@ -81,6 +63,11 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with multiple datasources") {
 
+    val rackFlopsQuery = Set(
+      metaEntryFromStrings("domain", "rack", "identifier"),
+      metaEntryFromStrings("value", "flops", "count")
+    )
+
     lazy val solutions = Query(dataSources, rackFlopsQuery)
       .solutions
       .toList
@@ -97,6 +84,12 @@ class QuerySpec extends ScrubJaySpec {
   }
 
   describe("Query with multiple datasources and single derivations") {
+
+    val jobFlopsQuery = Set(
+      metaEntryFromStrings("domain", "job", "identifier"),
+      metaEntryFromStrings("value", "flops", "count")
+    )
+
     lazy val solutions = Query(dataSources, jobFlopsQuery)
       .solutions
       .toList
@@ -116,6 +109,13 @@ class QuerySpec extends ScrubJaySpec {
   }
 
   describe("Crazy query") {
+
+    val jobFlopsTemperatureQuery = Set(
+      metaEntryFromStrings("domain", "job", "identifier"),
+      metaEntryFromStrings("value", "temperature", "degrees Celsius"),
+      metaEntryFromStrings("value", "flops", "count")
+    )
+
     lazy val solutions = Query(dataSources, jobFlopsTemperatureQuery)
       .solutions
       .toList
@@ -124,12 +124,8 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      //solutions.head.saveToCSV("crazy.csv")
+      solutions.head.describe()
       //assert(solutions.head.realize.collect.toSet == trueNodeRackTimeJobFlops)
-    }
-    it("should convert to a dataset") {
-      println(DataSourceID.toJsonString(solutions.head))
-      solutions.head.toDataFrame.show(false)
     }
     it("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
@@ -137,7 +133,7 @@ class QuerySpec extends ScrubJaySpec {
   }
 
   describe("Enumerate all possible derivations") {
-    lazy val solutions = Query(dataSources, jobFlopsQuery)
+    lazy val solutions = Query(dataSources, Set.empty)
       .allDerivations
       .toList
 

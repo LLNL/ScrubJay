@@ -47,6 +47,8 @@ object DerivationSpace {
 
   lazy val allDerivationChains: Constraint[DataSourceID] = memoize(args => {
     val dsID = args(0).as[DataSourceID]
-    derivationChain(Seq(dsID, columnDerivations))
+    val derivationCombinations = 1.until(columnDerivations.length+1)
+      .flatMap(c => columnDerivations.combinations(c))
+    derivationCombinations.flatMap(c => derivationChain(Seq(dsID, c)))
   })
 }

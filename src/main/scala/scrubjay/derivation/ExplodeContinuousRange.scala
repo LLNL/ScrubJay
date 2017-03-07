@@ -16,7 +16,7 @@ case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Do
   val metaSource: MetaSource = {
     val originalMetaEntry = dsID.metaSource(column)
     val newMeta = originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
-    dsID.metaSource.withMetaEntries(Map(column -> newMeta))
+    dsID.metaSource.withMetaEntries(Map(newColumn -> newMeta))
       .withoutColumns(Seq(column))
   }
 
