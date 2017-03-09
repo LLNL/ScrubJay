@@ -1,4 +1,4 @@
-package scrubjay.derivation
+package scrubjay.transformation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.metasource._

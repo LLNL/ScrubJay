@@ -1,4 +1,4 @@
-package scrubjay.derivation
+package scrubjay.transformation
 
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._

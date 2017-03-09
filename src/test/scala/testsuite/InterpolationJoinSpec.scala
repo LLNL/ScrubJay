@@ -2,9 +2,8 @@ package testsuite
 
 import scrubjay.metasource._
 import scrubjay.datasource._
-import scrubjay.derivation.InterpolationJoin
-
 import org.scalactic.source.Position
+import scrubjay.combination.InterpolationJoin
 
 
 class InterpolationJoinSpec extends ScrubJaySpec {

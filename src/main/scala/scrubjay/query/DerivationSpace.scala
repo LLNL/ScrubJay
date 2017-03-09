@@ -2,7 +2,7 @@ package scrubjay.query
 
 import scrubjay.metasource._
 import scrubjay.datasource._
-import scrubjay.derivation.{ExplodeContinuousRange, ExplodeDiscreteRange}
+import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
 import gov.llnl.ConstraintSolver._
 
@@ -15,7 +15,7 @@ object DerivationSpace {
     ExplodeContinuousRange(_,_,60000) // FIXME: WINDOW SIZE
   )
 
-  // Run a single derivation on all columns of this data source
+  // Run a single transformation on all columns of this data source
   lazy val derivation: Constraint[DataSourceID] = memoize(args => {
     val dsID = args(0).as[DataSourceID]
     val derivation = args(1).as[(DataSourceID, String) => DataSourceID]
@@ -34,10 +34,10 @@ object DerivationSpace {
       // No derivations
       case Seq() => Seq()
 
-      // One derivation
+      // One transformation
       case Seq(dv) => derivation(Seq(dsID, dv))
 
-      // More than one, do a single derivation and pass that into a multi derivation with the rest of the derivations
+      // More than one, do a single transformation and pass that into a multi transformation with the rest of the derivations
       case n =>
         n.flatMap(dv =>
           derivation(Seq(dsID, dv)).flatMap(headSolution =>

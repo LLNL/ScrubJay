@@ -1,14 +1,14 @@
-package scrubjay.derivation
+package scrubjay.combination
 
-import scrubjay.units._
-import scrubjay.metasource._
+import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
 import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
+import scrubjay.metabase.MetaEntry
+import scrubjay.metasource._
+import scrubjay.units.UnitsTag.DomainType
+import scrubjay.units._
 
 import scala.language.existentials
-import org.apache.spark.rdd.RDD
-import scrubjay.metabase.MetaEntry
-import scrubjay.units.UnitsTag.DomainType
 
 case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double)
   extends DataSourceID {

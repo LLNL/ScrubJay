@@ -1,12 +1,12 @@
-package scrubjay.derivation
+package scrubjay.combination
 
+import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
 import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension}
-import scrubjay.metasource._
-import scrubjay.units._
-import org.apache.spark.rdd.RDD
 import scrubjay.metabase.MetaEntry
+import scrubjay.metasource._
 import scrubjay.units.UnitsTag.DomainType
+import scrubjay.units._
 
 case class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID)
   extends DataSourceID {

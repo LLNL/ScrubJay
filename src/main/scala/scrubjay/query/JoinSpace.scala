@@ -1,26 +1,32 @@
 package scrubjay.query
 
 import scrubjay.datasource._
-import scrubjay.derivation._
+import scrubjay.transformation._
 import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.metasource._
-
-
 import gov.llnl.ConstraintSolver._
+import scrubjay.combination.{InterpolationJoin, NaturalJoin}
 
 object JoinSpace {
 
   // Get shared domain dimensions
-  def commonDimensions(dsID1: DataSourceID, dsID2: DataSourceID): Iterator[(MetaDimension, MetaEntry, MetaEntry)] = {
+  def commonDomainDimensions(dsID1: DataSourceID, dsID2: DataSourceID): Seq[(MetaDimension, MetaEntry, MetaEntry)] = {
     MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
       .filter(e => Seq(e._2.relationType, e._3.relationType).forall(_ == MetaRelationType.DOMAIN))
   }
 
-
+  // Figure out what kind of join to do, then do it
   lazy val joinedPair: Constraint[DataSourceID] = memoize(args => {
     val dsID1 = args(0).as[DataSourceID]
     val dsID2 = args(1).as[DataSourceID]
+
+    val cDDs = commonDomainDimensions(dsID1, dsID2)
+
+    cDDs.flatMap(cDD => cDD match {
+      case (dim, entry1, entry2) => Seq()
+      case _ => Seq()
+    })
 
     Seq(
       // Natural

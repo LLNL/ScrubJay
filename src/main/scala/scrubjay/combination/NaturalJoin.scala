@@ -1,4 +1,4 @@
-package scrubjay.derivation
+package scrubjay.combination
 
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
@@ -43,7 +43,7 @@ case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
     val ds1 = dsID1.realize
     val ds2 = dsID2.realize
 
-    // RDD derivation defined here
+    // RDD transformation defined here
     val rdd: RDD[DataRow] = {
 
       // Create key

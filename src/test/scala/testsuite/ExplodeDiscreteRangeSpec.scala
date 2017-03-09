@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay.datasource._
 import scrubjay.metasource._
-import scrubjay.derivation.ExplodeDiscreteRange
+import scrubjay.transformation.ExplodeDiscreteRange
 
 
 class ExplodeDiscreteRangeSpec extends ScrubJaySpec {

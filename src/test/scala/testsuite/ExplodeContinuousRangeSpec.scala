@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay.datasource._
 import scrubjay.metasource._
-import scrubjay.derivation.ExplodeContinuousRange
+import scrubjay.transformation.ExplodeContinuousRange
 
 
 class ExplodeContinuousRangeSpec extends ScrubJaySpec {

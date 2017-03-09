@@ -9,7 +9,7 @@ case class QuerySpace(metaEntries: Set[MetaEntry], dsIDs: Seq[DataSourceID]) ext
 
   // TODO: trim this space!
 
-  val enumeratedDerivations: Seq[DataSourceID] = dsIDs.flatMap(dsID => DerivationSpace.allDerivationChains(Seq(dsID)))
+  val enumeratedDerivations: Seq[DataSourceID] = Seq()//dsIDs.flatMap(dsID => DerivationSpace.allDerivationChains(Seq(dsID)))
 
   override def enumerate: Iterator[Arguments] = {
 

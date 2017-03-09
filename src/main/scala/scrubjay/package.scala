@@ -8,8 +8,8 @@
 import scrubjay.datasource._
 import scrubjay.metabase._
 import scrubjay.query._
-
 import org.apache.spark._
+import scrubjay.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
 
 
 package object scrubjay {
@@ -48,31 +48,31 @@ package object scrubjay {
      */
 
     def deriveMergeColumns(columns: Seq[String]): DataSourceID = {
-      scrubjay.derivation.MergeColumns(dsID, columns)
+      scrubjay.transformation.MergeColumns(dsID, columns)
     }
 
     def deriveCoreFrequency: DataSourceID = {
-      scrubjay.derivation.CoreFrequency(dsID)
+      scrubjay.transformation.CoreFrequency(dsID)
     }
 
     def deriveExplodeList(column: String): DataSourceID = {
-      scrubjay.derivation.ExplodeDiscreteRange(dsID, column)
+      scrubjay.transformation.ExplodeDiscreteRange(dsID, column)
     }
 
     def deriveExplodeTimeSpan(column: String, period: Double): DataSourceID = {
-      scrubjay.derivation.ExplodeContinuousRange(dsID, column, period)
+      scrubjay.transformation.ExplodeContinuousRange(dsID, column, period)
     }
 
     def deriveNaturalJoin(dsID2: DataSourceID): DataSourceID = {
-      scrubjay.derivation.NaturalJoin(dsID, dsID2)
+      NaturalJoin(dsID, dsID2)
     }
 
     def deriveInterpolationJoin(dsID2: DataSourceID, window: Double): DataSourceID = {
-      scrubjay.derivation.InterpolationJoin(dsID, dsID2, window)
+      InterpolationJoin(dsID, dsID2, window)
     }
 
     def deriveRangeJoin(dsID2: DataSourceID): DataSourceID = {
-      scrubjay.derivation.RangeJoin(dsID, dsID2)
+      RangeJoin(dsID, dsID2)
     }
 
     /**

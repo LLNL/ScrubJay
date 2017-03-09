@@ -21,7 +21,7 @@ class ScrubJayRDD(fromRdd: ParsedRDD) extends RDD[DataRow](fromRdd) {
     // If this is an original object, save it as such
 
     // If it is a derived object, compute the hash
-    //   for its derivation path and store it as a
+    //   for its transformation path and store it as a
     //   derived object keyed by the hash.
 
     // RESEARCH QUESTION:
