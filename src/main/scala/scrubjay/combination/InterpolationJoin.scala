@@ -11,7 +11,7 @@ import scrubjay.units._
 import scala.language.existentials
 
 case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double)
-  extends DataSourceID {
+  extends DataSourceID(dsID1, dsID2) {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
   val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource).toSeq

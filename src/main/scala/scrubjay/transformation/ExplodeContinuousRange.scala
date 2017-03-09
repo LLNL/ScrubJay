@@ -8,7 +8,7 @@ import scrubjay.metasource._
 import org.apache.spark.rdd.RDD
 
 case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Double)
-  extends DataSourceID {
+  extends DataSourceID(dsID) {
 
   val newColumn: String = column + "_exploded"
 

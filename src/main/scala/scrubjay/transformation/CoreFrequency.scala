@@ -10,7 +10,7 @@ import scrubjay.metabase._
 import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
 case class CoreFrequency(dsID: DataSourceID)
-  extends DataSourceID {
+  extends DataSourceID(dsID) {
 
   // Find aperf and mperf time entries
   def aperfEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>

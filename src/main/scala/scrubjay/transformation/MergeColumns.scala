@@ -6,7 +6,7 @@ import scrubjay.datasource.{DataRow, DataSourceID, ScrubJayRDD}
 import scrubjay.metasource._
 
 case class MergeColumns(dsID: DataSourceID, columns: Seq[String])
-  extends DataSourceID {
+  extends DataSourceID(dsID) {
 
   def newColumn: String = columns.mkString("_")
   def metaEntry: MetaEntry = dsID.metaSource(columns.head)

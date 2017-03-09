@@ -21,7 +21,7 @@ import org.apache.spark.rdd.RDD
  */
 
 case class ExplodeDiscreteRange(dsID: DataSourceID, column: String)
-  extends DataSourceID {
+  extends DataSourceID(dsID) {
 
   val newColumn: String = column + "_exploded"
 

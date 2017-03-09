@@ -19,7 +19,7 @@ import scrubjay.metasource._
  */
 
 case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
-  extends DataSourceID {
+  extends DataSourceID(dsID1, dsID2) {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
   def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.metaSource, dsID2.metaSource)

@@ -9,7 +9,7 @@ import scrubjay.units.UnitsTag.DomainType
 import scrubjay.units._
 
 case class RangeJoin(dsID1: DataSourceID, dsID2: DataSourceID)
-  extends DataSourceID {
+  extends DataSourceID(dsID1, dsID2) {
 
   // Determine common continuous (point, range) column pairs and and discrete dimension columns
   val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource).toSeq
