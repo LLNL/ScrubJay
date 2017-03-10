@@ -16,7 +16,7 @@ case class DateTimeSpan(value: (DateTimeStamp, DateTimeStamp)) extends Units[(Da
     DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").print(max.value.toLong)
 
   override def explode(period: Double): Iterator[DateTimeStamp] = {
-    Iterator.iterate(min)(current => DateTimeStamp(current.asDouble + period)).takeWhile(_.asDouble < max.asDouble)
+    Iterator.iterate(min)(current => DateTimeStamp(current.asDouble + period)).takeWhile(_.asDouble <= max.asDouble)
   }
 }
 

@@ -14,7 +14,7 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
   extends DataSourceID(dsID1, dsID2) {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource).toSeq
+  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
   val commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
@@ -26,10 +26,21 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.relationType == MetaRelationType.DOMAIN)
 
-  // Single continuous axis for now
-  def isValid: Boolean = commonDimensions.nonEmpty && commonContinuousDimensions.length == 1
+  lazy val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }.head
+  lazy val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }.head
 
-  val metaSource: MetaSource = dsID2.metaSource.withMetaEntries(dsID1.metaSource)
+  lazy val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }
+  lazy val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }
+  lazy val allDiscreteColumns: Seq[String] = discreteDimColumns1 ++ discreteDimColumns2
+
+  // Single continuous axis for now
+  def isValid: Boolean = commonContinuousDimensions.length == 1 && commonDiscreteDimensions.forall(d => {
+    d._2.units.unitsTag.domainType == d._3.units.unitsTag.domainType
+  })
+
+  lazy val metaSource: MetaSource = dsID2.metaSource
+    .withoutColumns(continuousDimColumn2 +: discreteDimColumns2)
+    .withMetaEntries(dsID1.metaSource)
 
   def realize: ScrubJayRDD = {
 
@@ -38,11 +49,6 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
 
     val rdd: RDD[DataRow] = {
 
-      val continuousDimColumn1 = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }.head
-      val continuousDimColumn2 = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }.head
-
-      val discreteDimColumns1 = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }
-      val discreteDimColumns2 = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }
 
       // Bin by overlapping bins of size 2*window
       // -- Guarantees that union of bins will contain all points within `window`
@@ -71,18 +77,21 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
       // Co-group
       val cogrouped = binnedRdd1.cogroup(binnedRdd2)
         // Create 1 to N mapping from ds1 to ds2
-        .flatMap { case (_, (l1, l2)) => l1.map(l1row => {
-        // groupMapping.add(l2.toSeq.length) // **1**
-        // Filter out cells that are farther than `window` away
-        val l1v = l1row(continuousDimColumn1).asInstanceOf[Continuous].asDouble
-        (l1row, l2.filter(l2row => {
-          val l2v = l2row(continuousDimColumn2).asInstanceOf[Continuous].asDouble
-          Math.abs(l1v - l2v) < window
-        }))
-      })
-      }
+        .flatMap {
+          case (_, (l1, l2)) => l1.map(l1row => {
+          // groupMapping.add(l2.toSeq.length) // **1**
+          // Filter out cells that are farther than `window` away
+            val l1v = l1row(continuousDimColumn1).asInstanceOf[Continuous].asDouble
+            (l1row, l2.filter(l2row => {
+              val l2v = l2row(continuousDimColumn2).asInstanceOf[Continuous].asDouble
+              Math.abs(l1v - l2v) < window
+            }))
+          })
+        }
         // Combine all ds2 rows that map to the same ds1 row, without repeat rows
         .aggregateByKey(Set[DataRow]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
+        // Remove redundant discrete entries
+        .map{case (row, rowSet) => (row, rowSet.map(_.filterNot(kv => allDiscreteColumns.contains(kv._1))))}
 
       // Lift the heavies here
       val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.metaSource)

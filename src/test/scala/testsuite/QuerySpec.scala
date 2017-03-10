@@ -4,6 +4,7 @@ import scrubjay._
 import scrubjay.datasource._
 import scrubjay.metasource._
 import scrubjay.query._
+
 import org.scalactic.source.Position
 
 
@@ -31,6 +32,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should find the correct datasource") {
+      //solutions.head.describe()
       assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
     it("should pickle/unpickle correctly") {
@@ -53,8 +55,8 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should find the correct datasource") {
-      //solutions.foreach(_.describe())
-      //assert(solutions.head.realize.collect.toSet == trueJobQueue)
+      //solutions.head.describe()
+      assert(solutions.head.realize.collect.toSet == trueJobQueueExplodedTime)
     }
     it("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
@@ -76,7 +78,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      solutions.head.describe()
+      //solutions.head.describe()
       assert(solutions.head.realize.collect.toSet == trueNodeRackTimeFlops)
     }
     it("should pickle/unpickle correctly") {
@@ -99,32 +101,8 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.nonEmpty)
     }
     it("should derive the correct datasource") {
-      solutions.head.describe()
+      //solutions.head.describe()
       assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
-    }
-    it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
-    }
-  }
-
-  describe("Crazy query") {
-
-    val jobFlopsTemperatureQuery = Set(
-      metaEntryFromStrings("domain", "job", "identifier"),
-      metaEntryFromStrings("value", "temperature", "degrees Celsius"),
-      metaEntryFromStrings("value", "flops", "count")
-    )
-
-    lazy val solutions = Query(dataSources, jobFlopsTemperatureQuery)
-      .solutions
-      .toList
-
-    it("should have at least one solution") {
-      assert(solutions.nonEmpty)
-    }
-    it("should derive the correct datasource") {
-      solutions.head.describe()
-      //assert(solutions.head.realize.collect.toSet == trueNodeRackTimeJobFlops)
     }
     it("should pickle/unpickle correctly") {
       assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
@@ -134,11 +112,14 @@ class QuerySpec extends ScrubJaySpec {
   describe("Enumerate all possible derivations") {
     lazy val solutions = Query(dataSources, Set.empty)
       .allDerivations
-      .toList
 
     it("should do things") {
-      //solutions.foreach(solution => println(solution.metaSource.values.map(_.dimension.title)))
+      //solutions.foreach(solution => {
+      //  println(solution)
+      //  println(solution.metaSource.values.map(_.dimension.title))
+      //})
       //println(solutions.length)
+      val unLazy = solutions.toList
       assert(true)
     }
   }

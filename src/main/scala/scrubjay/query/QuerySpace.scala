@@ -3,17 +3,15 @@ package scrubjay.query
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
 import scrubjay.datasource.DataSourceID
 import scrubjay.metabase.MetaEntry
+import scrubjay.transformation.UberExplode
 
 
 case class QuerySpace(metaEntries: Set[MetaEntry], dsIDs: Seq[DataSourceID]) extends ArgumentSpace {
 
-  // TODO: trim this space!
-
-  val enumeratedDerivations: Seq[DataSourceID] = Seq()//dsIDs.flatMap(dsID => DerivationSpace.allDerivationChains(Seq(dsID)))
-
   override def enumerate: Iterator[Arguments] = {
 
-    val originalAndDerivedIDs = dsIDs ++ enumeratedDerivations
+    val explodedIDs: Seq[DataSourceID] = dsIDs.flatMap(dsID => UberExplode(dsID))
+    val originalAndDerivedIDs: Seq[DataSourceID] = dsIDs ++ explodedIDs
 
     // From 1 to N datasources at a time
     1.to(originalAndDerivedIDs.length).toIterator.flatMap(

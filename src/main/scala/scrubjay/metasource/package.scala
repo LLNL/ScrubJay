@@ -7,6 +7,10 @@ package object metasource {
 
   type MetaSource = Map[String, MetaEntry]
 
+  def haveSharedProperty(me1: MetaEntry, me2: MetaEntry, property: (MetaEntry) => Boolean): Boolean = {
+    property(me1) && property(me2)
+  }
+
   implicit class MetaSourceImplicits(metaSource: MetaSource) extends Serializable {
 
     val columns: Seq[String] = metaSource.keys.toSeq
