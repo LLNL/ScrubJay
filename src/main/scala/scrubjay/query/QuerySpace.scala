@@ -25,11 +25,7 @@ case class QuerySpace(metaEntries: Set[MetaEntry], dsIDs: Seq[DataSourceID]) ext
 case class DataSourceArgumentSpace(dsIDs: Seq[DataSourceID]) extends ArgumentSpace {
 
   override def enumerate: Iterator[Arguments] = {
-    // From 1 to N datasources at a time
-    1.to(dsIDs.length).toIterator.flatMap(
-      // For all combinations of size N
-      dsIDs.combinations(_).map(c => Seq(c.toSet[DataSourceID]))
-    )
+    QuerySpace(Set.empty, dsIDs).enumerate.map(args => Seq(args(1)))
   }
 
 }

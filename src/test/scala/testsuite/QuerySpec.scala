@@ -102,6 +102,7 @@ class QuerySpec extends ScrubJaySpec {
     }
     it("should derive the correct datasource") {
       //solutions.head.describe()
+      //println(DataSourceID.toDotString(solutions.head))
       assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
     }
     it("should pickle/unpickle correctly") {
@@ -114,12 +115,9 @@ class QuerySpec extends ScrubJaySpec {
       .allDerivations
 
     it("should do things") {
-      //solutions.foreach(solution => {
-      //  println(solution)
-      //  println(solution.metaSource.values.map(_.dimension.title))
-      //})
-      //println(solutions.length)
-      val unLazy = solutions.toList
+      solutions.foreach(solution => {
+        println(DataSourceID.toDotString(solution))
+      })
       assert(true)
     }
   }

@@ -4,6 +4,8 @@ package scrubjay.datasource
 
 import scrubjay.metasource._
 import com.roundeights.hasher.Implicits._
+import scrubjay.combination.{InterpolationJoin, NaturalJoin}
+import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
 
 abstract class DataSourceID(inChildren: DataSourceID*) extends Serializable {
@@ -35,42 +37,56 @@ object DataSourceID {
   def fromJsonString(s: String): DataSourceID = functions.unpickle[DataSourceID](JSONPickle(s))
   def toHash(dsID: DataSourceID): String = "h" + toJsonString(dsID).sha256.hex
 
-  protected def toNodeEdgeTuple(dsID: DataSourceID, parentName: Option[String] = None): (String, String) = {
-    import scrubjay.util._
+  protected def toNodeEdgeTuple(dsID: DataSourceID, parentName: Option[String] = None): (Seq[String], Seq[String]) = {
 
-    val hash = toHash(dsID)
-    // node_type = d.get('$type')
-    // node_color = 'white'
-    //
-    // if 'datasource' in node_type:
-    //     node_color = 'orange'
-    // elif 'Join' in node_type:
-    //     node_color = 'lightgreen'
-    // elif 'derivation' in node_type:
-    //     node_color = 'lightblue'
-    //
-    // name = node_type.split('.')[-1]
-    // node = [key + ' [label = "' + name + '", fontname="helvetica", penwidth=2, style=filled, fillcolor=' + node_color + ']']
-    // edge = [p + ' -> ' + key + '[penwidth=2]'] if p != '' else []
-    val edge = parentName.ifDefinedThen(p => Seq(p + " -> " + hash))(Some(Seq.empty))
-    // children = map(lambda k: d[k], filter(lambda a: a != '$type', d.keys()))
-    // children_nodes = []
-    // children_edges = []
-    // for child in children:
-    //     (child_nodes, child_edges) = json_to_dot_data(child, key)
-    //     children_nodes = children_nodes + child_nodes
-    //     children_edges = children_edges + child_edges
+    val hash: String = toHash(dsID)
 
-    // return (node + children_nodes, edge + children_edges)
-    ???
+    // Graph node
+    val style = dsID match {
+
+      // Combined data sources
+      case _: NaturalJoin => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\""
+      case _: InterpolationJoin => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\""
+
+      // Transformed data sources
+      case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\""
+      case _: ExplodeContinuousRange => "style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\""
+
+      // Original data sources
+      case _: CSVDataSource => "style=filled, fillcolor=\"darkorange\", label=\"CSVDataSource\""
+      case _: CassandraDataSource => "style=filled, fillcolor=\"darkorange\", label=\"CassandraDataSource\""
+      case _: LocalDataSource => "style=filled, fillcolor=\"darkorange\", label=\"LocalDataSource\""
+
+      // Unknown
+      case _  => "label='unknown'"
+    }
+    val node: String = hash + " [" + style + "]"
+
+    // Graph edge
+    val edge: Seq[String] = {
+      if (parentName.isDefined)
+        Seq(parentName.get + " -> " + hash + " [penwidth=2]")
+      else
+        Seq()
+    }
+
+    val (childNodes: Seq[String], childEdges: Seq[String]) = dsID.children
+      .map(toNodeEdgeTuple(_, Some(hash)))
+      .fold((Seq.empty, Seq.empty))((a, b) => (a._1 ++ b._1, a._2 ++ b._2))
+
+    (node +: childNodes, edge ++ childEdges)
   }
+
   def toDotString(dsID: DataSourceID): String = {
 
-    // digraph_data = json_to_dot_data(derivation)
+    val (nodes, edges) = toNodeEdgeTuple(dsID)
 
-    // digraph_source = 'digraph "Derivations" {\n\t' + '\n\t'.join(digraph_data[0]) + '\n\t\t' + '\n\t\t'.join(digraph_data[1]) + ' }'
+    val header = "digraph {"
+    val nodeSection = nodes.map("\t" + _).mkString("\n")
+    val edgeSection = edges.map("\t\t" + _).mkString("\n")
+    val footer = "}"
 
-    ???
+    Seq(header, nodeSection, edgeSection, footer).mkString("\n")
   }
 
   protected def saveStringToFile(text: String, filename: String): Unit = {
