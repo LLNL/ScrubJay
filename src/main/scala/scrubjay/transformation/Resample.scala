@@ -7,7 +7,6 @@ import scrubjay.datasource._
 import org.apache.spark.rdd.RDD
 
 
-
 /*
  *  Valid resampling queries:
  *    GET (flops) PER (job)
