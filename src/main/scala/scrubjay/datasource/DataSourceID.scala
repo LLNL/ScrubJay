@@ -41,21 +41,24 @@ object DataSourceID {
 
     val hash: String = toHash(dsID)
 
+    // Create string of columns Node X Flops X Time, etc
+    val columnString = dsID.metaSource.columns.mkString(" X ")
+
     // Graph node
     val style = dsID match {
 
       // Combined data sources
-      case _: NaturalJoin => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\""
-      case _: InterpolationJoin => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\""
+      case _: NaturalJoin => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\\n" + columnString + "\""
+      case _: InterpolationJoin => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\\n" + columnString + "\""
 
       // Transformed data sources
-      case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\""
-      case _: ExplodeContinuousRange => "style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\""
+      case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\\n" + columnString + "\""
+      case _: ExplodeContinuousRange => "style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\\n" + columnString + "\""
 
       // Original data sources
-      case _: CSVDataSource => "style=filled, fillcolor=\"darkorange\", label=\"CSVDataSource\""
-      case _: CassandraDataSource => "style=filled, fillcolor=\"darkorange\", label=\"CassandraDataSource\""
-      case _: LocalDataSource => "style=filled, fillcolor=\"darkorange\", label=\"LocalDataSource\""
+      case _: CSVDataSource => "style=filled, fillcolor=\"darkorange\", label=\"CSV\\n" + columnString + "\""
+      case _: CassandraDataSource => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
+      case _: LocalDataSource => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
 
       // Unknown
       case _  => "label='unknown'"

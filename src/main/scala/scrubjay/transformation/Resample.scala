@@ -1,43 +1,68 @@
 package scrubjay.transformation
 
-import scrubjay.metabase._
-import scrubjay.metasource._
 import scrubjay.datasource._
+import scrubjay.metasource._
+import scrubjay.units._
+import scrubjay.metabase.MetaEntry
 
-import org.apache.spark.rdd.RDD
+import scala.language.existentials
 
 
 /*
- *  Valid resampling queries:
+ *  Example resamplings:
+ *
  *    GET (flops) PER (job)
- *    GET (job, flops) PER (time = Seconds(1) FROM time = 10:00 TO time = 11:00)
+ *    GET (flops, job) PER (time [period=Seconds(1)])
+ *    GET (flops, job) PER (time [period=Seconds(1), start=10:00, end=11:00])
+ *    TODO: GET (flops, job) PER (node, job)
  */
 
-case class Resample(dsID: DataSourceID, columns: Seq[String])
-  extends DataSourceID(dsID) {
+case class ResampleMethod[T: Units](metaEntry: MetaEntry, start: Option[T], end: Option[T], period: Option[Double])
 
-  def isValid: Boolean = ???
+case class Resample(dsID: DataSourceID, method: ResampleMethod[_])
+  extends DataSourceID {
 
-  val metaSource: MetaSource = dsID.metaSource
+  override val metaSource: MetaSource = dsID.metaSource
 
-  def realize: ScrubJayRDD = ???
+  override def isValid: Boolean = true
 
-  /*
-  {
-
+  override def realize: ScrubJayRDD = {
     val ds = dsID.realize
 
-    val rdd: RDD[DataRow] = {
+    // Key each row by the provided metaEntry
+    val column = metaSource.columnForEntry(method.metaEntry).get
 
-      val reducer = metaEntry.units.unitsTag.reduce _
+    var rdd = ds.rdd.keyBy(row => row(column).asInstanceOf[Continuous].asDouble)
 
-      ds.map(row => {
-        val mergedVal = reducer(columns.map(row))
-        row.filterNot{case (k, _) => columns.contains(k)} ++ Map(newColumn -> mergedVal)
-      })
+    // If we have a start filter
+    if (method.start.isDefined) {
+      rdd = rdd.filter(
+        _._1.asInstanceOf[Continuous].asDouble >=
+          method.start.get.asInstanceOf[Continuous].asDouble)
     }
 
-    new ScrubJayRDD(rdd)
+    // If we have an end filter
+    if (method.end.isDefined) {
+      rdd = rdd.filter(
+        _._1.asInstanceOf[Continuous].asDouble >=
+          method.end.get.asInstanceOf[Continuous].asDouble)
+    }
+
+    // If we have a period, transform the key into the period
+    if (method.period.isDefined) {
+      val periodDouble = method.period.asInstanceOf[Continuous].asDouble
+      rdd = rdd.map{case (key, row) =>
+        (key / periodDouble, row)
+      }
+    }
+
+    // Reduce all other columns by the bin (aggregateByKey)
+    val reducer = method.metaEntry.units.unitsTag.reduce _
+    rdd = rdd.map{case (key, rows) => {
+      val aggregatedRow = ???
+      null
+    }}
+
+    new ScrubJayRDD(ds.rdd)
   }
-  */
 }
