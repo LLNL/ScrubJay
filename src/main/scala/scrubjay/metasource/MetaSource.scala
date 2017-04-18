@@ -6,7 +6,7 @@ import scrubjay.metabase.MetaDescriptor.MetaDimension
 object MetaSource {
 
   def empty: MetaSource = {
-    Map[String, MetaEntry]()
+    Map.empty
   }
 
   def commonMetaEntries(ms1: MetaSource, ms2: MetaSource): Set[MetaEntry] = {
