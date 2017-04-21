@@ -1,7 +1,7 @@
 package scrubjay.combination
 
 import org.apache.spark.rdd.RDD
-import scrubjay.datasource._
+import scrubjay.dataset._
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.schema._
 

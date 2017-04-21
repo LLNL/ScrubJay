@@ -1,4 +1,4 @@
-package scrubjay.datasource
+package scrubjay.dataset
 
 //import scrubjay.combination.{InterpolationJoin, NaturalJoin}
 //import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
@@ -30,10 +30,9 @@ import scala.util.Try
   new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
   new Type(value = classOf[ExplodeDiscreteRange], name = "ExplodeDiscreteRange")
 ))
-abstract class DatasetID(inChildren: DatasetID*) extends Serializable {
-  val children: Seq[DatasetID] = inChildren
+abstract class DatasetID(val dependencies: Seq[DatasetID] = Seq.empty) extends Serializable {
+  val isValid: Boolean
 
-  def isValid: Boolean
   def realize: DataFrame
   def asOption: Option[DatasetID] = {
     if (isValid)
@@ -119,7 +118,7 @@ object DatasetID {
         Seq()
     }
 
-    val (childNodes: Seq[String], childEdges: Seq[String]) = dsID.children
+    val (childNodes: Seq[String], childEdges: Seq[String]) = dsID.dependencies
       .map(toNodeEdgeTuple(_, Some(hash)))
       .fold((Seq.empty, Seq.empty))((a, b) => (a._1 ++ b._1, a._2 ++ b._2))
 

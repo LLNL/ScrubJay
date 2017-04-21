@@ -1,5 +1,5 @@
 package scrubjay
 
-package object datasource {
+package object dataset {
   type Schema = org.apache.spark.sql.types.StructType
 }

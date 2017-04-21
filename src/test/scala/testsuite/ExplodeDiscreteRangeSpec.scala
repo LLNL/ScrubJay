@@ -1,6 +1,6 @@
 package testsuite
 
-import scrubjay.datasource._
+import scrubjay.dataset._
 
 import scrubjay.transformation.ExplodeDiscreteRange
 

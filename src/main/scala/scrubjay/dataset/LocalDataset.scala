@@ -1,4 +1,4 @@
-package scrubjay.datasource
+package scrubjay.dataset
 
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
@@ -12,7 +12,7 @@ case class LocalDataset(rawData: Seq[Row], metaSourceID: StructType)
 
   //override val schema: Schema = ???
 
-  override def isValid: Boolean = true
+  override lazy val isValid: Boolean = true
 
   override def realize: DataFrame = {
     ???

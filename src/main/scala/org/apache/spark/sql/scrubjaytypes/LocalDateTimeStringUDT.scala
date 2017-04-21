@@ -1,12 +1,10 @@
-package org.apache.spark.sql
-
-import scrubjay.units.LocalDateTimeType
-
-import org.apache.spark.sql.types._
-import org.apache.spark.unsafe.types.UTF8String
+package org.apache.spark.sql.scrubjaytypes
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
+import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 
 
 class LocalDateTimeStringUDT extends UserDefinedType[LocalDateTimeType] {

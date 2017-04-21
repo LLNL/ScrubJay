@@ -1,8 +1,8 @@
 package testsuite
 
 import org.apache.spark.sql.types.StructType
-import scrubjay.datasource._
-import scrubjay.schema._
+import scrubjay.dataset._
+
 import org.scalactic.source.Position
 
 

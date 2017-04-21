@@ -1,6 +1,6 @@
 package scrubjay.transformation
 
-import scrubjay.datasource._
+import scrubjay.dataset._
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.schema._
 

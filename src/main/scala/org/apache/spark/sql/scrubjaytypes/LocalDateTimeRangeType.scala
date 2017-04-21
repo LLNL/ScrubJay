@@ -1,11 +1,10 @@
-package scrubjay.units
+package org.apache.spark.sql.scrubjaytypes
 
 import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.LocalDateTimeRangeStringUDT
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.SQLUserDefinedType
 import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.types.SQLUserDefinedType
 
 @SQLUserDefinedType(udt = classOf[LocalDateTimeRangeStringUDT])
 class LocalDateTimeRangeType(val start: LocalDateTimeType, val end: LocalDateTimeType)

@@ -1,4 +1,4 @@
-package scrubjay.datasource
+package scrubjay.dataset
 
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -10,7 +10,7 @@ case class CassandraDataset(keyspace: String,
 
   // TODO: how to merge incoming schema with schema gathered from Cassandra
 
-  override def isValid: Boolean = true
+  override val isValid: Boolean = true
 
   override def realize: DataFrame = {
     SparkSession.builder().getOrCreate()

@@ -2,7 +2,7 @@ package scrubjay.transformation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.schema._
-import scrubjay.datasource._
+import scrubjay.dataset._
 
 /*
 class TransformColumn(dsID: DatasetID, column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry)

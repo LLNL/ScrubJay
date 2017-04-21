@@ -1,8 +1,7 @@
-package scrubjay.units
+package org.apache.spark.sql.scrubjaytypes
 
 import java.time.LocalDateTime
 
-import org.apache.spark.sql.LocalDateTimeStringUDT
 import org.apache.spark.sql.types.SQLUserDefinedType
 
 @SQLUserDefinedType(udt = classOf[LocalDateTimeStringUDT])

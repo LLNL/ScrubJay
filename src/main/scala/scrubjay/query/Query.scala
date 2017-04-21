@@ -1,7 +1,7 @@
 package scrubjay.query
 
 import scrubjay.metabase._
-import scrubjay.datasource._
+import scrubjay.dataset._
 
 import gov.llnl.ConstraintSolver._
 

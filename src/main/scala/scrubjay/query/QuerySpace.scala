@@ -1,7 +1,7 @@
 package scrubjay.query
 
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
-import scrubjay.datasource.DatasetID
+import scrubjay.dataset.DatasetID
 //import scrubjay.transformation.UberExplode
 
 

@@ -2,7 +2,7 @@ package scrubjay.transformation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.metabase._
-import scrubjay.datasource._
+import scrubjay.dataset._
 import scrubjay.schema._
 
 /*

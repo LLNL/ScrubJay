@@ -1,6 +1,6 @@
 package scrubjay.combination
 
-import scrubjay.datasource.DatasetID
+import scrubjay.dataset.DatasetID
 import scrubjay.metabase.MetaDescriptor._
 import scrubjay.schema._
 //import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}

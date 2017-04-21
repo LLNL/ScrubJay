@@ -5,7 +5,7 @@
  *
  */
 
-import scrubjay.datasource._
+import scrubjay.dataset._
 import scrubjay.metabase._
 import scrubjay.query._
 import org.apache.spark._

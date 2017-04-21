@@ -1,6 +1,6 @@
 package scrubjay.objectbase
 
-import scrubjay.datasource._
+import scrubjay.dataset._
 import scrubjay.ScrubJaySessionImplicits
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector._
