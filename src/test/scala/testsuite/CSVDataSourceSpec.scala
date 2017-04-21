@@ -13,10 +13,15 @@ class CSVDataSourceSpec extends ScrubJaySpec {
 
   describe("CSV sourced job queue data") {
     it("should exist") {
-      jobQueue.realize.collect()
+      println("DataFrame:")
+      jobQueue.realize.show(false)
+      println("Schema:")
+      jobQueue.realize.printSchema()
     }
     it("should serialize/deserialize") {
       val json: String = DatasetID.toJsonString(jobQueue)
+      println("JSON:")
+      println(json)
       val reloaded: DatasetID = DatasetID.fromJsonString(json)
       assert(reloaded == jobQueue)
     }

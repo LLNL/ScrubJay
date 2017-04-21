@@ -1,10 +1,9 @@
 package scrubjay.transformation
 
 import scrubjay.datasource._
-
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{udf, explode}
+import org.apache.spark.sql.functions.{explode, udf}
+import scrubjay.units.LocalDateTimeRangeType
 
 /*
  * ExplodeList
@@ -21,17 +20,16 @@ import org.apache.spark.sql.functions.{udf, explode}
 case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
   extends DatasetID(dsID) {
 
-  override def isValid: Boolean = dsID.schema(column).metadata.getString("units").startsWith("list")
+  override def isValid: Boolean = dsID.realize.schema(column).metadata.getString("units").startsWith("list")
 
   override def realize: DataFrame = {
-    val wowUDF = udf((s: String) => WowString(s))
-    val boogersUDF = udf((a: Any) => WowString(a.asInstanceOf[WowString].deriveBoogers))
     val df = dsID.realize
     val string2ListUDF = udf((s: String) => s.split(","))
     val dfList = df.withColumn(column, string2ListUDF(df(column)))
     val dfList2 = dfList.withColumn(column, explode(dfList(column)))
-    val dfList3 = dfList2.withColumn(column + "_custom", wowUDF(dfList2(column)))
-    dfList3.withColumn(column + "_boogers", boogersUDF(dfList3(column + "_custom")))
+
+    val explodeTimeRange = udf((tr: LocalDateTimeRangeType) => tr.discretize(30000))
+    dfList2.withColumn("timespan_exploded", explodeTimeRange(df("timespan")))
     //df.withColumn(newColumn, explode(df(column)))
   }
 }

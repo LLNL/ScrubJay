@@ -33,7 +33,6 @@ import scala.util.Try
 abstract class DatasetID(inChildren: DatasetID*) extends Serializable {
   val children: Seq[DatasetID] = inChildren
 
-  def schema: Schema = realize.schema
   def isValid: Boolean
   def realize: DataFrame
   def asOption: Option[DatasetID] = {
@@ -89,7 +88,7 @@ object DatasetID {
     val hash: String = toHash(dsID)
 
     // Create string of columns Node X Flops X Time, etc
-    val columnString = dsID.schema.fieldNames.mkString(" X ")
+    val columnString = dsID.realize.schema.fieldNames.mkString(" X ")
 
     // Graph node
     val style = dsID match {

@@ -14,14 +14,17 @@ class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
     it("should be defined") {
       assert(jobQueueExploded.isValid)
     }
-    it("should match ground truth") {
-      jobQueueExploded.realize.show()
-    }
-    it("should have a schema") {
+    it("should exist") {
+      println("DataFrame:")
+      jobQueueExploded.realize.show(false)
+      println("Schema")
       jobQueueExploded.realize.printSchema()
     }
     it("should pickle/unpickle correctly") {
-      assert(DatasetID.fromJsonString(DatasetID.toJsonString(jobQueueExploded)) == jobQueueExploded)
+      val json: String = DatasetID.toJsonString(jobQueueExploded)
+      println("JSON:")
+      println(json)
+      assert(DatasetID.fromJsonString(json) == jobQueueExploded)
     }
   }
 }

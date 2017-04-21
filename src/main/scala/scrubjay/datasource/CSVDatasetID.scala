@@ -3,7 +3,7 @@ package scrubjay.datasource
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-case class CSVDatasetID(csvFileName: String, schema: StructType, options: Map[String, String] = Map.empty)
+case class CSVDatasetID(csvFileName: String, schema: Schema, options: Map[String, String] = Map.empty)
   extends DatasetID {
 
   override def isValid: Boolean = true
@@ -12,7 +12,7 @@ case class CSVDatasetID(csvFileName: String, schema: StructType, options: Map[St
     SparkSession.builder().getOrCreate()
       .read
       .schema(schema)
-      .options(options)
+      .options(options ++ Map("inferSchema" -> "false"))
       .csv(csvFileName)
   }
 }

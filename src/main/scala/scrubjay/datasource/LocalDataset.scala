@@ -10,7 +10,7 @@ import scrubjay.schema._
 case class LocalDataset(rawData: Seq[Row], metaSourceID: StructType)
   extends DatasetID {
 
-  override val schema: StructType = ???
+  //override val schema: Schema = ???
 
   override def isValid: Boolean = true
 

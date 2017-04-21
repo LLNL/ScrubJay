@@ -37,7 +37,12 @@
         },
         {
             "name" : "timespan",
-            "type" : "string",
+            "type" : {
+                "type" : "udt",
+                "class" : "org.apache.spark.sql.LocalDateTimeRangeStringUDT",
+                "pyClass" : null,
+                "sqlType" : "string"
+            },
             "nullable" : true,
             "metadata" :
             {
