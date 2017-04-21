@@ -1,7 +1,5 @@
 package scrubjay.metabase
 
-import scrubjay.units._
-
 import scrubjay.metabase.MetaDescriptor._
 
 object GlobalMetaBase {
@@ -10,7 +8,7 @@ object GlobalMetaBase {
 
   // Unknowns - REQUIRED
   final val DIMENSION_UNKNOWN: MetaDimension = META_BASE.addDimension(MetaDimension("unknown", "The upside down", DimensionSpace.DISCRETE))
-  final val UNITS_UNKNOWN: MetaUnits = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", UnorderedDiscrete))
+  // final val UNITS_UNKNOWN: MetaUnits = META_BASE.addUnits(MetaUnits("unknown", "Squeebles", UnorderedDiscrete))
 
   // Dimensions
   final val DIMENSION_TIME: MetaDimension = META_BASE.addDimension(MetaDimension("time", "The time dimension", DimensionSpace.CONTINUOUS))
@@ -47,17 +45,16 @@ object GlobalMetaBase {
   // *      final val UNITS_SOME_UNITS = META_BASE.addUnits(MetaUnits("SomeUnits", "Some description", SomeUnits))
   // *
   // *******************************************************************************
-  final val UNITS_UNORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", UnorderedDiscrete))
-  final val UNITS_ORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", OrderedDiscrete))
-  final val UNITS_ACCUMULATION: MetaUnits = META_BASE.addUnits(MetaUnits("accumulation", "An accumulated discrete amount", Accumulation))
-  final val UNITS_ORDERED_CONTINUOUS: MetaUnits = META_BASE.addUnits(MetaUnits("amount", "An amount that is ordered and continuous (real numbers)", OrderedContinuous))
+  // final val UNITS_UNORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("identifier", "A categorical identifier", UnorderedDiscrete))
+  // final val UNITS_ORDERED_DISCRETE: MetaUnits = META_BASE.addUnits(MetaUnits("count", "A discrete, positive quantity (whole numbers)", OrderedDiscrete))
+  // final val UNITS_ACCUMULATION: MetaUnits = META_BASE.addUnits(MetaUnits("accumulation", "An accumulated discrete amount", Accumulation))
+  // final val UNITS_ORDERED_CONTINUOUS: MetaUnits = META_BASE.addUnits(MetaUnits("amount", "An amount that is ordered and continuous (real numbers)", OrderedContinuous))
 
-  final val UNITS_SECONDS: MetaUnits = META_BASE.addUnits(MetaUnits("seconds", "A quantity of seconds", Seconds))
-  final val UNITS_DEGREES_CELSIUS: MetaUnits = META_BASE.addUnits(MetaUnits("degrees Celsius", "A measured temperature in degrees Celsius", DegreesCelsius))
-  final val UNITS_DATETIMESTAMP: MetaUnits = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", DateTimeStamp))
-  final val UNITS_DATETIMESPAN: MetaUnits = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", DateTimeSpan))
+  // final val UNITS_SECONDS: MetaUnits = META_BASE.addUnits(MetaUnits("seconds", "A quantity of seconds", Seconds))
+  // final val UNITS_DEGREES_CELSIUS: MetaUnits = META_BASE.addUnits(MetaUnits("degrees Celsius", "A measured temperature in degrees Celsius", DegreesCelsius))
+  // final val UNITS_DATETIMESTAMP: MetaUnits = META_BASE.addUnits(MetaUnits("datetimestamp", "An instant in time, by date and time", DateTimeStamp))
+  // final val UNITS_DATETIMESPAN: MetaUnits = META_BASE.addUnits(MetaUnits("datetimespan", "A span of time, by date and time, with a start and and end", DateTimeSpan))
 
-
-  // Composite Units
-  final val UNITS_COMPOSITE_LIST: MetaUnits = META_BASE.addUnits(MetaUnits("list", "A list of...", UnitsList))
+  // // Composite Units
+  // final val UNITS_COMPOSITE_LIST: MetaUnits = META_BASE.addUnits(MetaUnits("list", "A list of...", UnitsList))
 }

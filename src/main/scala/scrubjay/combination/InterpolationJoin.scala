@@ -2,19 +2,17 @@ package scrubjay.combination
 
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
-import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
-import scrubjay.metabase.MetaEntry
-import scrubjay.metasource._
-import scrubjay.units.UnitsTag.DomainType
-import scrubjay.units._
+import scrubjay.metabase.MetaDescriptor._
+import scrubjay.schema._
 
 import scala.language.existentials
 
-case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: Double)
-  extends DataSourceID(dsID1, dsID2) {
+/*
+case class InterpolationJoin(dsID1: DatasetID, dsID2: DatasetID, window: Double)
+  extends DatasetID(dsID1, dsID2) {
 
   // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
+  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.schema, dsID2.schema)
   val commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.POINT &&
@@ -26,11 +24,11 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
     d._2.relationType == MetaRelationType.DOMAIN &&
     d._3.relationType == MetaRelationType.DOMAIN)
 
-  lazy val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }.head
-  lazy val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }.head
+  lazy val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.schema.columnForEntry(me1) }.head
+  lazy val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.schema.columnForEntry(me2) }.head
 
-  lazy val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.metaSource.columnForEntry(me1) }
-  lazy val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.metaSource.columnForEntry(me2) }
+  lazy val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.schema.columnForEntry(me1) }
+  lazy val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.schema.columnForEntry(me2) }
   lazy val allDiscreteColumns: Seq[String] = discreteDimColumns1 ++ discreteDimColumns2
 
   // Single continuous axis for now
@@ -38,9 +36,9 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
     d._2.units.unitsTag.domainType == d._3.units.unitsTag.domainType
   })
 
-  lazy val metaSource: MetaSource = dsID2.metaSource
+  lazy val schema: MetaSource = dsID2.schema
     .withoutColumns(continuousDimColumn2 +: discreteDimColumns2)
-    .withMetaEntries(dsID1.metaSource)
+    .withMetaEntries(dsID1.schema)
 
   def realize: ScrubJayRDD = {
 
@@ -94,7 +92,7 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
         .map{case (row, rowSet) => (row, rowSet.map(_.filterNot(kv => allDiscreteColumns.contains(kv._1))))}
 
       // Lift the heavies here
-      val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.metaSource)
+      val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.schema)
 
       def projection(row: DataRow, keyColumn: String, mappedRows: Set[DataRow], mappedKeyColumn: String): DataRow = {
 
@@ -127,3 +125,4 @@ case class InterpolationJoin(dsID1: DataSourceID, dsID2: DataSourceID, window: D
     new ScrubJayRDD(rdd)
   }
 }
+*/

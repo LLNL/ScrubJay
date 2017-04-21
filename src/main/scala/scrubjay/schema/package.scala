@@ -1,9 +1,26 @@
 package scrubjay
 
 
+import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.types.{DataType, StructType}
 import scrubjay.metabase._
 
-package object metasource {
+import scala.io.Source
+import scala.util.Try
+
+package object schema {
+
+  def fromJSON(json: String): StructType = {
+    Try(DataType.fromJson(json)).getOrElse(LegacyTypeStringParser.parse(json)) match {
+      case t: StructType => t
+      case _ => throw new RuntimeException(s"Failed parsing StructType: $json")
+    }
+  }
+
+  def fromJSONFile(filename: String): StructType = {
+    fromJSON(Source.fromFile(filename).getLines().mkString("\n"))
+  }
+  /*
 
   type MetaSource = Map[String, MetaEntry]
 
@@ -74,4 +91,5 @@ package object metasource {
     }
 
   }
+  */
 }

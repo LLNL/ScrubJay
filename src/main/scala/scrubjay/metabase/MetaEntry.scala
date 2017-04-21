@@ -3,6 +3,7 @@ package scrubjay.metabase
 import scrubjay.metabase.GlobalMetaBase._
 import scrubjay.metabase.MetaDescriptor._
 
+/*
 case class MetaEntry(relationType: MetaRelationType.MetaRelationType,
                      dimension: MetaDimension,
                      units: MetaUnits) extends Serializable
@@ -37,5 +38,4 @@ object MetaEntry {
     )
   }
 }
-
-
+*/

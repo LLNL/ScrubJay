@@ -23,5 +23,3 @@ trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
     spark.stop()
   }
 }
-
-

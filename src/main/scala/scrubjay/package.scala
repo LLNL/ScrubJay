@@ -9,7 +9,7 @@ import scrubjay.datasource._
 import scrubjay.metabase._
 import scrubjay.query._
 import org.apache.spark._
-import scrubjay.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
+//import scrubjay.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
 
 
 package object scrubjay {
@@ -18,9 +18,9 @@ package object scrubjay {
    * Standalone functions
    */
 
-  def metaEntryFromStrings(relationType: String, dimension: String, units: String): MetaEntry = {
-    scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, dimension, units)
-  }
+  // def metaEntryFromStrings(relationType: String, dimension: String, units: String): MetaEntry = {
+  //   scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, dimension, units)
+  // }
 
   /**
    * SparkContext implicit functions
@@ -29,7 +29,7 @@ package object scrubjay {
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
     val metaBase: MetaBase = GlobalMetaBase.META_BASE
-    var objectBase: Map[String, ScrubJayRDD] = Map.empty
+    var objectBase: Map[String, DatasetID] = Map.empty
 
     def loadAllObjects(): Unit = {
       objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
@@ -41,68 +41,72 @@ package object scrubjay {
    * ScrubJayRDD implicit functions
    */
 
-  implicit class DataSourceImplicits(dsID: DataSourceID) {
+  implicit class DataSourceImplicits(dsID: DatasetID) {
 
     /**
      * Derivations
      */
 
-    def deriveMergeColumns(columns: Seq[String]): DataSourceID = {
+    /*
+    def deriveMergeColumns(columns: Seq[String]): DatasetID = {
       scrubjay.transformation.MergeColumns(dsID, columns)
     }
 
-    def deriveCoreFrequency: DataSourceID = {
+    def deriveCoreFrequency: DatasetID = {
       scrubjay.transformation.CoreFrequency(dsID)
     }
 
-    def deriveExplodeList(column: String): DataSourceID = {
+    def deriveExplodeList(column: String): DatasetID = {
       scrubjay.transformation.ExplodeDiscreteRange(dsID, column)
     }
 
-    def deriveExplodeTimeSpan(column: String, period: Double): DataSourceID = {
+    def deriveExplodeTimeSpan(column: String, period: Double): DatasetID = {
       scrubjay.transformation.ExplodeContinuousRange(dsID, column, period)
     }
 
-    def deriveNaturalJoin(dsID2: DataSourceID): DataSourceID = {
+    def deriveNaturalJoin(dsID2: DatasetID): DatasetID = {
       NaturalJoin(dsID, dsID2)
     }
 
-    def deriveInterpolationJoin(dsID2: DataSourceID, window: Double): DataSourceID = {
+    def deriveInterpolationJoin(dsID2: DatasetID, window: Double): DatasetID = {
       InterpolationJoin(dsID, dsID2, window)
     }
 
-    def deriveRangeJoin(dsID2: DataSourceID): DataSourceID = {
+    def deriveRangeJoin(dsID2: DatasetID): DatasetID = {
       RangeJoin(dsID, dsID2)
     }
+    */
 
     /**
      * Save formats
      */
 
+    /*
     def saveToCassandra(keyspace: String, table: String): Unit = {
-      scrubjay.datasource.CassandraDataSource.saveToCassandra(dsID, keyspace, table)
+      scrubjay.datasource.CassandraDataset.saveToCassandra(dsID, keyspace, table)
     }
 
     def createCassandraTable(keyspace: String, table: String, primaryKeys: Seq[String], clusterKeys: Seq[String]): Unit = {
-      scrubjay.datasource.CassandraDataSource.createCassandraTable(dsID, keyspace, table, primaryKeys, clusterKeys)
+      scrubjay.datasource.CassandraDataset.createCassandraTable(dsID, keyspace, table, primaryKeys, clusterKeys)
     }
 
     def saveToCSV(filename: String,
                   wrapperChar: String = "\"",
                   delimiter: String = ",",
                   noneString: String = "null"): Unit = {
-      scrubjay.datasource.CSVDataSource.saveToCSV(dsID, filename, wrapperChar, delimiter, noneString)
+      scrubjay.datasource.CSVDatasetID.saveToCSV(dsID, filename, wrapperChar, delimiter, noneString)
     }
+    */
 
     /**
-      * Create a new LocalMetaSource by interactively choosing them from the GlobalMetaBase
+      * Create a new LocalSchema by interactively choosing them from the GlobalMetaBase
       */
     /*
     def createMetaSourceInteractively: MetaSource = {
 
       createLocalMetaSource {
         {
-          for (column <- ds.metaSource.columns) yield {
+          for (column <- ds.schema.columns) yield {
 
             // Get relation type
             Seq("domain", "value").foreach(relationType =>

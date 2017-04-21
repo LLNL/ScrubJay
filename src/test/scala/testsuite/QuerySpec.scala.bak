@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay._
 import scrubjay.datasource._
-import scrubjay.metasource._
+import scrubjay.schema._
 import scrubjay.query._
 
 import org.scalactic.source.Position
@@ -10,11 +10,11 @@ import org.scalactic.source.Position
 
 class QuerySpec extends ScrubJaySpec {
 
-  val dataSources: Set[DataSourceID] = Set(
-    CSVDataSource(clusterLayoutFilename, CSVMetaSource(clusterLayoutMetaFilename)),
-    CSVDataSource(nodeFlopsFilename, CSVMetaSource(nodeFlopsMetaFilename)),
-    CSVDataSource(temperatureFilename, CSVMetaSource(temperatureMetaFilename)),
-    CSVDataSource(jobQueueFilename, CSVMetaSource(jobQueueMetaFilename))
+  val dataSources: Set[DatasetID] = Set(
+    CSVDatasetID(clusterLayoutFilename, CSVSchema(clusterLayoutMetaFilename)),
+    CSVDatasetID(nodeFlopsFilename, CSVSchema(nodeFlopsMetaFilename)),
+    CSVDatasetID(temperatureFilename, CSVSchema(temperatureMetaFilename)),
+    CSVDatasetID(jobQueueFilename, CSVSchema(jobQueueMetaFilename))
   )
 
   describe("Query with single datasource solution") {
@@ -36,7 +36,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
@@ -59,7 +59,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.head.realize.collect.toSet == trueJobQueueExplodedTime)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
@@ -82,7 +82,7 @@ class QuerySpec extends ScrubJaySpec {
       assert(solutions.head.realize.collect.toSet == trueNodeRackTimeFlops)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
@@ -102,11 +102,11 @@ class QuerySpec extends ScrubJaySpec {
     }
     it("should derive the correct datasource") {
       //solutions.head.describe()
-      //println(DataSourceID.toDotString(solutions.head))
+      //println(DatasetID.toDotString(solutions.head))
       assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(solutions.head)) == solutions.head)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
   }
 
@@ -116,7 +116,7 @@ class QuerySpec extends ScrubJaySpec {
 
     it("should do things") {
       solutions.foreach(solution => {
-        println(DataSourceID.toDotString(solution))
+        println(DatasetID.toDotString(solution))
       })
       assert(true)
     }

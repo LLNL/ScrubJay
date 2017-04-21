@@ -1,22 +1,20 @@
 package scrubjay.combination
 
-import scrubjay.datasource.DataSourceID
-import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension, MetaRelationType}
-import scrubjay.metabase.MetaEntry
-import scrubjay.metasource._
-import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
-import scrubjay.units.UnitsTag.DomainType
+import scrubjay.datasource.DatasetID
+import scrubjay.metabase.MetaDescriptor._
+import scrubjay.schema._
+//import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
-
+/*
 object UberJoin {
 
   // FIXME: (throughout) window size, period length
   val interJoinWindow = 60000
   val explodePeriod = 60000
 
-  def UberInterpolationJoin(dsID1: DataSourceID,
-                            dsID2: DataSourceID,
-                            commonContinuousDomainDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)]): Seq[DataSourceID] = {
+  def UberInterpolationJoin(dsID1: DatasetID,
+                            dsID2: DatasetID,
+                            commonContinuousDomainDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)]): Seq[DatasetID] = {
 
     commonContinuousDomainDimensions.flatMap{
 
@@ -56,9 +54,9 @@ object UberJoin {
     }
   }
 
-  def UberNaturalJoin(dsID1: DataSourceID,
-                      dsID2: DataSourceID,
-                      commonDiscreteDomainDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)]): Seq[DataSourceID] = {
+  def UberNaturalJoin(dsID1: DatasetID,
+                      dsID2: DatasetID,
+                      commonDiscreteDomainDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)]): Seq[DatasetID] = {
 
     commonDiscreteDomainDimensions.flatMap{
 
@@ -89,7 +87,7 @@ object UberJoin {
   }
 
   // Get shared domain dimensions
-  def apply(dsID1: DataSourceID, dsID2: DataSourceID): Seq[DataSourceID] = {
+  def apply(dsID1: DatasetID, dsID2: DatasetID): Seq[DatasetID] = {
 
     val commonDomainDimensions = MetaSource.commonDimensionEntries(dsID1.metaSource, dsID2.metaSource)
       .filter(e => haveSharedProperty(e._2, e._3, _.relationType == MetaRelationType.DOMAIN))
@@ -110,3 +108,4 @@ object UberJoin {
       ).flatten
   }
 }
+*/

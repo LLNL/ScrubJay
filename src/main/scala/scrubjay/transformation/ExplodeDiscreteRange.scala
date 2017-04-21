@@ -1,12 +1,10 @@
 package scrubjay.transformation
 
 import scrubjay.datasource._
-import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.units._
-import scrubjay.util.cartesianProduct
-import scrubjay.metasource._
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.{udf, explode}
 
 /*
  * ExplodeList
@@ -20,52 +18,20 @@ import org.apache.spark.rdd.RDD
  *  explodes the row, duplicating all other columns
  */
 
-case class ExplodeDiscreteRange(dsID: DataSourceID, column: String)
-  extends DataSourceID(dsID) {
+case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
+  extends DatasetID(dsID) {
 
-  val newColumn: String = column + "_exploded"
+  override def isValid: Boolean = dsID.schema(column).metadata.getString("units").startsWith("list")
 
-  // Add column_exploded meta entry for each column
-  val metaSource: MetaSource = {
-    if (isValid) {
-      val originalMetaEntry = dsID.metaSource(column)
-      val newMetaEntry = originalMetaEntry.copy(units = originalMetaEntry.units.unitsChildren.head)
-      dsID.metaSource
-        .withoutColumns(Seq(column))
-        .withMetaEntries(Map(newColumn -> newMetaEntry))
-    }
-    else
-      dsID.metaSource
-  }
-
-  def isValid: Boolean = dsID.metaSource(column).units == UNITS_COMPOSITE_LIST
-
-  def realize: ScrubJayRDD = {
-
-    val ds = dsID.realize
-
-    val rdd: RDD[DataRow] = {
-
-      // Derivation function for flatMap returns a sequence of DataRows
-      def derivation(row: DataRow, col: String): Seq[DataRow] = {
-
-        // Get lists to explode
-        val valueToExplode = row(col)
-        val explodedValues: Iterator[Units[_]] = valueToExplode.asInstanceOf[DiscreteRange].explode
-        val rowWithoutColumn: Map[String, Units[_]] = row.filterNot(kv => column == kv._1)
-
-        // For each combination of exploded values, add a row
-        val newRows = for (elem <- explodedValues) yield {
-           rowWithoutColumn ++ Map(newColumn -> elem)
-        }
-
-        newRows.toSeq
-      }
-
-      // Create the derived dataset
-      ds.flatMap(row => derivation(row, column))
-    }
-
-    new ScrubJayRDD(rdd)
+  override def realize: DataFrame = {
+    val wowUDF = udf((s: String) => WowString(s))
+    val boogersUDF = udf((a: Any) => WowString(a.asInstanceOf[WowString].deriveBoogers))
+    val df = dsID.realize
+    val string2ListUDF = udf((s: String) => s.split(","))
+    val dfList = df.withColumn(column, string2ListUDF(df(column)))
+    val dfList2 = dfList.withColumn(column, explode(dfList(column)))
+    val dfList3 = dfList2.withColumn(column + "_custom", wowUDF(dfList2(column)))
+    dfList3.withColumn(column + "_boogers", boogersUDF(dfList3(column + "_custom")))
+    //df.withColumn(newColumn, explode(df(column)))
   }
 }

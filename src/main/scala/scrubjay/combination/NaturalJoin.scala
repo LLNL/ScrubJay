@@ -3,9 +3,7 @@ package scrubjay.combination
 import org.apache.spark.rdd.RDD
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.metabase.MetaDescriptor.MetaRelationType
-import scrubjay.metabase.MetaEntry
-import scrubjay.metasource._
+import scrubjay.schema._
 
 /*
  * NaturalJoin 
@@ -18,25 +16,26 @@ import scrubjay.metasource._
  *  The inner join of the two dataSources, based on their common columns
  */
 
-case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
-  extends DataSourceID(dsID1, dsID2) {
+/*
+case class NaturalJoin(dsID1: DatasetID, dsID2: DatasetID)
+  extends DatasetID(dsID1, dsID2) {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.metaSource, dsID2.metaSource)
+  def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.schema, dsID2.schema)
     .filter(me =>
       me.relationType == MetaRelationType.DOMAIN &&
       me.units == UNITS_UNORDERED_DISCRETE &&
       me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
-  def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.metaSource.columnForEntry)
-  def keyColumns2: Seq[String] = validEntries.flatMap(dsID2.metaSource.columnForEntry)
+  def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.schema.columnForEntry)
+  def keyColumns2: Seq[String] = validEntries.flatMap(dsID2.schema.columnForEntry)
 
   def isValid: Boolean = validEntries.nonEmpty
 
-  val metaSource: MetaSource = dsID2.metaSource
+  val schema: MetaSource = dsID2.schema
     .withoutColumns(keyColumns2)
-    .withMetaEntries(dsID1.metaSource)
+    .withMetaEntries(dsID1.schema)
 
   def realize: ScrubJayRDD = {
 
@@ -59,4 +58,4 @@ case class NaturalJoin(dsID1: DataSourceID, dsID2: DataSourceID)
     new ScrubJayRDD(rdd)
   }
 }
-
+*/

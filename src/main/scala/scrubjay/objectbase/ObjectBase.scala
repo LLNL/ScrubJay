@@ -1,12 +1,12 @@
 package scrubjay.objectbase
 
-import scrubjay.datasource.{CassandraDataSource, DataSourceID, ScrubJayRDD}
+import scrubjay.datasource._
 import scrubjay.ScrubJaySessionImplicits
 import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector._
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.SparkContext
-import scrubjay.metasource.CassandraMetaSource
+//import scrubjay.schema.CassandraSchema
 
 object ObjectBase {
 
@@ -37,7 +37,7 @@ object ObjectBase {
   final val OBJECT_COLUMN_DATA_KEYSPACE = "dataKeyspace"
   final val OBJECT_COLUMN_DATA_TABLE = "dataTable"
 
-  private def loadObjects(crdd: CassandraTableScanRDD[CassandraRow]): Map[String, ScrubJayRDD] = {
+  private def loadObjects(crdd: CassandraTableScanRDD[CassandraRow]): Map[String, DatasetID] = {
 
     val sc = crdd.sparkContext
 
@@ -49,23 +49,18 @@ object ObjectBase {
         row.getString(OBJECT_COLUMN_DATA_TABLE)
       )).collect.toSeq
 
-    names.map{
-      case (k, metaKeyspace, metaTable, dataKeyspace, dataTable) => {
-        val metaSource = CassandraMetaSource(metaKeyspace, metaTable)
-        (k, CassandraDataSource(dataKeyspace, dataTable, metaSource).asInstanceOf[ScrubJayRDD])
-      }
-    }.toMap
+    ???
   }
 
-  def loadOriginalObjects(sc: SparkContext): Map[String, ScrubJayRDD] = {
+  def loadOriginalObjects(sc: SparkContext): Map[String, DatasetID] = {
     loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_ORIGINAL_OBJECTS_TABLE))
   }
 
-  def loadDerivedObjects(sc: SparkContext): Map[String, ScrubJayRDD] = {
+  def loadDerivedObjects(sc: SparkContext): Map[String, DatasetID] = {
     loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_DERIVED_OBJECTS_TABLE))
   }
 
-  def saveAsOriginalObject(dsID: DataSourceID,
+  def saveAsOriginalObject(dsID: DatasetID,
                            metaKeyspaceTableTuple: Option[(String, String)],
                            dataKeyspaceTableTuple: Option[(String, String)],
                            saveObjectReferenceOnly: Boolean = false): Unit = {
@@ -83,7 +78,7 @@ object ObjectBase {
 
     if (!saveObjectReferenceOnly) {
       // FIXME
-      //dsID.metaSource.saveToCassandra(sc, metaKeyspace, name)
+      //dsID.schema.saveToCassandra(sc, metaKeyspace, name)
       //ds.saveToCassandra(dataKeyspace, name)
     }
 

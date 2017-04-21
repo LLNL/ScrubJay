@@ -1,0 +1,50 @@
+{
+    "type" : "struct",
+    "fields" :
+    [
+        {
+            "name" : "jobid",
+            "type" : "string",
+            "nullable" : true,
+            "metadata" :
+            {
+                "domain" : true,
+                "dimension" : "job",
+                "units" : "identifier"
+            }
+        },
+        {
+            "name" : "nodelist",
+            "type" : "string",
+            "nullable" : true,
+            "metadata" :
+            {
+                "domain" : true,
+                "dimension" : "node",
+                "units" : "list<identifier>"
+            }
+        },
+        {
+            "name" : "elapsed",
+            "type" : "integer",
+            "nullable" : true,
+            "metadata" :
+            {
+                "domain" : false,
+                "dimension" : "time",
+                "units" : "seconds"
+            }
+        },
+        {
+            "name" : "timespan",
+            "type" : "string",
+            "nullable" : true,
+            "metadata" :
+            {
+                "domain" : true,
+                "dimension" : "time",
+                "units" : "datetimespan"
+            }
+        }
+    ]
+}

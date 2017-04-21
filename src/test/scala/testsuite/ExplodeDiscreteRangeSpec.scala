@@ -1,24 +1,27 @@
 package testsuite
 
 import scrubjay.datasource._
-import scrubjay.metasource._
+
 import scrubjay.transformation.ExplodeDiscreteRange
 
 
 class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
 
-  lazy val jobQueue: DataSourceID = CSVDataSource(jobQueueFilename, CSVMetaSource(jobQueueMetaFilename))
-  lazy val jobQueueExploded: DataSourceID = ExplodeDiscreteRange(jobQueue, "nodelist")
+  lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, scrubjay.schema.fromJSONFile(jobQueueMetaFilename), Map("header" -> "true", "delimiter" -> "|"))
+  lazy val jobQueueExploded: DatasetID = ExplodeDiscreteRange(jobQueue, "nodelist")
 
   describe("Derive exploded node list") {
     it("should be defined") {
       assert(jobQueueExploded.isValid)
     }
     it("should match ground truth") {
-      assert(jobQueueExploded.realize.collect.toSet == trueJobQueueExplodedList)
+      jobQueueExploded.realize.show()
+    }
+    it("should have a schema") {
+      jobQueueExploded.realize.printSchema()
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(jobQueueExploded)) == jobQueueExploded)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(jobQueueExploded)) == jobQueueExploded)
     }
   }
 }

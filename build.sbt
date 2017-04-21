@@ -8,10 +8,10 @@ scalaVersion := "2.11.8"
 scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
 //val sparkVersion = "1.6.2"
-val sparkVersion = "2.0.0"
+val sparkVersion = "2.1.0"
 
 //val sparkCassandraConnectorVersion = "1.6.0"
-val sparkCassandraConnectorVersion = "2.0.0-M3"
+val sparkCassandraConnectorVersion = "2.0.0"
 
 val hadoopVersion = "2.6.2"
 val cassandraVersion = "3.4.0"
@@ -32,16 +32,15 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 // Breeze
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-libraryDependencies += "org.scalanlp" %% "breeze" % "0.12"
-libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
+// resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+// libraryDependencies += "org.scalanlp" %% "breeze" % "0.12"
+// libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
 
 // Msgpack (serialization)
 libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
 
 // JSON serialization
-libraryDependencies += "org.scala-lang.modules" %% "scala-pickling" % "0.10.1"
-//libraryDependencies += "com.github.fommil" %% "spray-json-shapeless" % "1.3.0"
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.5"
 
 // Hashing
 libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"

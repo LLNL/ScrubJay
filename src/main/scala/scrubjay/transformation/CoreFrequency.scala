@@ -1,23 +1,21 @@
 package scrubjay.transformation
 
 import scrubjay.datasource._
-import scrubjay.metabase.MetaEntry
 import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.metasource._
-import scrubjay.units._
+import scrubjay.schema._
 import org.apache.spark.rdd.RDD
 import scrubjay.metabase._
-import scrubjay.metabase.MetaDescriptor.MetaRelationType
 
-case class CoreFrequency(dsID: DataSourceID)
-  extends DataSourceID(dsID) {
+/*
+case class CoreFrequency(dsID: DatasetID)
+  extends DatasetID(dsID) {
 
   // Find aperf and mperf time entries
-  def aperfEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>
+  def aperfEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
       me._2.dimension == DIMENSION_APERF)
-  def mperfEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>
+  def mperfEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
       me._2.dimension == DIMENSION_MPERF)
-  def baseFreqEntry: Option[(String, MetaEntry)] = dsID.metaSource.find(me =>
+  def baseFreqEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
       me._2.dimension == DIMENSION_CPU_BASE_FREQUENCY)
 
   // Helper functions
@@ -45,7 +43,7 @@ case class CoreFrequency(dsID: DataSourceID)
 
   val isValid: Boolean = allSpans.exists(_.isDefined)
 
-  val metaSource: MetaSource = dsID.metaSource
+  val schema: MetaSource = dsID.schema
     .withoutColumns(Seq(aperfEntry.get._1, mperfEntry.get._1, baseFreqEntry.get._1))
     .withMetaEntries(Map("cpu frequency" -> MetaEntry(MetaRelationType.VALUE, DIMENSION_CPU_ACTIVE_FREQUENCY, UNITS_ORDERED_CONTINUOUS)))
 
@@ -60,3 +58,4 @@ case class CoreFrequency(dsID: DataSourceID)
     new ScrubJayRDD(rdd)
   }
 }
+*/

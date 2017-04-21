@@ -2,26 +2,26 @@ package scrubjay.transformation
 
 import scrubjay.datasource._
 import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.units._
-import scrubjay.metasource._
+import scrubjay.schema._
 
 import org.apache.spark.rdd.RDD
 
-case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Double)
-  extends DataSourceID(dsID) {
+/*
+case class ExplodeContinuousRange(dsID: DatasetID, column: String, period: Double)
+  extends DatasetID(dsID) {
 
   val newColumn: String = column + "_exploded"
 
   // Add column_exploded meta entry for each column
-  val metaSource: MetaSource = {
-    val originalMetaEntry = dsID.metaSource(column)
+  val schema: MetaSource = {
+    val originalMetaEntry = dsID.schema(column)
     val newMeta = originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
-    dsID.metaSource
+    dsID.schema
       .withoutColumns(Seq(column))
       .withMetaEntries(Map(newColumn -> newMeta))
   }
 
-  def isValid: Boolean = dsID.metaSource(column).units == UNITS_DATETIMESPAN
+  def isValid: Boolean = dsID.schema(column).units == UNITS_DATETIMESPAN
 
   def realize: ScrubJayRDD = {
 
@@ -47,3 +47,4 @@ case class ExplodeContinuousRange(dsID: DataSourceID, column: String, period: Do
     new ScrubJayRDD(rdd)
   }
 }
+*/

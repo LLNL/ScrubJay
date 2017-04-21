@@ -1,5 +1,0 @@
-column, relationType, dimension, units
-jobid, domain, job, identifier
-nodelist, domain, node, list<identifier>
-elapsed, value, time, seconds
-timespan, domain, time, datetimespan

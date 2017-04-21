@@ -1,7 +1,6 @@
 package testsuite
 
-import scrubjay.datasource.{DataSourceID, LocalDataSource}
-import scrubjay.metasource.LocalMetaSource
+import scrubjay.datasource.{DatasetID$, LocalDataset}
 
 import org.scalactic.source.Position
 
@@ -30,7 +29,7 @@ class LocalDataSourceSpec extends ScrubJaySpec {
     ("timespan", "domain", "time", "datetimespan")
   )
 
-  lazy val jobQueue: DataSourceID = LocalDataSource(jobQueueData, LocalMetaSource(jobQueueMeta))
+  lazy val jobQueue: DatasetID = LocalDataset(jobQueueData, LocalSchema(jobQueueMeta))
 
   describe("Locally generated job queue data") {
     it("should be defined") {
@@ -40,7 +39,7 @@ class LocalDataSourceSpec extends ScrubJaySpec {
       assert(jobQueue.realize.collect.toSet == trueJobQueue)
     }
     it("should pickle/unpickle correctly") {
-      assert(DataSourceID.fromJsonString(DataSourceID.toJsonString(jobQueue)) == jobQueue)
+      assert(DatasetID.fromJsonString(DatasetID.toJsonString(jobQueue)) == jobQueue)
     }
   }
 }

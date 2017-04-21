@@ -1,33 +1,34 @@
 package scrubjay.query
 
-import scrubjay.metasource._
+import scrubjay.schema._
 import scrubjay.datasource._
-import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
+//import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
 import gov.llnl.ConstraintSolver._
 
+/*
 
 object DerivationSpace {
   // TODO: does object memoize correctly?
 
-  val columnDerivations: Seq[(DataSourceID, String) => DataSourceID] = Seq(
+  val columnDerivations: Seq[(DatasetID, String) => DatasetID] = Seq(
     ExplodeDiscreteRange(_,_),
     ExplodeContinuousRange(_,_,60000) // FIXME: WINDOW SIZE
   )
 
   // Run a single transformation on all columns of this data source
-  lazy val derivation: Constraint[DataSourceID] = memoize(args => {
-    val dsID = args(0).as[DataSourceID]
-    val derivation = args(1).as[(DataSourceID, String) => DataSourceID]
+  lazy val derivation: Constraint[DatasetID] = memoize(args => {
+    val dsID = args(0).as[DatasetID]
+    val derivation = args(1).as[(DatasetID, String) => DatasetID]
 
-    val columns: Seq[String] = dsID.metaSource.columns
+    val columns: Seq[String] = dsID.schema.columns
 
     columns.flatMap(column => derivation(dsID, column).asOption)
   })
 
-  lazy val derivationChain: Constraint[DataSourceID] = memoize(args => {
-    val dsID = args(0).as[DataSourceID]
-    val derivations = args(1).as[Seq[(DataSourceID, String) => DataSourceID]]
+  lazy val derivationChain: Constraint[DatasetID] = memoize(args => {
+    val dsID = args(0).as[DatasetID]
+    val derivations = args(1).as[Seq[(DatasetID, String) => DatasetID]]
 
     derivations match {
 
@@ -45,10 +46,11 @@ object DerivationSpace {
     }
   })
 
-  lazy val allDerivationChains: Constraint[DataSourceID] = memoize(args => {
-    val dsID = args(0).as[DataSourceID]
+  lazy val allDerivationChains: Constraint[DatasetID] = memoize(args => {
+    val dsID = args(0).as[DatasetID]
     val derivationCombinations = 1.to(columnDerivations.length)
       .flatMap(c => columnDerivations.combinations(c))
     derivationCombinations.flatMap(c => derivationChain(Seq(dsID, c)))
   })
 }
+*/

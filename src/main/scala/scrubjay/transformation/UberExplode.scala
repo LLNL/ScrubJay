@@ -2,14 +2,14 @@ package scrubjay.transformation
 
 import scrubjay.datasource._
 import scrubjay.metabase.MetaDescriptor.DimensionSpace
-import scrubjay.units.UnitsTag.DomainType
 
 
+/*
 object UberExplode {
 
-  def apply(dsID: DataSourceID): Seq[DataSourceID] = {
+  def apply(dsID: DatasetID): Seq[DatasetID] = {
 
-    val explodeColumns = dsID.metaSource.filter(e =>
+    val explodeColumns = dsID.schema.filter(e =>
       e._2.units.unitsTag.domainType == DomainType.MULTIPOINT ||
       e._2.units.unitsTag.domainType == DomainType.RANGE)
       .keys.toSeq
@@ -36,3 +36,4 @@ object UberExplode {
     })
   }
 }
+*/

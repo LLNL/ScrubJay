@@ -2,11 +2,12 @@ package scrubjay.transformation
 
 import org.apache.spark.rdd.RDD
 import scrubjay.metabase._
-import scrubjay.datasource.{DataRow, DataSourceID, ScrubJayRDD}
-import scrubjay.metasource._
+import scrubjay.datasource._
+import scrubjay.schema._
 
-case class MergeColumns(dsID: DataSourceID, columns: Seq[String])
-  extends DataSourceID(dsID) {
+/*
+case class MergeColumns(dsID: DatasetID, columns: Seq[String])
+  extends DatasetID(dsID) {
 
   def newColumn: String = columns.mkString("_")
   def metaEntry: MetaEntry = dsID.metaSource(columns.head)
@@ -36,3 +37,4 @@ case class MergeColumns(dsID: DataSourceID, columns: Seq[String])
     new ScrubJayRDD(rdd)
   }
 }
+*/
