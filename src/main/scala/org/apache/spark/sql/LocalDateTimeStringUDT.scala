@@ -24,20 +24,20 @@ class LocalDateTimeStringUDT extends UserDefinedType[LocalDateTimeType] {
 
 object LocalDateTimeStringUDT {
 
-  private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  private val defaultFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-  def serialize(p: LocalDateTimeType): UTF8String = {
-    UTF8String.fromString(p.value.format(formatter))
+  def serialize(p: LocalDateTimeType, dateTimeFormatter: DateTimeFormatter = defaultFormatter): UTF8String = {
+    UTF8String.fromString(p.value.format(dateTimeFormatter))
   }
 
-  def deserialize(datum: Any): LocalDateTimeType = {
+  def deserialize(datum: Any, dateTimeFormatter: DateTimeFormatter = defaultFormatter): LocalDateTimeType = {
     datum match {
       case utf8: UTF8String => {
         val s = utf8.toString
-        new LocalDateTimeType(LocalDateTime.parse(s, formatter))
+        new LocalDateTimeType(LocalDateTime.parse(s, dateTimeFormatter))
       }
       case s: String => {
-        new LocalDateTimeType(LocalDateTime.parse(s, formatter))
+        new LocalDateTimeType(LocalDateTime.parse(s, dateTimeFormatter))
       }
     }
   }
