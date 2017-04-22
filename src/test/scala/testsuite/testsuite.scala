@@ -23,6 +23,8 @@ package object testsuite {
   val clusterLayoutMetaFilename: String = getClass.getResource("/clusterLayoutMeta.csv").getPath
   val clusterLayoutFilename: String = getClass.getResource("/clusterLayout.csv").getPath
 
+  val jobQueueDatasetIDFilename: String = getClass.getResource("/jobQueue.sj").getPath
+
   /*
    * Ground truth
    */

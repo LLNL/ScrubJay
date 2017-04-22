@@ -15,7 +15,9 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import scrubjay.transformation.ExplodeDiscreteRange
+import java.io.{BufferedWriter, File, FileWriter}
 
+import scala.io.Source
 import scala.util.Try
 
 @JsonIgnoreProperties(
@@ -97,7 +99,7 @@ object DatasetID {
       // case _: InterpolationJoin => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\\n" + columnString + "\""
 
       // Transformed data sources
-      // case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\\n" + columnString + "\""
+      case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\\n" + columnString + "\""
       // case _: ExplodeContinuousRange => "style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\\n" + columnString + "\""
 
       // Original data sources
@@ -138,14 +140,17 @@ object DatasetID {
   }
 
   protected def saveStringToFile(text: String, filename: String): Unit = {
-    import java.io.{BufferedWriter, File, FileWriter}
-
     val file = new File(filename)
     val bw = new BufferedWriter(new FileWriter(file))
     bw.write(text)
     bw.close()
   }
 
-  def saveToJson(dsID: DatasetID, filename: String): Unit = saveStringToFile(toJsonString(dsID), filename)
-  def saveToDot(dsID: DatasetID, filename: String): Unit = saveStringToFile(toDotString(dsID), filename)
+  def loadFromJsonFile(filename: String): DatasetID = {
+    val fileContents = Source.fromFile(filename).getLines.mkString("\n")
+    fromJsonString(fileContents)
+  }
+
+  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toJsonString(dsID), filename)
+  def saveToDotFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toDotString(dsID), filename)
 }
