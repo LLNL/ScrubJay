@@ -1,7 +1,5 @@
 package org.apache.spark.sql.scrubjaytypes
 
-import java.time.format.DateTimeFormatter
-
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types.SQLUserDefinedType
@@ -25,15 +23,9 @@ class LocalDateTimeRangeType(val start: LocalDateTimeType, val end: LocalDateTim
     }
     timeIterator.takeWhile(_ < end).toArray
   }
-
 }
 
 object LocalDateTimeRangeType {
-
-  def parseStringUDF(datePattern: String): UserDefinedFunction = {
-    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(datePattern)))
-  }
-
   def discretizeUDF(milliseconds: Double): UserDefinedFunction = {
     udf((v: LocalDateTimeRangeType) => v.discretize(milliseconds))
   }

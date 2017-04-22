@@ -2,7 +2,7 @@ package org.apache.spark.sql.scrubjaytypes
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.{Metadata, StructField}
 
 object ScrubJayUDFParser {
 
@@ -22,10 +22,18 @@ object ScrubJayUDFParser {
   def parseUDFForColumnSchema(structField: StructField): Option[UserDefinedFunction] = {
     if (structField.metadata.contains("scrubjaytype")) {
       structField.metadata.getString("scrubjaytype") match {
-        case "LocalDateTimeRangeType" => {
+        case "LocalDateTimeRangeString" => {
           // requires a dateformat entry as well
           val dateformat = structField.metadata.getString("dateformat")
-          Some(LocalDateTimeRangeType.parseStringUDF(dateformat))
+          Some(LocalDateTimeRangeStringUDT.parseStringUDF(dateformat))
+        }
+        case "ArrayString" => {
+          // requires a subtype entry as well
+          val delimiter = structField.metadata.getString("delimiter")
+          Some(ArrayStringUDT.parseStringUDF(delimiter))
+        }
+        case unknownType: String => {
+          throw new RuntimeException(s"ScrubJay type $unknownType unknown!")
         }
       }
     }

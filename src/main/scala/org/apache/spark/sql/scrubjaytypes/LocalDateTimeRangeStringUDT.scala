@@ -3,6 +3,8 @@ package org.apache.spark.sql.scrubjaytypes
 import java.time.format.DateTimeFormatter
 
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.unsafe.types.UTF8String
 
 
@@ -48,5 +50,10 @@ object LocalDateTimeRangeStringUDT {
           LocalDateTimeStringUDT.deserialize(values(1), dateTimeFormatter))
       }
     }
+  }
+
+
+  def parseStringUDF(datePattern: String): UserDefinedFunction = {
+    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(datePattern)))
   }
 }

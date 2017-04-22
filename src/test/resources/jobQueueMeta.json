@@ -21,7 +21,11 @@
             {
                 "domain" : true,
                 "dimension" : "node",
-                "units" : "list<identifier>"
+                "scrubjaytype" : "ArrayString",
+                "delimiter" : ",",
+                "subtype" : {
+                  "type" : "string"
+                }
             }
         },
         {
@@ -44,7 +48,7 @@
                 "domain" : true,
                 "dimension" : "time",
                 "dateformat" : "yyyy-MM-dd'T'HH:mm:ss",
-                "scrubjaytype" : "LocalDateTimeRangeType"
+                "scrubjaytype" : "LocalDateTimeRangeString"
             }
         }
     ]
