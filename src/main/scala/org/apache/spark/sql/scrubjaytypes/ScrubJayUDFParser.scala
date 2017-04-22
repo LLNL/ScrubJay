@@ -21,17 +21,19 @@ object ScrubJayUDFParser {
   // Get parse function (UDF) for the scrubjaytype specified in metadata, if it exists
   def parseUDFForColumnSchema(structField: StructField): Option[UserDefinedFunction] = {
     if (structField.metadata.contains("scrubjaytype")) {
+
       structField.metadata.getString("scrubjaytype") match {
+
         case "LocalDateTimeRangeString" => {
-          // requires a dateformat entry as well
           val dateformat = structField.metadata.getString("dateformat")
           Some(LocalDateTimeRangeStringUDT.parseStringUDF(dateformat))
         }
+
         case "ArrayString" => {
-          // requires a subtype entry as well
           val delimiter = structField.metadata.getString("delimiter")
           Some(ArrayStringUDT.parseStringUDF(delimiter))
         }
+
         case unknownType: String => {
           throw new RuntimeException(s"ScrubJay type $unknownType unknown!")
         }
