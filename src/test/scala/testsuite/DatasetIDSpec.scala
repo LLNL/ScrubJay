@@ -7,7 +7,7 @@ class DatasetIDSpec extends ScrubJaySpec {
 
   lazy val dsID: DatasetID = DatasetID.loadFromJsonFile(jobQueueDatasetIDFilename)
 
-  lazy val jobQueueMetaSource: StructType = scrubjay.schema.fromJSONFile(jobQueueMetaFilename)
+  lazy val jobQueueMetaSource: StructType = scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename)
   lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, jobQueueMetaSource, Map("header" -> "true", "delimiter" -> "|"))
 
   describe("Load ScrubJay DatasetID from .sj file") {

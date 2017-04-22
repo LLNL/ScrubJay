@@ -22,8 +22,8 @@ case class CSVDatasetID(csvFileName: String, schema: Schema, options: Map[String
 object CSVDatasetID {
 
   def saveDataToCSV(dsID: DatasetID,
-                fileName: String,
-                options: Map[String, String]): Unit = {
+                    fileName: String,
+                    options: Map[String, String]): Unit = {
     dsID.realize
       .write
       .options(options)

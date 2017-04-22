@@ -5,11 +5,6 @@ import scala.language.existentials
 
 object MetaDescriptor {
 
-  object DimensionSpace extends Enumeration {
-    type DimensionSpace = Value
-    val CONTINUOUS, DISCRETE = Value
-  }
-
   case class MetaDimension(title: String, description: String, dimensionType: DimensionSpace.DimensionSpace)
 
   case class MetaUnits(title: String, description: String,
@@ -34,4 +29,10 @@ object MetaDescriptor {
       }
     }
   }
+
+  object DimensionSpace extends Enumeration {
+    type DimensionSpace = Value
+    val CONTINUOUS, DISCRETE = Value
+  }
+
 }

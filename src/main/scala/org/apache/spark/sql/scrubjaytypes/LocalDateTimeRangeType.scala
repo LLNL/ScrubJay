@@ -18,8 +18,8 @@ class LocalDateTimeRangeType(val start: LocalDateTimeType, val end: LocalDateTim
   }
 
   def discretize(milliseconds: Double): Array[LocalDateTimeType] = {
-    val timeIterator: Iterator[LocalDateTimeType] = Iterator.iterate(start){ current =>
-      new LocalDateTimeType(current.value.plusNanos((milliseconds*1000000).toLong))
+    val timeIterator: Iterator[LocalDateTimeType] = Iterator.iterate(start) { current =>
+      new LocalDateTimeType(current.value.plusNanos((milliseconds * 1000000).toLong))
     }
     timeIterator.takeWhile(_ < end).toArray
   }

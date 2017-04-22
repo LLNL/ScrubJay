@@ -1,11 +1,5 @@
 package scrubjay.transformation
 
-import scrubjay.dataset._
-import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.schema._
-
-import org.apache.spark.rdd.RDD
-
 /*
 case class ExplodeContinuousRange(dsID: DatasetID, column: String, period: Double)
   extends DatasetID(dsID) {

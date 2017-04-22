@@ -1,9 +1,9 @@
 package scrubjay.transformation
 
-import scrubjay.dataset._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.explode
-import org.apache.spark.sql.types.{ArrayType, DataTypes, MapType}
+import org.apache.spark.sql.types.{ArrayType, MapType}
+import scrubjay.dataset._
 
 
 case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
@@ -12,6 +12,7 @@ case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
   override lazy val isValid: Boolean = dsID.realize.schema(column).dataType match {
     case ArrayType(_, _) => true
     case MapType(_, _, _) => true
+    case _ => false
   }
 
   override def realize: DataFrame = {

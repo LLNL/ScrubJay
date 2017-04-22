@@ -1,13 +1,12 @@
 package testsuite
 
 import scrubjay.dataset._
-
 import scrubjay.transformation.ExplodeDiscreteRange
 
 
 class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
 
-  lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, scrubjay.schema.fromJSONFile(jobQueueMetaFilename), Map("header" -> "true", "delimiter" -> "|"))
+  lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename), Map("header" -> "true", "delimiter" -> "|"))
   lazy val jobQueueExploded: DatasetID = ExplodeDiscreteRange(jobQueue, "nodelist")
 
   describe("Derive exploded node list") {

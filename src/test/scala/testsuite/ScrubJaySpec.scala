@@ -3,8 +3,6 @@ package testsuite
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 
-import org.scalactic.source.Position
-
 trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 
   var spark: SparkSession = _

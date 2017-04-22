@@ -45,7 +45,7 @@ object JoinSpace {
         val pairThenRest = head2TailPairs.flatMap(pair => {
           val pairArgs = pair.arguments.map(_.as[DatasetID])
           val rest = dsIDSet.filterNot(pairArgs.contains)
-          pair.solutions.flatMap(sol =>  {
+          pair.solutions.flatMap(sol => {
             joinedSet(Seq(rest + sol))
           })
         })

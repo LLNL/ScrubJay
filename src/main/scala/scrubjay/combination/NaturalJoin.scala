@@ -1,10 +1,5 @@
 package scrubjay.combination
 
-import org.apache.spark.rdd.RDD
-import scrubjay.dataset._
-import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.schema._
-
 /*
  * NaturalJoin 
  * 

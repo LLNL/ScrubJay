@@ -1,11 +1,10 @@
 package scrubjay.objectbase
 
-import scrubjay.dataset._
-import scrubjay.ScrubJaySessionImplicits
-import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector._
+import com.datastax.spark.connector.cql.CassandraConnector
 import com.datastax.spark.connector.rdd.CassandraTableScanRDD
 import org.apache.spark.SparkContext
+import scrubjay.dataset._
 //import scrubjay.schema.CassandraSchema
 
 object ObjectBase {
@@ -37,12 +36,20 @@ object ObjectBase {
   final val OBJECT_COLUMN_DATA_KEYSPACE = "dataKeyspace"
   final val OBJECT_COLUMN_DATA_TABLE = "dataTable"
 
+  def loadOriginalObjects(sc: SparkContext): Map[String, DatasetID] = {
+    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_ORIGINAL_OBJECTS_TABLE))
+  }
+
+  def loadDerivedObjects(sc: SparkContext): Map[String, DatasetID] = {
+    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_DERIVED_OBJECTS_TABLE))
+  }
+
   private def loadObjects(crdd: CassandraTableScanRDD[CassandraRow]): Map[String, DatasetID] = {
 
     val sc = crdd.sparkContext
 
     val names = crdd.map(row =>
-      ( row.getString(OBJECT_COLUMN_NAME),
+      (row.getString(OBJECT_COLUMN_NAME),
         row.getString(OBJECT_COLUMN_META_KEYSPACE),
         row.getString(OBJECT_COLUMN_META_TABLE),
         row.getString(OBJECT_COLUMN_DATA_KEYSPACE),
@@ -50,14 +57,6 @@ object ObjectBase {
       )).collect.toSeq
 
     ???
-  }
-
-  def loadOriginalObjects(sc: SparkContext): Map[String, DatasetID] = {
-    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_ORIGINAL_OBJECTS_TABLE))
-  }
-
-  def loadDerivedObjects(sc: SparkContext): Map[String, DatasetID] = {
-    loadObjects(sc.cassandraTable(SCRUBJAY_OBJECTS_KEYSPACE, SCRUBJAY_DERIVED_OBJECTS_TABLE))
   }
 
   def saveAsOriginalObject(dsID: DatasetID,
@@ -69,8 +68,8 @@ object ObjectBase {
 
     val CQLCommand =
       s"INSERT INTO $SCRUBJAY_OBJECTS_KEYSPACE.$SCRUBJAY_ORIGINAL_OBJECTS_TABLE " +
-      s"($OBJECT_COLUMN_NAME, $OBJECT_COLUMN_META_KEYSPACE, $OBJECT_COLUMN_META_TABLE, $OBJECT_COLUMN_DATA_KEYSPACE, $OBJECT_COLUMN_DATA_TABLE) " +
-      s"VALUES (name, $metaKeyspace, $metaTable, $dataKeyspace, $dataTable)" /* FIXME */
+        s"($OBJECT_COLUMN_NAME, $OBJECT_COLUMN_META_KEYSPACE, $OBJECT_COLUMN_META_TABLE, $OBJECT_COLUMN_DATA_KEYSPACE, $OBJECT_COLUMN_DATA_TABLE) " +
+        s"VALUES (name, $metaKeyspace, $metaTable, $dataKeyspace, $dataTable)" /* FIXME */
 
     CassandraConnector(SparkContext.getOrCreate().getConf).withSessionDo { session =>
       session.execute(CQLCommand)

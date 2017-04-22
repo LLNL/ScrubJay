@@ -1,30 +1,29 @@
 /**
- * Single entry point for ScrubJay API
- *
- * All functionality here is meant to be externally accessible via `import scrubjay.imports._`
- *
- */
+  * Single entry point for ScrubJay API
+  *
+  * All functionality here is meant to be externally accessible via `import scrubjay.imports._`
+  *
+  */
 
+import org.apache.spark._
 import scrubjay.dataset._
 import scrubjay.metabase._
-import scrubjay.query._
-import org.apache.spark._
 //import scrubjay.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
 
 
 package object scrubjay {
 
   /**
-   * Standalone functions
-   */
+    * Standalone functions
+    */
 
   // def metaEntryFromStrings(relationType: String, dimension: String, units: String): MetaEntry = {
   //   scrubjay.metabase.MetaEntry.metaEntryFromStrings(relationType, dimension, units)
   // }
 
   /**
-   * SparkContext implicit functions
-   */
+    * SparkContext implicit functions
+    */
 
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
@@ -38,14 +37,14 @@ package object scrubjay {
   }
 
   /**
-   * ScrubJayRDD implicit functions
-   */
+    * ScrubJayRDD implicit functions
+    */
 
   implicit class DataSourceImplicits(dsID: DatasetID) {
 
     /**
-     * Derivations
-     */
+      * Derivations
+      */
 
     /*
     def deriveMergeColumns(columns: Seq[String]): DatasetID = {
@@ -78,8 +77,8 @@ package object scrubjay {
     */
 
     /**
-     * Save formats
-     */
+      * Save formats
+      */
 
     /*
     def saveToCassandra(keyspace: String, table: String): Unit = {
@@ -139,4 +138,5 @@ package object scrubjay {
     }
     */
   }
+
 }

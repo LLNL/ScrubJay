@@ -1,11 +1,5 @@
 package scrubjay.transformation
 
-import scrubjay.dataset._
-import scrubjay.metabase.GlobalMetaBase._
-import scrubjay.schema._
-import org.apache.spark.rdd.RDD
-import scrubjay.metabase._
-
 /*
 case class CoreFrequency(dsID: DatasetID)
   extends DatasetID(dsID) {

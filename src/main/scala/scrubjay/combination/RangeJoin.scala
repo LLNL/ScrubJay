@@ -1,10 +1,5 @@
 package scrubjay.combination
 
-import org.apache.spark.rdd.RDD
-import scrubjay.dataset._
-import scrubjay.metabase.MetaDescriptor.{DimensionSpace, MetaDimension}
-import scrubjay.schema._
-
 /*
 case class RangeJoin(dsID1: DatasetID, dsID2: DatasetID)
   extends DatasetID(dsID1, dsID2) {

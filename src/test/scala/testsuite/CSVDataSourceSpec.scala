@@ -3,12 +3,10 @@ package testsuite
 import org.apache.spark.sql.types.StructType
 import scrubjay.dataset._
 
-import org.scalactic.source.Position
-
 
 class CSVDataSourceSpec extends ScrubJaySpec {
 
-  lazy val jobQueueMetaSource: StructType = scrubjay.schema.fromJSONFile(jobQueueMetaFilename)
+  lazy val jobQueueMetaSource: StructType = scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename)
   lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, jobQueueMetaSource, Map("header" -> "true", "delimiter" -> "|"))
 
   describe("CSV sourced job queue data") {

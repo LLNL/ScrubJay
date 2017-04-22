@@ -1,8 +1,5 @@
 package scrubjay.transformation
 
-import scrubjay.dataset._
-import scrubjay.schema._
-
 import scala.language.existentials
 
 

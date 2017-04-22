@@ -3,12 +3,15 @@ package scrubjay
 
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import org.apache.spark.sql.types.{DataType, StructType}
-import scrubjay.metabase._
 
 import scala.io.Source
 import scala.util.Try
 
 package object schema {
+
+  def loadFromJSONFile(filename: String): StructType = {
+    fromJSON(Source.fromFile(filename).getLines().mkString("\n"))
+  }
 
   def fromJSON(json: String): StructType = {
     Try(DataType.fromJson(json)).getOrElse(LegacyTypeStringParser.parse(json)) match {
@@ -17,9 +20,6 @@ package object schema {
     }
   }
 
-  def fromJSONFile(filename: String): StructType = {
-    fromJSON(Source.fromFile(filename).getLines().mkString("\n"))
-  }
   /*
 
   type MetaSource = Map[String, MetaEntry]

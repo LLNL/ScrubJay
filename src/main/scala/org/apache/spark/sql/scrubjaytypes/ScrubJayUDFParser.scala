@@ -2,7 +2,7 @@ package org.apache.spark.sql.scrubjaytypes
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.{Metadata, StructField}
+import org.apache.spark.sql.types.StructField
 
 object ScrubJayUDFParser {
 

@@ -1,10 +1,5 @@
 package scrubjay.transformation
 
-import org.apache.spark.rdd.RDD
-import scrubjay.metabase._
-import scrubjay.dataset._
-import scrubjay.schema._
-
 /*
 case class MergeColumns(dsID: DatasetID, columns: Seq[String])
   extends DatasetID(dsID) {

@@ -1,6 +1,4 @@
-import scrubjay._
 
-import org.joda.time.{DateTime, Interval}
 
 package object testsuite {
 

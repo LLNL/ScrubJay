@@ -1,10 +1,5 @@
 package scrubjay.query
-
-import scrubjay.schema._
-import scrubjay.dataset._
 //import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
-
-import gov.llnl.ConstraintSolver._
 
 /*
 

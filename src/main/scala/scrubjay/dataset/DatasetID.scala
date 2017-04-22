@@ -3,19 +3,20 @@ package scrubjay.dataset
 //import scrubjay.combination.{InterpolationJoin, NaturalJoin}
 //import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
-import com.roundeights.hasher.Implicits._
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.DataType
+import java.io.{BufferedWriter, File, FileWriter}
+
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
-import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind._
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.roundeights.hasher.Implicits._
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.types.DataType
 import scrubjay.transformation.ExplodeDiscreteRange
-import java.io.{BufferedWriter, File, FileWriter}
 
 import scala.io.Source
 import scala.util.Try
@@ -36,6 +37,7 @@ abstract class DatasetID(val dependencies: Seq[DatasetID] = Seq.empty) extends S
   val isValid: Boolean
 
   def realize: DataFrame
+
   def asOption: Option[DatasetID] = {
     if (isValid)
       Some(this)
@@ -45,25 +47,6 @@ abstract class DatasetID(val dependencies: Seq[DatasetID] = Seq.empty) extends S
 }
 
 object DatasetID {
-
-  /**
-    * Serializer/Deserializer for Schema (Spark DataFrame StructType)
-    */
-  class SchemaSerializer extends JsonSerializer[Schema] {
-    override def serialize(value: Schema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
-      gen.writeRawValue(value.prettyJson)
-    }
-  }
-
-  class SchemaDeserializer extends JsonDeserializer[Schema] {
-    override def deserialize(p: JsonParser, ctxt: DeserializationContext): Schema = {
-      val raw = p.readValueAsTree().toString
-      Try(DataType.fromJson(raw)).getOrElse(LegacyTypeStringParser.parse(raw)) match {
-        case t: Schema => t
-        case _ => throw new RuntimeException(s"Failed parsing Schema: $raw")
-      }
-    }
-  }
 
   val objectMapper: ObjectMapper with ScalaObjectMapper = {
     val structTypeModule: SimpleModule = new SimpleModule()
@@ -76,13 +59,43 @@ object DatasetID {
     m
   }
 
-  def toJsonString(dsID: DatasetID): String = {
-    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dsID)
+  def toHash(dsID: DatasetID): String = "h" + toJsonString(dsID).sha256.hex
+
+  def toDotString(dsID: DatasetID): String = {
+
+    val (nodes, edges) = toNodeEdgeTuple(dsID)
+
+    val header = "digraph {"
+    val nodeSection = nodes.map("\t" + _).mkString("\n")
+    val edgeSection = edges.map("\t\t" + _).mkString("\n")
+    val footer = "}"
+
+    Seq(header, nodeSection, edgeSection, footer).mkString("\n")
   }
+
+  def loadFromJsonFile(filename: String): DatasetID = {
+    val fileContents = Source.fromFile(filename).getLines.mkString("\n")
+    fromJsonString(fileContents)
+  }
+
   def fromJsonString(json: String): DatasetID = {
     objectMapper.readValue[DatasetID](json, classOf[DatasetID])
   }
-  def toHash(dsID: DatasetID): String = "h" + toJsonString(dsID).sha256.hex
+
+  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toJsonString(dsID), filename)
+
+  def toJsonString(dsID: DatasetID): String = {
+    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dsID)
+  }
+
+  protected def saveStringToFile(text: String, filename: String): Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(text)
+    bw.close()
+  }
+
+  def saveToDotFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toDotString(dsID), filename)
 
   private def toNodeEdgeTuple(dsID: DatasetID, parentName: Option[String] = None): (Seq[String], Seq[String]) = {
 
@@ -108,7 +121,7 @@ object DatasetID {
       // case _: LocalDataset => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
 
       // Unknown
-      case _  => "label='unknown'"
+      case _ => "label='unknown'"
     }
     val node: String = hash + " [" + style + "]"
 
@@ -127,30 +140,22 @@ object DatasetID {
     (node +: childNodes, edge ++ childEdges)
   }
 
-  def toDotString(dsID: DatasetID): String = {
-
-    val (nodes, edges) = toNodeEdgeTuple(dsID)
-
-    val header = "digraph {"
-    val nodeSection = nodes.map("\t" + _).mkString("\n")
-    val edgeSection = edges.map("\t\t" + _).mkString("\n")
-    val footer = "}"
-
-    Seq(header, nodeSection, edgeSection, footer).mkString("\n")
+  /**
+    * Serializer/Deserializer for Schema (Spark DataFrame StructType)
+    */
+  class SchemaSerializer extends JsonSerializer[Schema] {
+    override def serialize(value: Schema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
+      gen.writeRawValue(value.prettyJson)
+    }
   }
 
-  protected def saveStringToFile(text: String, filename: String): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(text)
-    bw.close()
+  class SchemaDeserializer extends JsonDeserializer[Schema] {
+    override def deserialize(p: JsonParser, ctxt: DeserializationContext): Schema = {
+      val raw = p.readValueAsTree().toString
+      Try(DataType.fromJson(raw)).getOrElse(LegacyTypeStringParser.parse(raw)) match {
+        case t: Schema => t
+        case _ => throw new RuntimeException(s"Failed parsing Schema: $raw")
+      }
+    }
   }
-
-  def loadFromJsonFile(filename: String): DatasetID = {
-    val fileContents = Source.fromFile(filename).getLines.mkString("\n")
-    fromJsonString(fileContents)
-  }
-
-  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toJsonString(dsID), filename)
-  def saveToDotFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toDotString(dsID), filename)
 }

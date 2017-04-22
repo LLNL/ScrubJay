@@ -2,9 +2,9 @@ package org.apache.spark.sql.scrubjaytypes
 
 import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.functions.udf
+import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
 
@@ -34,26 +34,25 @@ object LocalDateTimeRangeStringUDT {
     )
   }
 
+  def parseStringUDF(datePattern: String): UserDefinedFunction = {
+    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(datePattern)))
+  }
+
   def deserialize(datum: Any, dateTimeFormatter: DateTimeFormatter = defaultFormatter): LocalDateTimeRangeType = {
     datum match {
       case utf8: UTF8String => {
         val s = utf8.toString
-        val values = s.substring(1, s.length-1).split(",")
+        val values = s.substring(1, s.length - 1).split(",")
         new LocalDateTimeRangeType(
           LocalDateTimeStringUDT.deserialize(values(0), dateTimeFormatter),
           LocalDateTimeStringUDT.deserialize(values(1), dateTimeFormatter))
       }
       case s: String => {
-        val values = s.substring(1, s.length-1).split(",")
+        val values = s.substring(1, s.length - 1).split(",")
         new LocalDateTimeRangeType(
           LocalDateTimeStringUDT.deserialize(values(0), dateTimeFormatter),
           LocalDateTimeStringUDT.deserialize(values(1), dateTimeFormatter))
       }
     }
-  }
-
-
-  def parseStringUDF(datePattern: String): UserDefinedFunction = {
-    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(datePattern)))
   }
 }
