@@ -1,9 +1,7 @@
 package scrubjay.dataset
 
-//import scrubjay.combination.{InterpolationJoin, NaturalJoin}
-//import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
-
-import java.io.{BufferedWriter, File, FileWriter}
+import scrubjay.util.writeStringToFile
+import scrubjay.transformation.ExplodeDiscreteRange
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
@@ -16,7 +14,6 @@ import com.roundeights.hasher.Implicits._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import org.apache.spark.sql.types.DataType
-import scrubjay.transformation.ExplodeDiscreteRange
 
 import scala.io.Source
 import scala.util.Try
@@ -30,6 +27,9 @@ import scala.util.Try
   property = "type"
 )
 @JsonSubTypes(Array(
+  /**
+    * Add DatasetID subtypes here to allow their JSON serialization
+    */
   new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
   new Type(value = classOf[ExplodeDiscreteRange], name = "ExplodeDiscreteRange")
 ))
@@ -48,7 +48,7 @@ abstract class DatasetID(val dependencies: Seq[DatasetID] = Seq.empty) extends S
 
 object DatasetID {
 
-  val objectMapper: ObjectMapper with ScalaObjectMapper = {
+  private val objectMapper: ObjectMapper with ScalaObjectMapper = {
     val structTypeModule: SimpleModule = new SimpleModule()
     structTypeModule.addSerializer(classOf[Schema], new SchemaSerializer())
     structTypeModule.addDeserializer(classOf[Schema], new SchemaDeserializer())
@@ -73,7 +73,7 @@ object DatasetID {
     Seq(header, nodeSection, edgeSection, footer).mkString("\n")
   }
 
-  def loadFromJsonFile(filename: String): DatasetID = {
+  def fromJsonFile(filename: String): DatasetID = {
     val fileContents = Source.fromFile(filename).getLines.mkString("\n")
     fromJsonString(fileContents)
   }
@@ -82,20 +82,13 @@ object DatasetID {
     objectMapper.readValue[DatasetID](json, classOf[DatasetID])
   }
 
-  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toJsonString(dsID), filename)
+  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = writeStringToFile(toJsonString(dsID), filename)
 
   def toJsonString(dsID: DatasetID): String = {
     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dsID)
   }
 
-  protected def saveStringToFile(text: String, filename: String): Unit = {
-    val file = new File(filename)
-    val bw = new BufferedWriter(new FileWriter(file))
-    bw.write(text)
-    bw.close()
-  }
-
-  def saveToDotFile(dsID: DatasetID, filename: String): Unit = saveStringToFile(toDotString(dsID), filename)
+  def saveToDotFile(dsID: DatasetID, filename: String): Unit = writeStringToFile(toDotString(dsID), filename)
 
   private def toNodeEdgeTuple(dsID: DatasetID, parentName: Option[String] = None): (Seq[String], Seq[String]) = {
 

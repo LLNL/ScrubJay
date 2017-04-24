@@ -1,5 +1,7 @@
 package scrubjay
 
+import java.io.{BufferedWriter, File, FileWriter}
+
 import scala.reflect.ClassTag
 import scala.util.control.Exception.allCatch
 
@@ -37,6 +39,13 @@ package object util {
   def cartesianProduct[T](xss: Seq[Seq[T]]): Seq[Seq[T]] = xss match {
     case Nil => Seq(Nil)
     case h +: t => for (xh <- h; xt <- cartesianProduct(t)) yield xh +: xt
+  }
+
+  def writeStringToFile(text: String, filename: String): Unit = {
+    val file = new File(filename)
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(text)
+    bw.close()
   }
 
 }

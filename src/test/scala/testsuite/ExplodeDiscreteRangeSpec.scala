@@ -1,29 +1,30 @@
 package testsuite
 
 import scrubjay.dataset._
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 import scrubjay.transformation.ExplodeDiscreteRange
 
 
 class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
 
-  lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename), Map("header" -> "true", "delimiter" -> "|"))
-  lazy val jobQueueExploded: DatasetID = ExplodeDiscreteRange(jobQueue, "nodelist")
+  lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
+  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeDiscreteRange(jobQueue, "nodelist")
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      assert(jobQueueExploded.isValid)
+      assert(jobQueueExplodeNodeList.isValid)
     }
     it("should exist") {
       println("DataFrame:")
-      jobQueueExploded.realize.show(false)
+      jobQueueExplodeNodeList.realize.show(false)
       println("Schema")
-      jobQueueExploded.realize.printSchema()
+      jobQueueExplodeNodeList.realize.printSchema()
     }
     it("should pickle/unpickle correctly") {
-      val json: String = DatasetID.toJsonString(jobQueueExploded)
+      val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)
       println("JSON:")
       println(json)
-      assert(DatasetID.fromJsonString(json) == jobQueueExploded)
+      assert(DatasetID.fromJsonString(json) == jobQueueExplodeNodeList)
     }
   }
 }

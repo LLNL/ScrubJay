@@ -1,21 +1,14 @@
 package scrubjay.transformation
 
+import scrubjay.dataset.DatasetID
+
 /*
 case class ExplodeContinuousRange(dsID: DatasetID, column: String, period: Double)
-  extends DatasetID(dsID) {
+  extends DatasetID(Seq(dsID)) {
 
-  val newColumn: String = column + "_exploded"
-
-  // Add column_exploded meta entry for each column
-  val schema: MetaSource = {
-    val originalMetaEntry = dsID.schema(column)
-    val newMeta = originalMetaEntry.copy(units = UNITS_DATETIMESTAMP)
-    dsID.schema
-      .withoutColumns(Seq(column))
-      .withMetaEntries(Map(newColumn -> newMeta))
+  override lazy val isValid: Boolean = dsID.realize.schema(column).metadata.getString("dimension") match {
+    case _ => false
   }
-
-  def isValid: Boolean = dsID.schema(column).units == UNITS_DATETIMESPAN
 
   def realize: ScrubJayRDD = {
 

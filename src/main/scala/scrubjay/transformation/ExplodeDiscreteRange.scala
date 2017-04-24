@@ -16,6 +16,7 @@ case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
   }
 
   override def realize: DataFrame = {
+    // TODO: update metadata, e.g. a List[String] becomes a String
     val DF = dsID.realize
     DF.withColumn(column, explode(DF(column)))
   }

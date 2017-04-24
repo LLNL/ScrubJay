@@ -28,11 +28,6 @@ package object scrubjay {
   implicit class ScrubJaySessionImplicits(sc: SparkContext) {
 
     val metaBase: MetaBase = GlobalMetaBase.META_BASE
-    var objectBase: Map[String, DatasetID] = Map.empty
-
-    def loadAllObjects(): Unit = {
-      objectBase = scrubjay.objectbase.ObjectBase.loadOriginalObjects(sc)
-    }
 
   }
 

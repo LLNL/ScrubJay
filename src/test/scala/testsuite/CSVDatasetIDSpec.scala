@@ -4,7 +4,7 @@ import org.apache.spark.sql.types.StructType
 import scrubjay.dataset._
 
 
-class CSVDataSourceSpec extends ScrubJaySpec {
+class CSVDatasetIDSpec extends ScrubJaySpec {
 
   lazy val jobQueueMetaSource: StructType = scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename)
   lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, jobQueueMetaSource, Map("header" -> "true", "delimiter" -> "|"))
