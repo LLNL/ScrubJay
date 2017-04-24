@@ -37,11 +37,6 @@ object LocalDateTimeRangeStringUDT {
     )
   }
 
-  def parseStringUDF(metadata: Metadata): UserDefinedFunction = {
-    val dateFormat = metadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
-    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
-  }
-
   def deserialize(datum: Any, dateTimeFormatter: DateTimeFormatter = defaultFormatter): LocalDateTimeRangeType = {
     datum match {
       case utf8: UTF8String => {
@@ -58,5 +53,10 @@ object LocalDateTimeRangeStringUDT {
           LocalDateTimeStringUDT.deserialize(values(1), dateTimeFormatter))
       }
     }
+  }
+
+  def parseStringUDF(metadata: Metadata): UserDefinedFunction = {
+    val dateFormat = metadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
+    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
   }
 }
