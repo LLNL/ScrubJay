@@ -7,6 +7,7 @@ import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
+import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser._
 
 class LocalDateTimeRangeStringUDT extends UserDefinedType[LocalDateTimeRangeType] {
 
@@ -23,7 +24,9 @@ class LocalDateTimeRangeStringUDT extends UserDefinedType[LocalDateTimeRangeType
 
 object LocalDateTimeRangeStringUDT {
 
-  private val defaultFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  private val defaultPattern = "yyyy-MM-dd HH:mm:ss"
+  private val dateFormatKey: String = "dateformat"
+  private val defaultFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(defaultPattern)
 
   def serialize(p: LocalDateTimeRangeType, dateTimeFormatter: DateTimeFormatter = defaultFormatter): UTF8String = {
     UTF8String.fromString("[" +
@@ -34,8 +37,9 @@ object LocalDateTimeRangeStringUDT {
     )
   }
 
-  def parseStringUDF(datePattern: String): UserDefinedFunction = {
-    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(datePattern)))
+  def parseStringUDF(metadata: Metadata): UserDefinedFunction = {
+    val dateFormat = metadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
+    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
   }
 
   def deserialize(datum: Any, dateTimeFormatter: DateTimeFormatter = defaultFormatter): LocalDateTimeRangeType = {

@@ -2,9 +2,33 @@ package org.apache.spark.sql.scrubjaytypes
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.{Metadata, StructField}
 
 object ScrubJayUDFParser {
+
+  // Spark hides metadata's internal Map, so we have to improvise for Map semantics...
+  implicit class RichMetaData(metadata: Metadata) {
+    def getLongOption(key: String): Option[Long] =
+      if(metadata.contains(key)) Some(metadata.getLong(key)) else None
+    def getDoubleOption(key: String): Option[Double] =
+      if(metadata.contains(key)) Some(metadata.getDouble(key)) else None
+    def getBooleanOption(key: String): Option[Boolean] =
+      if(metadata.contains(key)) Some(metadata.getBoolean(key)) else None
+    def getStringOption(key: String): Option[String] =
+      if(metadata.contains(key)) Some(metadata.getString(key)) else None
+    def getMetadataOption(key: String): Option[Metadata] =
+      if(metadata.contains(key)) Some(metadata.getMetadata(key)) else None
+    def getLongArrayOption(key: String): Option[Array[Long]] =
+      if(metadata.contains(key)) Some(metadata.getLongArray(key)) else None
+    def getDoubleArrayOption(key: String): Option[Array[Double]] =
+      if(metadata.contains(key)) Some(metadata.getDoubleArray(key)) else None
+    def getBooleanArrayOption(key: String): Option[Array[Boolean]] =
+      if(metadata.contains(key)) Some(metadata.getBooleanArray(key)) else None
+    def getStringArrayOption(key: String): Option[Array[String]] =
+      if(metadata.contains(key)) Some(metadata.getStringArray(key)) else None
+    def getMetadataArrayOption(key: String): Option[Array[Metadata]] =
+      if(metadata.contains(key)) Some(metadata.getMetadataArray(key)) else None
+  }
 
   def parse(DF: DataFrame): DataFrame = {
 
@@ -23,20 +47,12 @@ object ScrubJayUDFParser {
     if (structField.metadata.contains("scrubjaytype")) {
 
       structField.metadata.getString("scrubjaytype") match {
-
-        case "LocalDateTimeRangeString" => {
-          val dateformat = structField.metadata.getString("dateformat")
-          Some(LocalDateTimeRangeStringUDT.parseStringUDF(dateformat))
-        }
-
-        case "ArrayString" => {
-          val delimiter = structField.metadata.getString("delimiter")
-          Some(ArrayStringUDT.parseStringUDF(delimiter))
-        }
-
-        case unknownType: String => {
+        case "LocalDateTimeRangeString" =>
+          Some(LocalDateTimeRangeStringUDT.parseStringUDF(structField.metadata))
+        case "ArrayString" =>
+          Some(ArrayStringUDT.parseStringUDF(structField.metadata))
+        case unknownType: String =>
           throw new RuntimeException(s"ScrubJay type $unknownType unknown!")
-        }
       }
     }
     else {
