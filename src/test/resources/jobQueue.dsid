@@ -1,6 +1,6 @@
 {
   "type" : "CSVDatasetID",
-  "csvFileName" : "/Users/chai/src/scrubjay/target/scala-2.11/test-classes/jobQueue.csv",
+  "csvFileName" : "target/scala-2.11/test-classes/jobQueue.csv",
   "schema" : {
   "type" : "struct",
   "fields" : [ {
