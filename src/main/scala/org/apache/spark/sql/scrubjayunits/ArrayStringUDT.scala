@@ -1,9 +1,9 @@
-package org.apache.spark.sql.scrubjaytypes
+package org.apache.spark.sql.scrubjayunits
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.{Metadata, StructField}
 import org.apache.spark.sql.functions.udf
-import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser._
+import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser._
 import scrubjay.dataset.transformation._
 
 // TODO: subtypes, e.g. Array[Int]

@@ -1,6 +1,6 @@
-package org.apache.spark.sql.scrubjaytypes
+package org.apache.spark.sql.scrubjayunits
 
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.{Metadata, StructField}
 
 object ScrubJayUDFParser {
@@ -44,7 +44,7 @@ object ScrubJayUDFParser {
       val scrubjayParserMetadata = structField.metadata.getMetadata("scrubjay_parser")
       scrubjayParserMetadata.getString("type") match {
         case "LocalDateTimeRangeString" =>
-          df.withColumn(structField.name, LocalDateTimeRangeStringUDT.parseStringUDF(df, structField, scrubjayParserMetadata))
+          df.withColumn(structField.name, LocalDateTimeRange.parseStringUDF(df, structField, scrubjayParserMetadata))
         case "ArrayString" =>
           ArrayStringUDT.parseStringUDF(df, structField, scrubjayParserMetadata)
         case unknownType: String =>

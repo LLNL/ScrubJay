@@ -34,8 +34,6 @@ package object transformation {
 
     def withMetadata(newMetadata: Metadata): StructField = {
 
-      val oldMetadata = new MetadataBuilder().withMetadata(structField.metadata)
-
       val newNewMetadata = new MetadataBuilder()
         .withMetadata(structField.metadata)
         .withMetadata(newMetadata)

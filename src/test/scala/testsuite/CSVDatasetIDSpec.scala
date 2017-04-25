@@ -1,14 +1,11 @@
 package testsuite
 
-import org.apache.spark.sql.types.StructType
 import scrubjay.dataset._
-import scrubjay.dataset.original.CSVDatasetID
 
 
 class CSVDatasetIDSpec extends ScrubJaySpec {
 
-  lazy val jobQueueMetaSource: StructType = scrubjay.schema.loadFromJSONFile(jobQueueMetaFilename)
-  lazy val jobQueue: DatasetID = CSVDatasetID(jobQueueFilename, jobQueueMetaSource, Map("header" -> "true", "delimiter" -> "|"))
+  lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
 
   describe("CSV sourced job queue data") {
     it("should exist") {

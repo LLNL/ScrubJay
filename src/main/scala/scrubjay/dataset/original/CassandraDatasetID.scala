@@ -1,6 +1,6 @@
 package scrubjay.dataset.original
 
-import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser
+import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
