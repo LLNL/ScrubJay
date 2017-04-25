@@ -1,7 +1,8 @@
 package testsuite
 
 import org.apache.spark.sql.types.StructType
-import scrubjay.dataset.{CSVDatasetID, DatasetID}
+import scrubjay.dataset.DatasetID
+import scrubjay.dataset.original.CSVDatasetID
 
 class DatasetIDSpec extends ScrubJaySpec {
 
@@ -12,7 +13,7 @@ class DatasetIDSpec extends ScrubJaySpec {
 
   describe("Load ScrubJay DatasetID from .sj file") {
     it("should match ground truth") {
-      assert(dsID == jobQueue)
+      assert(dsID.realize.collect.toSet == jobQueue.realize.collect.toSet)
     }
   }
 }

@@ -1,10 +1,11 @@
-package scrubjay.dataset
+package scrubjay.dataset.original
 
 import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import scrubjay.dataset.{DatasetID, Schema}
 
 case class CSVDatasetID(csvFileName: String, schema: Schema, options: Map[String, String] = Map.empty)
-  extends DatasetID {
+  extends OriginalDatasetID {
 
   override lazy val isValid: Boolean = new java.io.File(csvFileName).exists()
 

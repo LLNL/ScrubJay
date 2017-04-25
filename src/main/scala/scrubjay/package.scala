@@ -8,7 +8,7 @@
 import org.apache.spark._
 import scrubjay.dataset._
 import scrubjay.metabase._
-//import scrubjay.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
+//import scrubjay.dataset.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
 
 
 package object scrubjay {
@@ -43,19 +43,19 @@ package object scrubjay {
 
     /*
     def deriveMergeColumns(columns: Seq[String]): DatasetID = {
-      scrubjay.transformation.MergeColumns(dsID, columns)
+      scrubjay.dataset.transformation.MergeColumns(dsID, columns)
     }
 
     def deriveCoreFrequency: DatasetID = {
-      scrubjay.transformation.CoreFrequency(dsID)
+      scrubjay.dataset.transformation.CoreFrequency(dsID)
     }
 
     def deriveExplodeList(column: String): DatasetID = {
-      scrubjay.transformation.ExplodeDiscreteRange(dsID, column)
+      scrubjay.dataset.transformation.ExplodeDiscreteRange(dsID, column)
     }
 
     def deriveExplodeTimeSpan(column: String, period: Double): DatasetID = {
-      scrubjay.transformation.ExplodeContinuousRange(dsID, column, period)
+      scrubjay.dataset.transformation.ExplodeContinuousRange(dsID, column, period)
     }
 
     def deriveNaturalJoin(dsID2: DatasetID): DatasetID = {
@@ -77,11 +77,11 @@ package object scrubjay {
 
     /*
     def saveToCassandra(keyspace: String, table: String): Unit = {
-      scrubjay.datasource.CassandraDataset.saveToCassandra(dsID, keyspace, table)
+      scrubjay.datasource.CassandraDatasetID.saveToCassandra(dsID, keyspace, table)
     }
 
     def createCassandraTable(keyspace: String, table: String, primaryKeys: Seq[String], clusterKeys: Seq[String]): Unit = {
-      scrubjay.datasource.CassandraDataset.createCassandraTable(dsID, keyspace, table, primaryKeys, clusterKeys)
+      scrubjay.datasource.CassandraDatasetID.createCassandraTable(dsID, keyspace, table, primaryKeys, clusterKeys)
     }
 
     def saveToCSV(filename: String,

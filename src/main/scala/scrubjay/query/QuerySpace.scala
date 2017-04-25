@@ -2,7 +2,7 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
 import scrubjay.dataset.DatasetID
-//import scrubjay.transformation.UberExplode
+//import scrubjay.dataset.transformation.UberExplode
 
 
 case class QuerySpace(metaEntries: Set[(String, String)], dsIDs: Seq[DatasetID]) extends ArgumentSpace {

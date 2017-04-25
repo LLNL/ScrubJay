@@ -1,10 +1,10 @@
-package scrubjay.dataset
+package scrubjay.dataset.original
 
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row}
 
-case class LocalDataset(rawData: Seq[Row], metaSourceID: StructType)
-  extends DatasetID {
+case class LocalDatasetID(rawData: Seq[Row], metaSourceID: StructType)
+  extends OriginalDatasetID {
 
   //override val schema: Schema = ???
 
@@ -15,6 +15,6 @@ case class LocalDataset(rawData: Seq[Row], metaSourceID: StructType)
   }
 }
 
-object LocalDataset {
+object LocalDatasetID {
 
 }

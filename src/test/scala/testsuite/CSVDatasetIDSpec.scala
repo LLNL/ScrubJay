@@ -2,6 +2,7 @@ package testsuite
 
 import org.apache.spark.sql.types.StructType
 import scrubjay.dataset._
+import scrubjay.dataset.original.CSVDatasetID
 
 
 class CSVDatasetIDSpec extends ScrubJaySpec {
@@ -13,8 +14,8 @@ class CSVDatasetIDSpec extends ScrubJaySpec {
     it("should exist") {
       println("DataFrame:")
       jobQueue.realize.show(false)
-      println("Schema:")
-      jobQueue.realize.printSchema()
+      println("Schema")
+      println(jobQueue.realize.schema.prettyJson)
     }
     it("should serialize/deserialize") {
       val json: String = DatasetID.toJsonString(jobQueue)

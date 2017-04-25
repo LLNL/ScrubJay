@@ -2,11 +2,10 @@ package org.apache.spark.sql.scrubjaytypes
 
 import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
-
 import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser._
 
 class LocalDateTimeRangeStringUDT extends UserDefinedType[LocalDateTimeRangeType] {
@@ -55,8 +54,9 @@ object LocalDateTimeRangeStringUDT {
     }
   }
 
-  def parseStringUDF(metadata: Metadata): UserDefinedFunction = {
-    val dateFormat = metadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
-    udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
+  def parseStringUDF(df: DataFrame, structField: StructField, scrubjayParserMetadata: Metadata): Column = {
+    val dateFormat = scrubjayParserMetadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
+    val parseUDF = udf((s: String) => LocalDateTimeRangeStringUDT.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
+    parseUDF(df(structField.name))
   }
 }

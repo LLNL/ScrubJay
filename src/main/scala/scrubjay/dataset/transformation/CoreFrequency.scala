@@ -1,4 +1,4 @@
-package scrubjay.transformation
+package scrubjay.dataset.transformation
 
 /*
 case class CoreFrequency(dsID: DatasetID)

@@ -1,4 +1,4 @@
-package scrubjay.transformation
+package scrubjay.dataset.transformation
 
 import scrubjay.dataset._
 
@@ -11,8 +11,8 @@ import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types.{ArrayType, MapType, StructType}
 
-case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
-  extends DatasetID(Seq(dsID)) {
+case class ExplodeContinuousRange(override val dsID: DatasetID, column: String)
+  extends Transformation {
 
   override lazy val isValid: Boolean = dsID.realize.schema(column).dataType match {
     case ArrayType(_, _) => true
@@ -22,11 +22,11 @@ case class ExplodeDiscreteRange(dsID: DatasetID, column: String)
 
   override def realize: DataFrame = {
     val DF = dsID.realize
-    DF.withColumn(column, ExplodeDiscreteRange.dfExpression(DF(column)))
+    DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column)))
   }
 }
 
-object ExplodeDiscreteRange {
+object ExplodeContinuousRange {
 
   @ExpressionDescription(
     usage = "_FUNC_(expr) - Separates the elements of array `expr` into multiple rows, or the elements of map `expr` into multiple rows and columns.",
@@ -91,3 +91,4 @@ object ExplodeDiscreteRange {
 
   def dfExpression(column: Column): Column = withExpr { ExpressionClass(column.expr) }
 }
+

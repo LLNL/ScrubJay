@@ -1,5 +1,5 @@
 package scrubjay.query
-//import scrubjay.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
+//import scrubjay.dataset.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
 /*
 

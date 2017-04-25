@@ -1,13 +1,13 @@
-package scrubjay.dataset
+package scrubjay.dataset.original
 
 import org.apache.spark.sql.scrubjaytypes.ScrubJayUDFParser
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-case class CassandraDataset(keyspace: String,
-                            table: String,
-                            schema: StructType)
-  extends DatasetID {
+case class CassandraDatasetID(keyspace: String,
+                              table: String,
+                              schema: StructType)
+  extends OriginalDatasetID {
 
   override lazy val isValid: Boolean = true
 
@@ -22,6 +22,6 @@ case class CassandraDataset(keyspace: String,
   }
 }
 
-object CassandraDataset {
+object CassandraDatasetID {
   // TODO: save to cassandra, Cassandra test spec
 }

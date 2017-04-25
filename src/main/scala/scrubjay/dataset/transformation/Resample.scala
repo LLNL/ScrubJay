@@ -1,4 +1,4 @@
-package scrubjay.transformation
+package scrubjay.dataset.transformation
 
 import scala.language.existentials
 

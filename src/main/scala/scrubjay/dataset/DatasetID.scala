@@ -1,8 +1,7 @@
 package scrubjay.dataset
 
 import scrubjay.util.writeStringToFile
-import scrubjay.transformation.ExplodeDiscreteRange
-
+import scrubjay.dataset.transformation.{ExplodeDiscreteRange, Transformation}
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
@@ -14,6 +13,8 @@ import com.roundeights.hasher.Implicits._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import org.apache.spark.sql.types.DataType
+import scrubjay.dataset.combination.Combination
+import scrubjay.dataset.original.{CSVDatasetID, OriginalDatasetID}
 
 import scala.io.Source
 import scala.util.Try
@@ -27,14 +28,14 @@ import scala.util.Try
   property = "type"
 )
 @JsonSubTypes(Array(
-  /**
-    * Add DatasetID subtypes here to allow their JSON serialization
-    */
-  new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
-  new Type(value = classOf[ExplodeDiscreteRange], name = "ExplodeDiscreteRange")
+  new Type(value = classOf[OriginalDatasetID], name = "OriginalDatasetID"),
+  new Type(value = classOf[Transformation], name = "Transformation"),
+  new Type(value = classOf[Combination], name = "Combination")
 ))
-abstract class DatasetID(val dependencies: Seq[DatasetID] = Seq.empty) extends Serializable {
+abstract class DatasetID extends Serializable {
   val isValid: Boolean
+
+  def dependencies: Seq[DatasetID]
 
   def realize: DataFrame
 
@@ -110,8 +111,8 @@ object DatasetID {
 
       // Original data sources
       case _: CSVDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"CSV\\n" + columnString + "\""
-      // case _: CassandraDataset => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
-      // case _: LocalDataset => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
+      // case _: CassandraDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
+      // case _: LocalDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
 
       // Unknown
       case _ => "label='unknown'"

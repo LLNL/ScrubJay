@@ -1,4 +1,4 @@
-package scrubjay.combination
+package scrubjay.dataset.combination
 
 import scala.language.existentials
 

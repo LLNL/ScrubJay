@@ -64,7 +64,6 @@
       "header" : "true",
       "delimiter" : "|"
     },
-    "dependencies" : [ ],
     "isValid" : true
   } ]
 }
