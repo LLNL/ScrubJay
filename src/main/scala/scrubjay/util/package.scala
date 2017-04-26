@@ -2,6 +2,7 @@ package scrubjay
 
 import java.io.{BufferedWriter, File, FileWriter}
 
+import scala.io.Source
 import scala.reflect.ClassTag
 import scala.util.control.Exception.allCatch
 
@@ -46,6 +47,10 @@ package object util {
     val bw = new BufferedWriter(new FileWriter(file))
     bw.write(text)
     bw.close()
+  }
+
+  def readFileToString(filename: String): String = {
+    Source.fromFile(filename).getLines.mkString("\n")
   }
 
 }

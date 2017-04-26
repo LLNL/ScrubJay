@@ -1,7 +1,14 @@
 package scrubjay.datasetid
 
-import scrubjay.util.writeStringToFile
-import scrubjay.datasetid.transformation.{ExplodeDiscreteRange, Transformation}
+import scrubjay.datasetid.transformation._
+import scrubjay.datasetid.combination._
+import scrubjay.datasetid.original._
+import scrubjay.util.{writeStringToFile, readFileToString}
+
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.types.DataType
+
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
@@ -9,16 +16,6 @@ import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.roundeights.hasher.Implicits._
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
-import org.apache.spark.sql.types.DataType
-import org.json4s.jackson.JsonMethods
-import scrubjay.datasetid.combination.Combination
-import scrubjay.datasetid.original.{CSVDatasetID, OriginalDatasetID}
-
-import scala.io.Source
-import scala.util.Try
 
 @JsonIgnoreProperties(
   value = Array("valid") // not sure why this gets populated
@@ -61,7 +58,10 @@ object DatasetID {
     m
   }
 
-  def toHash(dsID: DatasetID): String = "h" + toJsonString(dsID).sha256.hex
+  def toHash(dsID: DatasetID): String = {
+    import com.roundeights.hasher.Implicits._
+    "h" + toJsonString(dsID).sha256.hex
+  }
 
   def toDotString(dsID: DatasetID): String = {
 
@@ -76,21 +76,24 @@ object DatasetID {
   }
 
   def fromJsonFile(filename: String): DatasetID = {
-    val fileContents = Source.fromFile(filename).getLines.mkString("\n")
-    fromJsonString(fileContents)
+    fromJsonString(readFileToString(filename))
   }
 
   def fromJsonString(json: String): DatasetID = {
     objectMapper.readValue[DatasetID](json, classOf[DatasetID])
   }
 
-  def saveToJsonFile(dsID: DatasetID, filename: String): Unit = writeStringToFile(toJsonString(dsID), filename)
-
   def toJsonString(dsID: DatasetID): String = {
     objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(dsID)
   }
 
-  def saveToDotFile(dsID: DatasetID, filename: String): Unit = writeStringToFile(toDotString(dsID), filename)
+  def writeToJsonFile(dsID: DatasetID, filename: String): Unit = {
+    writeStringToFile(toJsonString(dsID), filename)
+  }
+
+  def writeToDotFile(dsID: DatasetID, filename: String): Unit = {
+    writeStringToFile(toDotString(dsID), filename)
+  }
 
   private def toNodeEdgeTuple(dsID: DatasetID, parentName: Option[String] = None): (Seq[String], Seq[String]) = {
 
@@ -112,7 +115,7 @@ object DatasetID {
 
       // Original data sources
       case _: CSVDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"CSV\\n" + columnString + "\""
-      // case _: CassandraDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
+      case _: CassandraDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
       // case _: LocalDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
 
       // Unknown
@@ -142,6 +145,7 @@ object DatasetID {
   class SchemaSerializer extends JsonSerializer[SparkSchema] {
     override def serialize(value: SparkSchema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
 
+      import org.json4s.jackson.JsonMethods
       import org.json4s.JsonAST.JValue
       import org.apache.spark.sql.scrubjayunits._
 
@@ -154,7 +158,7 @@ object DatasetID {
   class SchemaDeserializer extends JsonDeserializer[SparkSchema] {
     override def deserialize(p: JsonParser, ctxt: DeserializationContext): SparkSchema = {
       val json = p.readValueAsTree().toString
-      Try(DataType.fromJson(json)).getOrElse(LegacyTypeStringParser.parse(json)) match {
+      scala.util.Try(DataType.fromJson(json)).getOrElse(LegacyTypeStringParser.parse(json)) match {
         case t: SparkSchema => t
         case _ => throw new RuntimeException(s"Failed parsing SparkSchema: $json")
       }
