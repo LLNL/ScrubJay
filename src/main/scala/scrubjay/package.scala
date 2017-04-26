@@ -6,9 +6,9 @@
   */
 
 import org.apache.spark._
-import scrubjay.dataset._
+import scrubjay.datasetid._
 import scrubjay.metabase._
-//import scrubjay.dataset.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
+//import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin, RangeJoin}
 
 
 package object scrubjay {
@@ -43,19 +43,19 @@ package object scrubjay {
 
     /*
     def deriveMergeColumns(columns: Seq[String]): DatasetID = {
-      scrubjay.dataset.transformation.MergeColumns(dsID, columns)
+      scrubjay.datasetid.transformation.MergeColumns(dsID, columns)
     }
 
     def deriveCoreFrequency: DatasetID = {
-      scrubjay.dataset.transformation.CoreFrequency(dsID)
+      scrubjay.datasetid.transformation.CoreFrequency(dsID)
     }
 
     def deriveExplodeList(column: String): DatasetID = {
-      scrubjay.dataset.transformation.ExplodeDiscreteRange(dsID, column)
+      scrubjay.datasetid.transformation.ExplodeDiscreteRange(dsID, column)
     }
 
     def deriveExplodeTimeSpan(column: String, period: Double): DatasetID = {
-      scrubjay.dataset.transformation.ExplodeContinuousRange(dsID, column, period)
+      scrubjay.datasetid.transformation.ExplodeContinuousRange(dsID, column, period)
     }
 
     def deriveNaturalJoin(dsID2: DatasetID): DatasetID = {

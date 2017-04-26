@@ -1,6 +1,6 @@
-package scrubjay.dataset.transformation
+package scrubjay.datasetid.transformation
 
-import scrubjay.dataset._
+import scrubjay.datasetid._
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Column

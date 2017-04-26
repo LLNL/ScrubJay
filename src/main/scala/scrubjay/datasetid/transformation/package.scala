@@ -1,4 +1,4 @@
-package scrubjay.dataset
+package scrubjay.datasetid
 
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.catalyst.expressions.Expression

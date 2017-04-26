@@ -1,7 +1,7 @@
 package scrubjay.query
 
 import gov.llnl.ConstraintSolver._
-import scrubjay.dataset._
+import scrubjay.datasetid._
 
 
 case class Query(dataSources: Set[DatasetID],

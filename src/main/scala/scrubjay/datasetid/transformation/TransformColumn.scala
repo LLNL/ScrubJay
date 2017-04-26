@@ -1,4 +1,4 @@
-package scrubjay.dataset.transformation
+package scrubjay.datasetid.transformation
 
 /*
 class TransformColumn(dsID: DatasetID, column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry)

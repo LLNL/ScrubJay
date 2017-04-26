@@ -1,7 +1,7 @@
 package scrubjay.query
 
-import scrubjay.dataset._
-//import scrubjay.dataset.combination.UberJoin
+import scrubjay.datasetid._
+//import scrubjay.datasetid.combination.UberJoin
 
 import gov.llnl.ConstraintSolver._
 

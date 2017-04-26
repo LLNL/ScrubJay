@@ -1,6 +1,6 @@
 package testsuite
 
-import scrubjay.dataset._
+import scrubjay.datasetid._
 
 
 class CSVDatasetIDSpec extends ScrubJaySpec {

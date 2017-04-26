@@ -1,7 +1,7 @@
-package scrubjay.dataset
+package scrubjay.datasetid
 
 import scrubjay.util.writeStringToFile
-import scrubjay.dataset.transformation.{ExplodeDiscreteRange, Transformation}
+import scrubjay.datasetid.transformation.{ExplodeDiscreteRange, Transformation}
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
@@ -13,8 +13,8 @@ import com.roundeights.hasher.Implicits._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import org.apache.spark.sql.types.DataType
-import scrubjay.dataset.combination.Combination
-import scrubjay.dataset.original.{CSVDatasetID, OriginalDatasetID}
+import scrubjay.datasetid.combination.Combination
+import scrubjay.datasetid.original.{CSVDatasetID, OriginalDatasetID}
 
 import scala.io.Source
 import scala.util.Try

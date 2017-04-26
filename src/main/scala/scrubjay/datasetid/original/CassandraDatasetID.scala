@@ -1,8 +1,8 @@
-package scrubjay.dataset.original
+package scrubjay.datasetid.original
 
 import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import scrubjay.dataset.{ScrubJaySchema, SparkSchema}
+import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 
 case class CassandraDatasetID(keyspace: String,
                               table: String,

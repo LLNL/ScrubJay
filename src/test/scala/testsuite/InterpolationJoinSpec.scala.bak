@@ -3,7 +3,7 @@ package testsuite
 import scrubjay.schema._
 import scrubjay.datasource._
 import org.scalactic.source.Position
-import scrubjay.dataset.combination.InterpolationJoin
+import scrubjay.datasetid.combination.InterpolationJoin
 
 
 class InterpolationJoinSpec extends ScrubJaySpec {

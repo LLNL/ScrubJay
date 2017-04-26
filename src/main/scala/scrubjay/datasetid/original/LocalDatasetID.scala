@@ -1,7 +1,7 @@
-package scrubjay.dataset.original
+package scrubjay.datasetid.original
 
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import scrubjay.dataset.{ScrubJaySchema, SparkSchema}
+import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 
 case class LocalDatasetID(rawData: Seq[Row], sparkSchema: SparkSchema, scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID {

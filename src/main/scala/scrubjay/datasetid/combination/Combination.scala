@@ -1,6 +1,6 @@
-package scrubjay.dataset.combination
+package scrubjay.datasetid.combination
 
-import scrubjay.dataset.DatasetID
+import scrubjay.datasetid.DatasetID
 
 abstract class Combination extends DatasetID {
   val dsID1: DatasetID

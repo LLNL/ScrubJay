@@ -1,8 +1,8 @@
 package testsuite
 
 import org.apache.spark.sql.types.StructType
-import scrubjay.dataset.DatasetID
-import scrubjay.dataset.original.CSVDatasetID
+import scrubjay.datasetid.DatasetID
+import scrubjay.datasetid.original.CSVDatasetID
 
 class DatasetIDSpec extends ScrubJaySpec {
 

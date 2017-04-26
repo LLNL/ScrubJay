@@ -1,6 +1,6 @@
-package scrubjay.dataset.combination
+package scrubjay.datasetid.combination
 
-//import scrubjay.dataset.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
+//import scrubjay.datasetid.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
 
 /*
 object UberJoin {

@@ -1,6 +1,6 @@
 package scrubjay.dataspace
 
-import scrubjay.dataset.DatasetID
+import scrubjay.datasetid.DatasetID
 import scrubjay.util.writeStringToFile
 
 import com.fasterxml.jackson.databind.ObjectMapper

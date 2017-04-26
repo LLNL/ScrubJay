@@ -1,4 +1,4 @@
-package scrubjay.dataset.combination
+package scrubjay.datasetid.combination
 
 /*
 case class RangeJoin(dsID1: DatasetID, dsID2: DatasetID)

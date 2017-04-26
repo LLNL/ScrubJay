@@ -1,8 +1,8 @@
 package testsuite
 
-import scrubjay.dataset._
+import scrubjay.datasetid._
 import scrubjay.dataspace.{DataSpace, DimensionSpace}
-import scrubjay.dataset.transformation.ExplodeDiscreteRange
+import scrubjay.datasetid.transformation.ExplodeDiscreteRange
 
 
 class ExplodeDiscreteRangeSpec extends ScrubJaySpec {

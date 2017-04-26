@@ -1,4 +1,4 @@
-package scrubjay.dataset
+package scrubjay.datasetid
 
 package object original {
 

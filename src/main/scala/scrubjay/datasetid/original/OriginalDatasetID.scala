@@ -1,8 +1,8 @@
-package scrubjay.dataset.original
+package scrubjay.datasetid.original
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
-import scrubjay.dataset._
+import scrubjay.datasetid._
 
 @JsonIgnoreProperties(
   value = Array("valid") // not sure why this gets populated
