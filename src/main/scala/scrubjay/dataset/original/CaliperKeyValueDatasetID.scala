@@ -1,12 +1,12 @@
 package scrubjay.dataset.original
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.StructType
+import scrubjay.dataset.{ScrubJaySchema, SparkSchema}
 
-case class CaliperKeyValueDatasetID(ckvFileName: String, schema: StructType)
+case class CaliperKeyValueDatasetID(ckvFileName: String, sparkSchema: SparkSchema, scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID {
 
-  override lazy val isValid: Boolean = true
+  override def isValid: Boolean = true
 
   override def realize: DataFrame = ???
 }

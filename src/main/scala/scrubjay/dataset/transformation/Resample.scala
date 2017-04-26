@@ -18,7 +18,7 @@ case class ResampleMethod[T: Units](metaEntry: MetaEntry, start: Option[T], end:
 case class Resample(dsID: DatasetID, method: ResampleMethod[_])
   extends DatasetID {
 
-  override val schema: MetaSource = dsID.schema
+  override val sparkSchema: MetaSource = dsID.sparkSchema
 
   override def isValid: Boolean = true
 
@@ -26,7 +26,7 @@ case class Resample(dsID: DatasetID, method: ResampleMethod[_])
     val ds = dsID.realize
 
     // Key each row by the provided metaEntry
-    val column = schema.columnForEntry(method.metaEntry).get
+    val column = sparkSchema.columnForEntry(method.metaEntry).get
 
     var rdd = ds.rdd.keyBy(row => row(column).asInstanceOf[Continuous].asDouble)
 

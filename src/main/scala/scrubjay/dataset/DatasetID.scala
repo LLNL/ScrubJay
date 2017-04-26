@@ -33,12 +33,12 @@ import scala.util.Try
   new Type(value = classOf[Combination], name = "Combination")
 ))
 abstract class DatasetID extends Serializable {
-  val isValid: Boolean
 
+  def scrubJaySchema: ScrubJaySchema
+
+  def isValid: Boolean
   def dependencies: Seq[DatasetID]
-
   def realize: DataFrame
-
   def asOption: Option[DatasetID] = {
     if (isValid)
       Some(this)
@@ -51,8 +51,8 @@ object DatasetID {
 
   private val objectMapper: ObjectMapper with ScalaObjectMapper = {
     val structTypeModule: SimpleModule = new SimpleModule()
-    structTypeModule.addSerializer(classOf[Schema], new SchemaSerializer())
-    structTypeModule.addDeserializer(classOf[Schema], new SchemaDeserializer())
+    structTypeModule.addSerializer(classOf[SparkSchema], new SchemaSerializer())
+    structTypeModule.addDeserializer(classOf[SparkSchema], new SchemaDeserializer())
 
     val m = new ObjectMapper with ScalaObjectMapper
     m.registerModule(DefaultScalaModule)
@@ -135,20 +135,20 @@ object DatasetID {
   }
 
   /**
-    * Serializer/Deserializer for Schema (Spark DataFrame StructType)
+    * Serializer/Deserializer for SparkSchema (Spark DataFrame StructType)
     */
-  class SchemaSerializer extends JsonSerializer[Schema] {
-    override def serialize(value: Schema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
+  class SchemaSerializer extends JsonSerializer[SparkSchema] {
+    override def serialize(value: SparkSchema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
       gen.writeRawValue(value.prettyJson)
     }
   }
 
-  class SchemaDeserializer extends JsonDeserializer[Schema] {
-    override def deserialize(p: JsonParser, ctxt: DeserializationContext): Schema = {
+  class SchemaDeserializer extends JsonDeserializer[SparkSchema] {
+    override def deserialize(p: JsonParser, ctxt: DeserializationContext): SparkSchema = {
       val raw = p.readValueAsTree().toString
       Try(DataType.fromJson(raw)).getOrElse(LegacyTypeStringParser.parse(raw)) match {
-        case t: Schema => t
-        case _ => throw new RuntimeException(s"Failed parsing Schema: $raw")
+        case t: SparkSchema => t
+        case _ => throw new RuntimeException(s"Failed parsing SparkSchema: $raw")
       }
     }
   }

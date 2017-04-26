@@ -6,7 +6,7 @@ object UberExplode {
 
   def apply(dsID: DatasetID): Seq[DatasetID] = {
 
-    val explodeColumns = dsID.schema.filter(e =>
+    val explodeColumns = dsID.sparkSchema.filter(e =>
       e._2.units.unitsTag.domainType == DomainType.MULTIPOINT ||
       e._2.units.unitsTag.domainType == DomainType.RANGE)
       .keys.toSeq

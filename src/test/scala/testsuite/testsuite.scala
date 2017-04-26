@@ -12,7 +12,7 @@ package object testsuite {
   val flopsMetaFilename: String = getClass.getResource("/flopsMeta.csv").getPath
   val flopsFilename: String = getClass.getResource("/flops.csv").getPath
 
-  val jobQueueMetaFilename: String = getClass.getResource("/jobQueueMeta.json").getPath
+  //val jobQueueMetaFilename: String = getClass.getResource("/jobQueueMeta.json").getPath
   val jobQueueFilename: String = getClass.getResource("/jobQueue.csv").getPath
 
   val nodeFlopsMetaFilename: String = getClass.getResource("/nodeFlopsMeta.csv").getPath

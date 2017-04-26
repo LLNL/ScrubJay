@@ -100,7 +100,7 @@ package object scrubjay {
 
       createLocalMetaSource {
         {
-          for (column <- ds.schema.columns) yield {
+          for (column <- ds.sparkSchema.columns) yield {
 
             // Get relation type
             Seq("domain", "value").foreach(relationType =>

@@ -4,9 +4,9 @@ package scrubjay.dataset.transformation
 class TransformColumn(dsID: DatasetID, column: String, fn: Units[_] => Units[_], newMetaEntry: MetaEntry)
   extends DatasetID(Seq(dsID))(Seq(column, fn, newMetaEntry)) {
 
-  val isValid: Boolean = dsID.schema.columns contains column
+  val isValid: Boolean = dsID.sparkSchema.columns contains column
 
-  val schema: MetaSource = dsID.schema.withMetaEntries(Map(column -> newMetaEntry), overwrite = true)
+  val sparkSchema: MetaSource = dsID.sparkSchema.withMetaEntries(Map(column -> newMetaEntry), overwrite = true)
 
   def realize: ScrubJayRDD = {
 

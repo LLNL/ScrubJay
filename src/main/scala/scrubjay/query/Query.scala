@@ -14,7 +14,7 @@ case class Query(dataSources: Set[DatasetID],
 
     // Fun case: queried meta entries exist in a data source derived from multiple data sources
     /*
-    val dsIDMeta = dsIDSet.toSeq.map(_.schema.values.toSet).reduce(_ union _)
+    val dsIDMeta = dsIDSet.toSeq.map(_.sparkSchema.values.toSet).reduce(_ union _)
     val metaSatisfied = query.intersect(dsIDMeta).size == query.size
 
     if (metaSatisfied)

@@ -2,18 +2,21 @@ package scrubjay.dataset.original
 
 import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import scrubjay.dataset.{DatasetID, Schema}
+import scrubjay.dataset.{DatasetID, ScrubJaySchema, SparkSchema}
 
-case class CSVDatasetID(csvFileName: String, schema: Schema, options: Map[String, String] = Map.empty)
+case class CSVDatasetID(csvFileName: String,
+                        sparkSchema: SparkSchema,
+                        scrubJaySchema: ScrubJaySchema,
+                        options: Map[String, String] = Map.empty)
   extends OriginalDatasetID {
 
-  override lazy val isValid: Boolean = new java.io.File(csvFileName).exists()
+  override def isValid: Boolean = new java.io.File(csvFileName).exists()
 
   override def realize: DataFrame = {
     ScrubJayUDFParser.parse(
       SparkSession.builder().getOrCreate()
         .read
-        .schema(schema)
+        .schema(sparkSchema)
         .options(options)
         .csv(csvFileName)
     )

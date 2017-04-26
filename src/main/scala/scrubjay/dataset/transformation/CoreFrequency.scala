@@ -5,11 +5,11 @@ case class CoreFrequency(dsID: DatasetID)
   extends DatasetID(dsID) {
 
   // Find aperf and mperf time entries
-  def aperfEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
+  def aperfEntry: Option[(String, MetaEntry)] = dsID.sparkSchema.find(me =>
       me._2.dimension == DIMENSION_APERF)
-  def mperfEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
+  def mperfEntry: Option[(String, MetaEntry)] = dsID.sparkSchema.find(me =>
       me._2.dimension == DIMENSION_MPERF)
-  def baseFreqEntry: Option[(String, MetaEntry)] = dsID.schema.find(me =>
+  def baseFreqEntry: Option[(String, MetaEntry)] = dsID.sparkSchema.find(me =>
       me._2.dimension == DIMENSION_CPU_BASE_FREQUENCY)
 
   // Helper functions
@@ -37,7 +37,7 @@ case class CoreFrequency(dsID: DatasetID)
 
   val isValid: Boolean = allSpans.exists(_.isDefined)
 
-  val schema: MetaSource = dsID.schema
+  val sparkSchema: MetaSource = dsID.sparkSchema
     .withoutColumns(Seq(aperfEntry.get._1, mperfEntry.get._1, baseFreqEntry.get._1))
     .withMetaEntries(Map("cpu frequency" -> MetaEntry(MetaRelationType.VALUE, DIMENSION_CPU_ACTIVE_FREQUENCY, UNITS_ORDERED_CONTINUOUS)))
 

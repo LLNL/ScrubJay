@@ -5,26 +5,26 @@ case class RangeJoin(dsID1: DatasetID, dsID2: DatasetID)
   extends DatasetID(dsID1, dsID2) {
 
   // Determine common continuous (point, range) column pairs and and discrete dimension columns
-  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.schema, dsID2.schema).toSeq
+  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.sparkSchema, dsID2.sparkSchema).toSeq
   val commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
     d._1.dimensionType == DimensionSpace.CONTINUOUS &&
     d._2.units.unitsTag.domainType == DomainType.RANGE &&
     d._3.units.unitsTag.domainType == DomainType.POINT)
   val commonDiscreteDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(_._1.dimensionType == DimensionSpace.DISCRETE)
 
-  val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.schema.columnForEntry(me1) }.head
-  val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.schema.columnForEntry(me2) }.head
+  val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.sparkSchema.columnForEntry(me1) }.head
+  val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.sparkSchema.columnForEntry(me2) }.head
 
-  val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.schema.columnForEntry(me1) }
-  val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.schema.columnForEntry(me2) }
+  val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.sparkSchema.columnForEntry(me1) }
+  val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.sparkSchema.columnForEntry(me2) }
 
   // Restrict to single continuous axis for now
   def isValid: Boolean = commonContinuousDimensions.length == 1
 
-  val schema: MetaSource = dsID1.schema
+  val sparkSchema: MetaSource = dsID1.sparkSchema
     .withoutColumns(discreteDimColumns2)
     .withoutColumns(Seq(continuousDimColumn2))
-    .withMetaEntries(dsID2.schema)
+    .withMetaEntries(dsID2.sparkSchema)
 
   def realize: ScrubJayRDD = {
 
@@ -50,7 +50,7 @@ case class RangeJoin(dsID1: DatasetID, dsID2: DatasetID)
       }
 
       // Reduce all points that fall in a range using the appropriate reducer for those units
-      val meta = ds1.sparkContext.broadcast(dsID2.schema)
+      val meta = ds1.sparkContext.broadcast(dsID2.sparkSchema)
       val reducedMatch = continuousMatch.mapValues(_.toSeq).reduceByKey(_ ++ _)
         .mapValues(_.groupBy(_._1).map(kv => (kv._1, meta.value(kv._1).units.unitsTag.reduce(kv._2.map(_._2)))).toMap[String, Units[_]])
 

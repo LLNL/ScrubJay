@@ -17,8 +17,8 @@ class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
     it("should exist") {
       println("DataFrame:")
       jobQueueExplodeNodeList.realize.show(false)
-      println("Schema")
-      println(jobQueueExplodeNodeList.realize.schema.prettyJson)
+      println("SparkSchema")
+      jobQueueExplodeNodeList.realize.printSchema()
     }
     it("should pickle/unpickle correctly") {
       val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)

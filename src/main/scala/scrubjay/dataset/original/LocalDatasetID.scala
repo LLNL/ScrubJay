@@ -1,17 +1,17 @@
 package scrubjay.dataset.original
 
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import scrubjay.dataset.{ScrubJaySchema, SparkSchema}
 
-case class LocalDatasetID(rawData: Seq[Row], metaSourceID: StructType)
+case class LocalDatasetID(rawData: Seq[Row], sparkSchema: SparkSchema, scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID {
 
-  //override val schema: Schema = ???
-
-  override lazy val isValid: Boolean = true
+  override def isValid: Boolean = true
 
   override def realize: DataFrame = {
-    ???
+    val spark = SparkSession.builder().getOrCreate()
+    val rdd = spark.sparkContext.parallelize(rawData)
+    spark.createDataFrame(rdd, sparkSchema)
   }
 }
 

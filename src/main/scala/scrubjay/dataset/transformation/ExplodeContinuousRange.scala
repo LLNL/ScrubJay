@@ -14,7 +14,9 @@ import org.apache.spark.sql.types.{ArrayType, MapType, StructType}
 case class ExplodeContinuousRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
-  override lazy val isValid: Boolean = dsID.realize.schema(column).dataType match {
+  override def scrubJaySchema: ScrubJaySchema = dsID.scrubJaySchema
+
+  override def isValid: Boolean = dsID.realize.schema(column).dataType match {
     case ArrayType(_, _) => true
     case MapType(_, _, _) => true
     case _ => false
@@ -48,7 +50,7 @@ object ExplodeContinuousRange {
       }
     }
 
-    override def elementSchema: Schema = child.dataType match {
+    override def elementSchema: SparkSchema = child.dataType match {
       case ArrayType(et, containsNull) =>
         new StructType()
           .add("col", et, containsNull)

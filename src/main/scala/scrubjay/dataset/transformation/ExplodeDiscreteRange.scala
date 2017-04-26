@@ -12,7 +12,9 @@ import org.apache.spark.sql.types._
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
-  override lazy val isValid: Boolean = {
+  override def scrubJaySchema: ScrubJaySchema = dsID.scrubJaySchema
+
+  override def isValid: Boolean = {
     dsID.realize.schema(column).dataType match {
       case ArrayType(_, _) => true
       case MapType(_, _, _) => true

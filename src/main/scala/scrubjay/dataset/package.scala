@@ -1,5 +1,7 @@
 package scrubjay
 
+
 package object dataset {
-  type Schema = org.apache.spark.sql.types.StructType
+  type SparkSchema = org.apache.spark.sql.types.StructType
+  type ScrubJaySchema = Map[String, Map[String, Any]]
 }

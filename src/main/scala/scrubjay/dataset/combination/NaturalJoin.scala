@@ -16,21 +16,21 @@ case class NaturalJoin(dsID1: DatasetID, dsID2: DatasetID)
   extends DatasetID(dsID1, dsID2) {
 
   // Determine columns in common between ds1 and ds2 (matching meta entries)
-  def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.schema, dsID2.schema)
+  def validEntries: Seq[MetaEntry] = MetaSource.commonMetaEntries(dsID1.sparkSchema, dsID2.sparkSchema)
     .filter(me =>
       me.relationType == MetaRelationType.DOMAIN &&
       me.units == UNITS_UNORDERED_DISCRETE &&
       me.dimension != DIMENSION_UNKNOWN)
     .toSeq
 
-  def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.schema.columnForEntry)
-  def keyColumns2: Seq[String] = validEntries.flatMap(dsID2.schema.columnForEntry)
+  def keyColumns1: Seq[String] = validEntries.flatMap(dsID1.sparkSchema.columnForEntry)
+  def keyColumns2: Seq[String] = validEntries.flatMap(dsID2.sparkSchema.columnForEntry)
 
   def isValid: Boolean = validEntries.nonEmpty
 
-  val schema: MetaSource = dsID2.schema
+  val sparkSchema: MetaSource = dsID2.sparkSchema
     .withoutColumns(keyColumns2)
-    .withMetaEntries(dsID1.schema)
+    .withMetaEntries(dsID1.sparkSchema)
 
   def realize: ScrubJayRDD = {
 
