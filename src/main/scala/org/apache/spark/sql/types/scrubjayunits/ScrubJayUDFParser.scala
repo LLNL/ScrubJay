@@ -21,7 +21,7 @@ object ScrubJayUDFParser {
       val scrubjayParserMetadata = structField.metadata.getMetadata("scrubjay_parser")
       scrubjayParserMetadata.getString("type") match {
         case "LocalDateTimeRangeString" =>
-          df.withColumn(structField.name, SJLocalDateTimeRange_String.parseStringUDF(df, structField, scrubjayParserMetadata))
+          df.withColumn(structField.name, ScrubJayLocalDateTimeRange_String.parseStringUDF(df, structField, scrubjayParserMetadata))
         case "ArrayString" =>
           ArrayStringUDT.parseStringUDF(df, structField, scrubjayParserMetadata)
         case unknownType: String =>
