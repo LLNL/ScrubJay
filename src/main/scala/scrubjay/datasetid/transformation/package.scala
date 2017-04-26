@@ -1,8 +1,8 @@
 package scrubjay.datasetid
 
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.types.{Metadata, MetadataBuilder, StructField, StructType}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 package object transformation {
   def withExpr(expr: Expression): Column = new Column(expr)

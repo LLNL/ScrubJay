@@ -1,12 +1,11 @@
 package scrubjay.dataspace
 
-import scrubjay.datasetid.DatasetID
-import scrubjay.util.writeStringToFile
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import scrubjay.datasetid.DatasetID
+import scrubjay.util.writeStringToFile
 
 import scala.io.Source
 

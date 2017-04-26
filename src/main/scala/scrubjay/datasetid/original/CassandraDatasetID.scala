@@ -1,6 +1,6 @@
 package scrubjay.datasetid.original
 
-import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser
+import org.apache.spark.sql.types.scrubjayunits.ScrubJayUDFParser
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 

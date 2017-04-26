@@ -1,14 +1,5 @@
 package scrubjay.datasetid
 
-import scrubjay.datasetid.transformation._
-import scrubjay.datasetid.combination._
-import scrubjay.datasetid.original._
-import scrubjay.util.{writeStringToFile, readFileToString}
-
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
-import org.apache.spark.sql.types.DataType
-
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
@@ -16,6 +7,13 @@ import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.types.DataType
+import scrubjay.datasetid.combination._
+import scrubjay.datasetid.original._
+import scrubjay.datasetid.transformation._
+import scrubjay.util.{readFileToString, writeStringToFile}
 
 @JsonIgnoreProperties(
   value = Array("valid") // not sure why this gets populated
@@ -145,9 +143,9 @@ object DatasetID {
   class SchemaSerializer extends JsonSerializer[SparkSchema] {
     override def serialize(value: SparkSchema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
 
-      import org.json4s.jackson.JsonMethods
+      import org.apache.spark.sql.types.scrubjayunits._
       import org.json4s.JsonAST.JValue
-      import org.apache.spark.sql.scrubjayunits._
+      import org.json4s.jackson.JsonMethods
 
       val jValue: JValue = value.getJValue
       val jNode = JsonMethods.asJsonNode(jValue)

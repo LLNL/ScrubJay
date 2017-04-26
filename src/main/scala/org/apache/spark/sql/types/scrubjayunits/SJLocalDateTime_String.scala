@@ -1,20 +1,17 @@
-package org.apache.spark.sql.scrubjayunits
+package org.apache.spark.sql.types.scrubjayunits
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.types.SQLUserDefinedType
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser._
-
 
 @SQLUserDefinedType(udt = classOf[SJLocalDateTime_String.SJLocalDateTimeUDT])
 class SJLocalDateTime_String(val value: LocalDateTime)
-  extends ScrubJayUnits {
+  extends SJUnits {
 
   override def toString: String = {
     "LocalDateTime(" + value + ")"
@@ -60,7 +57,7 @@ object SJLocalDateTime_String {
   }
 
   def parseStringUDF(metadata: Metadata): UserDefinedFunction = {
-    val dateFormat = metadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
+    val dateFormat = metadata.getElementOrElse(dateFormatKey, defaultPattern)
     udf((s: String) => SJLocalDateTimeRange_String.deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
   }
 }

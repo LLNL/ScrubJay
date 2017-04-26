@@ -1,13 +1,13 @@
 package scrubjay.datasetid.transformation
 
-import scrubjay.datasetid._
-import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, Generator, UnaryExpression}
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
+import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, Generator, UnaryExpression}
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{Column, DataFrame}
+import scrubjay.datasetid._
 
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {

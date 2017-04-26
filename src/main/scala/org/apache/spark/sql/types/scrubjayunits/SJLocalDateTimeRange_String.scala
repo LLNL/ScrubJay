@@ -1,21 +1,18 @@
-package org.apache.spark.sql.scrubjayunits
+package org.apache.spark.sql.types.scrubjayunits
 
-import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.SQLUserDefinedType
 import java.time.format.DateTimeFormatter
 
-import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.unsafe.types.UTF8String
-import org.apache.spark.sql.scrubjayunits.ScrubJayUDFParser._
 
 @SQLUserDefinedType(udt = classOf[SJLocalDateTimeRange_String.LocalDateTimeRangeStringUDT])
 class SJLocalDateTimeRange_String(val start: SJLocalDateTime_String, val end: SJLocalDateTime_String)
-  extends ScrubJayUnits {
+  extends SJUnits {
 
   override def toString: String = {
-    "SJLocalDateTimeRange_String(" + start + "," + end + ")"
+    "LocalDateTimeRange(" + start + "," + end + ")"
   }
 
   override def equals(other: Any): Boolean = other match {
@@ -72,7 +69,7 @@ object SJLocalDateTimeRange_String {
   }
 
   def parseStringUDF(df: DataFrame, structField: StructField, scrubjayParserMetadata: Metadata): Column = {
-    val dateFormat = scrubjayParserMetadata.getStringOption(dateFormatKey).getOrElse(defaultPattern)
+    val dateFormat = scrubjayParserMetadata.getElementOrElse(dateFormatKey, defaultPattern)
     val parseUDF = udf((s: String) => deserialize(s, DateTimeFormatter.ofPattern(dateFormat)))
     parseUDF(df(structField.name))
   }
