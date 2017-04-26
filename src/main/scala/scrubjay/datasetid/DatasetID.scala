@@ -13,6 +13,7 @@ import com.roundeights.hasher.Implicits._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
 import org.apache.spark.sql.types.DataType
+import org.json4s.jackson.JsonMethods
 import scrubjay.datasetid.combination.Combination
 import scrubjay.datasetid.original.{CSVDatasetID, OriginalDatasetID}
 
@@ -137,18 +138,25 @@ object DatasetID {
   /**
     * Serializer/Deserializer for SparkSchema (Spark DataFrame StructType)
     */
+
   class SchemaSerializer extends JsonSerializer[SparkSchema] {
     override def serialize(value: SparkSchema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
-      gen.writeRawValue(value.prettyJson)
+
+      import org.json4s.JsonAST.JValue
+      import org.apache.spark.sql.scrubjayunits._
+
+      val jValue: JValue = value.getJValue
+      val jNode = JsonMethods.asJsonNode(jValue)
+      gen.writeTree(jNode)
     }
   }
 
   class SchemaDeserializer extends JsonDeserializer[SparkSchema] {
     override def deserialize(p: JsonParser, ctxt: DeserializationContext): SparkSchema = {
-      val raw = p.readValueAsTree().toString
-      Try(DataType.fromJson(raw)).getOrElse(LegacyTypeStringParser.parse(raw)) match {
+      val json = p.readValueAsTree().toString
+      Try(DataType.fromJson(json)).getOrElse(LegacyTypeStringParser.parse(json)) match {
         case t: SparkSchema => t
-        case _ => throw new RuntimeException(s"Failed parsing SparkSchema: $raw")
+        case _ => throw new RuntimeException(s"Failed parsing SparkSchema: $json")
       }
     }
   }
