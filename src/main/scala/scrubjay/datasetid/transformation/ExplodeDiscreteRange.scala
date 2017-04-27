@@ -8,7 +8,7 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
-import scrubjay.dataspace.{DataSpace, DimensionSpace}
+import scrubjay.dataspace.DimensionSpace
 
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {

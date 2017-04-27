@@ -1,12 +1,12 @@
 package scrubjay.datasetid.transformation
 
-import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, Generator, UnaryExpression}
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types.{ArrayType, MapType, StructType}
+import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 
