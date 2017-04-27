@@ -8,20 +8,25 @@ import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescript
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types.{ArrayType, MapType, StructType}
 import scrubjay.datasetid._
+import scrubjay.dataspace.DimensionSpace
 
 case class ExplodeContinuousRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
-  override def scrubJaySchema: ScrubJaySchema = dsID.scrubJaySchema
-
-  override def isValid: Boolean = dsID.realize.schema(column).dataType match {
-    case ArrayType(_, _) => true
-    case MapType(_, _, _) => true
-    case _ => false
+  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
+    dsID.scrubJaySchema(dimensionSpace)
   }
 
-  override def realize: DataFrame = {
-    val DF = dsID.realize
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+    dsID.realize(dimensionSpace).schema(column).dataType match {
+      case ArrayType(_, _) => true
+      case MapType(_, _, _) => true
+      case _ => false
+    }
+  }
+
+  override def realize(dimensionSpace: DimensionSpace): DataFrame = {
+    val DF = dsID.realize(dimensionSpace: DimensionSpace)
     DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column)))
   }
 }

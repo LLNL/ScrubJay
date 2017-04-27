@@ -8,24 +8,26 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
-import scrubjay.dataspace.DataSpace
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
   // TODO: modify this incoming schema
-  override def scrubJaySchema: ScrubJaySchema = dsID.scrubJaySchema
+  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
+    dsID.scrubJaySchema(dimensionSpace)
+  }
 
-  override def isValid: Boolean = {
-    dsID.realize.schema(column).dataType match {
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+    dsID.realize(dimensionSpace).schema(column).dataType match {
       case ArrayType(_, _) => true
       case MapType(_, _, _) => true
       case _ => false
     }
   }
 
-  override def realize: DataFrame = {
-    val DF = dsID.realize
+  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
+    val DF = dsID.realize(dimensionSpace)
     DF.withColumn(column, ExplodeDiscreteRange.dfExpression(DF(column)))
   }
 }

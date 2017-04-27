@@ -9,9 +9,9 @@ class CSVDatasetIDSpec extends ScrubJaySpec {
   describe("CSV sourced job queue data") {
     it("should exist") {
       println("DataFrame:")
-      jobQueue.realize.show(false)
+      jobQueue.realize().show(false)
       println("SparkSchema")
-      jobQueue.realize.printSchema()
+      jobQueue.realize().printSchema()
     }
     it("should serialize/deserialize") {
       val json: String = DatasetID.toJsonString(jobQueue)

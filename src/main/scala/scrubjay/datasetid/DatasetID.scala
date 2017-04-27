@@ -13,7 +13,7 @@ import org.apache.spark.sql.types.DataType
 import scrubjay.datasetid.combination._
 import scrubjay.datasetid.original._
 import scrubjay.datasetid.transformation._
-import scrubjay.dataspace.DataSpace
+import scrubjay.dataspace.DimensionSpace
 import scrubjay.util.{readFileToString, writeStringToFile}
 
 @JsonIgnoreProperties(
@@ -31,20 +31,11 @@ import scrubjay.util.{readFileToString, writeStringToFile}
 ))
 abstract class DatasetID extends Serializable {
 
-  @JsonIgnore
-  val dataSpace: DataSpace = DataSpace(Array(), Array())
+  def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean
+  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema
+  def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame
 
-  def scrubJaySchema: ScrubJaySchema
-
-  def isValid: Boolean
   def dependencies: Seq[DatasetID]
-  def realize: DataFrame
-  def asOption: Option[DatasetID] = {
-    if (isValid)
-      Some(this)
-    else
-      None
-  }
 }
 
 object DatasetID {
@@ -102,7 +93,7 @@ object DatasetID {
     val hash: String = toHash(dsID)
 
     // Create string of columns Node X Flops X Time, etc
-    val columnString = dsID.realize.schema.fieldNames.mkString(" X ")
+    val columnString = dsID.scrubJaySchema(DimensionSpace.empty).keys.mkString(" X ")
 
     // Graph node
     val style = dsID match {

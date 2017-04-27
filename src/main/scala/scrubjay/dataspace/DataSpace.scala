@@ -5,14 +5,13 @@ import scrubjay.util.writeStringToFile
 
 import scala.io.Source
 
-case class DimensionSpace(name: String, ordered: Boolean, continuous: Boolean)
-
-case class DataSpace(dimensions: Array[DimensionSpace], datasets: Array[DatasetID]) {
+case class DataSpace(dimensionSpace: DimensionSpace, datasets: Array[DatasetID]) {
   def toJsonString: String = DataSpace.toJsonString(this)
   def writeToJsonFile(filename: String): Unit = DataSpace.writeToJsonFile(this, filename)
 }
 
 object DataSpace {
+
 
   def toJsonString(ds: DataSpace): String = {
     DatasetID.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ds)

@@ -1,17 +1,23 @@
 {
-  "dimensions" : [ {
-    "name" : "time",
-    "ordered" : true,
-    "continuous" : true
-  }, {
-    "name" : "job",
-    "ordered" : false,
-    "continuous" : false
-  }, {
-    "name" : "node",
-    "ordered" : false,
-    "continuous" : false
-  } ],
+  "dimensionSpace" : {
+    "dimensions": [
+      {
+        "name": "time",
+        "ordered": true,
+        "continuous": true
+      },
+      {
+        "name": "job",
+        "ordered": false,
+        "continuous": false
+      },
+      {
+        "name": "node",
+        "ordered": false,
+        "continuous": false
+      }
+    ]
+  },
   "datasets" : [ {
     "type" : "CSVDatasetID",
     "csvFileName" : "target/scala-2.11/test-classes/jobQueue.csv",
