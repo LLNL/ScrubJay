@@ -1,9 +1,5 @@
 package scrubjay.dataspace
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import scrubjay.datasetid.DatasetID
 import scrubjay.util.writeStringToFile
 
@@ -18,20 +14,12 @@ case class DataSpace(dimensions: Array[DimensionSpace], datasets: Array[DatasetI
 
 object DataSpace {
 
-  private val objectMapper: ObjectMapper with ScalaObjectMapper = {
-    val structTypeModule: SimpleModule = new SimpleModule()
-    val m = new ObjectMapper with ScalaObjectMapper
-    m.registerModule(DefaultScalaModule)
-    m.registerModule(structTypeModule)
-    m
-  }
-
   def toJsonString(ds: DataSpace): String = {
-    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ds)
+    DatasetID.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(ds)
   }
 
   def fromJsonString(json: String): DataSpace = {
-    objectMapper.readValue[DataSpace](json, classOf[DataSpace])
+    DatasetID.objectMapper.readValue[DataSpace](json, classOf[DataSpace])
   }
 
   def writeToJsonFile(ds: DataSpace, filename: String): Unit = {

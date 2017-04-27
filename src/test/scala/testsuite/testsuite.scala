@@ -23,6 +23,8 @@ package object testsuite {
 
   val jobQueueDatasetIDFilename: String = getClass.getResource("/jobQueue.dsid").getPath
 
+  val jobAnalysisDataSpaceFilename: String = getClass.getResource("/jobAnalysis.sj").getPath
+
   /*
    * Ground truth
    */

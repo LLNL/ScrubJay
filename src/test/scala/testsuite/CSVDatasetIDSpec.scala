@@ -2,7 +2,6 @@ package testsuite
 
 import scrubjay.datasetid._
 
-
 class CSVDatasetIDSpec extends ScrubJaySpec {
 
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)

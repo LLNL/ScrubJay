@@ -28,8 +28,7 @@
       "nullable" : true,
       "metadata" : {
         "scrubjay_parser_UNIMPLEMENTED" : {
-          "type" : "Seconds",
-          "delimiter" : ","
+          "type" : "Seconds"
         }
       }
     }, {

@@ -1,7 +1,7 @@
 package scrubjay.datasetid
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -13,6 +13,7 @@ import org.apache.spark.sql.types.DataType
 import scrubjay.datasetid.combination._
 import scrubjay.datasetid.original._
 import scrubjay.datasetid.transformation._
+import scrubjay.dataspace.DataSpace
 import scrubjay.util.{readFileToString, writeStringToFile}
 
 @JsonIgnoreProperties(
@@ -30,6 +31,9 @@ import scrubjay.util.{readFileToString, writeStringToFile}
 ))
 abstract class DatasetID extends Serializable {
 
+  @JsonIgnore
+  val dataSpace: DataSpace = DataSpace(Array(), Array())
+
   def scrubJaySchema: ScrubJaySchema
 
   def isValid: Boolean
@@ -45,7 +49,7 @@ abstract class DatasetID extends Serializable {
 
 object DatasetID {
 
-  private val objectMapper: ObjectMapper with ScalaObjectMapper = {
+  private[scrubjay] val objectMapper: ObjectMapper with ScalaObjectMapper = {
     val structTypeModule: SimpleModule = new SimpleModule()
     structTypeModule.addSerializer(classOf[SparkSchema], new SchemaSerializer())
     structTypeModule.addDeserializer(classOf[SparkSchema], new SchemaDeserializer())
@@ -142,7 +146,6 @@ object DatasetID {
 
   class SchemaSerializer extends JsonSerializer[SparkSchema] {
     override def serialize(value: SparkSchema, gen: JsonGenerator, serializers: SerializerProvider): Unit = {
-
       import org.apache.spark.sql.types.scrubjayunits._
       import org.json4s.JsonAST.JValue
       import org.json4s.jackson.JsonMethods

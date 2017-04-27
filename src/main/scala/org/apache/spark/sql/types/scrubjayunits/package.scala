@@ -2,7 +2,6 @@ package org.apache.spark.sql.types
 
 import org.json4s.JsonAST.JValue
 
-
 package object scrubjayunits {
 
   implicit class MetadataExposePrivates(metadata: Metadata) {
