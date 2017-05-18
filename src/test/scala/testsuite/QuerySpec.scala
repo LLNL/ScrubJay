@@ -27,7 +27,7 @@ class QuerySpec extends ScrubJaySpec {
         println("Solution: ")
         solution.realize(dataSpace.dimensionSpace).show(false)
       })
-      //assert(solutions.head.realize.collect.toSet == trueJobQueue)
+      assert(solutions.nonEmpty)
     }
   }
 
