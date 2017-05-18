@@ -47,23 +47,27 @@
     "fields": [
       {
         "name" : "jobid",
-        "dimension": "job",
-        "domain": true
+        "dimension" : "job",
+        "units" : "identifier",
+        "domain" : true
       },
       {
         "name" : "nodelist",
-        "dimension": "node",
-        "domain": true
+        "dimension" : "node",
+        "units" : "list<identifier>",
+        "domain" : true
       },
       {
         "name" : "elapsed",
-        "dimension": "time",
-        "domain": false
+        "dimension" : "time",
+        "units" : "seconds",
+        "domain" : false
       },
       {
         "name" : "timespan",
-        "dimension": "time",
-        "domain": true
+        "dimension" : "time",
+        "units" : "datetimespan",
+        "domain" : true
       }
     ]
   }

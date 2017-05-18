@@ -1,5 +1,6 @@
 package testsuite
 
+import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
 import scrubjay.query._
 import scrubjay.dataspace.{DataSpace, DimensionSpace}
 
@@ -8,17 +9,30 @@ class QuerySpec extends ScrubJaySpec {
 
   val dataSpace: DataSpace = DataSpace.fromJsonFile(jobAnalysisDataSpaceFilename)
 
+  describe("Query with NO solution") {
+
+    val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "marmosets")
+    ))
+
+    val query = Query(dataSpace, queryTarget)
+
+    lazy val solutions = query.solutions.toList
+
+    it("should find no correct solution") {
+      assert(solutions.isEmpty)
+    }
+  }
+
   describe("Query with single original dataset solution") {
 
-    val domainDimensions = DimensionSpace(Array(
-      dataSpace.dimension("job")
+    val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "time")
     ))
 
-    val valueDimensions = DimensionSpace(Array(
-      dataSpace.dimension("time")
-    ))
-
-    val query = Query(dataSpace, domainDimensions, valueDimensions)
+    val query = Query(dataSpace, queryTarget)
 
     lazy val solutions = query.solutions.toList
 
@@ -31,29 +45,21 @@ class QuerySpec extends ScrubJaySpec {
     }
   }
 
+
   describe("Query with single derived datasource solution") {
 
-    /*
-    val jobTimeQuery = Set(
-      metaEntryFromStrings("domain", "job", "identifier"),
-      metaEntryFromStrings("domain", "time", "datetimestamp")
-    )
+    val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "node", units = "identifier")
+    ))
 
-    lazy val solutions = Query(dataSources, jobTimeQuery)
-      .solutions
-      .toList
+    val query = Query(dataSpace, queryTarget)
 
-    it("should have at least one solution") {
+    lazy val solutions = query.solutions.toList
+
+    it("should find the correct solution") {
       assert(solutions.nonEmpty)
     }
-    it("should find the correct datasource") {
-      //solutions.head.describe()
-      assert(solutions.head.realize.collect.toSet == trueJobQueueExplodedTime)
-    }
-    it("should pickle/unpickle correctly") {
-      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
-    }
-    */
   }
 
   describe("Query with multiple datasources") {

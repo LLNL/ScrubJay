@@ -13,17 +13,33 @@ import scrubjay.dataspace.DimensionSpace
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
-  // TODO: modify this incoming schema
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
-    dsID.scrubJaySchema(dimensionSpace)
+    ScrubJaySchema(
+      dsID.scrubJaySchema(dimensionSpace).fields.map{
+        // Modify column units from list to whatever was inside the list
+        case ScrubJayField(domain, `column`, dimension, units) => {
+          ScrubJayField(domain, column, dimension, units.stripPrefix("list<").stripSuffix(">"))
+        }
+        case other => other
+      }
+    )
   }
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+  def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+    val columnUnits = dsID.scrubJaySchema(dimensionSpace)(column).units
+    columnUnits.startsWith("list<") && columnUnits.endsWith(">")
+  }
+
+  def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
     dsID.realize(dimensionSpace).schema(column).dataType match {
       case ArrayType(_, _) => true
       case MapType(_, _, _) => true
       case _ => false
     }
+  }
+
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+    validScrubJaySchema(dimensionSpace) && validSparkSchema(dimensionSpace)
   }
 
   override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
