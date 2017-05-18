@@ -43,22 +43,28 @@
       }
     } ]
   },
-  "scrubJaySchema" : {
-    "jobid" : {
-      "dimension" : "job",
-      "domain" : true
-    },
-    "nodelist" : {
-      "dimension" : "node",
-      "domain" : true
-    },
-    "elapsed" : {
-      "dimension" : "time",
-      "domain" : false
-    },
-    "timespan" : {
-      "dimension" : "time",
-      "domain" : true
-    }
+  "scrubJaySchema": {
+    "fields": [
+      {
+        "name" : "jobid",
+        "dimension": "job",
+        "domain": true
+      },
+      {
+        "name" : "nodelist",
+        "dimension": "node",
+        "domain": true
+      },
+      {
+        "name" : "elapsed",
+        "dimension": "time",
+        "domain": false
+      },
+      {
+        "name" : "timespan",
+        "dimension": "time",
+        "domain": true
+      }
+    ]
   }
 }

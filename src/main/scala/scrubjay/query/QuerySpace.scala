@@ -2,33 +2,19 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
 import scrubjay.datasetid.DatasetID
-//import scrubjay.datasetid.transformation.UberExplode
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 
 
-case class QuerySpace(metaEntries: Set[(String, String)], dsIDs: Seq[DatasetID]) extends ArgumentSpace {
+case class QuerySpace(dataSpace: DataSpace,
+                      domainDimensions: DimensionSpace,
+                      valueDimensions: DimensionSpace) extends ArgumentSpace {
 
   override def enumerate: Iterator[Arguments] = {
-
-    /*
-    val explodedIDs: Seq[DatasetID] = dsIDs.flatMap(dsID => UberExplode(dsID))
-    val originalAndDerivedIDs: Seq[DatasetID] = dsIDs ++ explodedIDs
-
-    // From 1 to N datasources at a time
-    1.to(originalAndDerivedIDs.length).toIterator.flatMap(
-      // For all combinations of size N
-      originalAndDerivedIDs.combinations(_).map(c => Seq(metaEntries, c.toSet[DatasetID]))
+    // For all combinations of size 1 to N
+    1.to(dataSpace.datasets.length).toIterator.flatMap(
+      dataSpace.datasets.combinations(_).map(c => {
+        Seq(c.toSet[DatasetID], domainDimensions, valueDimensions)
+      })
     )
-    */
-    ???
   }
-
 }
-
-case class DataSourceArgumentSpace(dsIDs: Seq[DatasetID]) extends ArgumentSpace {
-
-  override def enumerate: Iterator[Arguments] = {
-    QuerySpace(Set.empty, dsIDs).enumerate.map(args => Seq(args(1)))
-  }
-
-}
-

@@ -93,7 +93,7 @@ object DatasetID {
     val hash: String = toHash(dsID)
 
     // Create string of columns Node X Flops X Time, etc
-    val columnString = dsID.scrubJaySchema(DimensionSpace.empty).keys.mkString(" X ")
+    val columnString = dsID.scrubJaySchema(DimensionSpace.empty).fieldNames.mkString(" X ")
 
     // Graph node
     val style = dsID match {

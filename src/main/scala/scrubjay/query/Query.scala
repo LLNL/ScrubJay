@@ -2,15 +2,24 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 
 
-case class Query(dataSources: Set[DatasetID],
-                 metaEntries: Set[(String, String)]) {
+case class Query(dataSpace: DataSpace,
+                 domainSpace: DimensionSpace,
+                 valueSpace: DimensionSpace) {
 
   // Can I derive a datasource from the set of datasources that satisfies my query?
   lazy val dsIDSetSatisfiesQuery: Constraint[DatasetID] = memoize(args => {
-    val query = args(0).as[Set[(String, String)]]
-    val dsIDSet = args(1).as[Set[DatasetID]]
+    dataSpace.datasets.filter(p = dataset => {
+      val datasetDimensions = dataset.scrubJaySchema(dataSpace.dimensionSpace).dimensions
+      val domainDimensions = domainSpace.dimensions.map(_.name)
+      val valueDimensions = valueSpace.dimensions.map(_.name)
+
+      // TODO: check if domain dimensions and value dimensions are satisfied
+      val satisfiesDomains = datasetDimensions.contains(domainDimensions)
+      (domainDimensions ++ valueDimensions).forall(datasetDimensions.contains)
+    })
 
     // Fun case: queried meta entries exist in a data source derived from multiple data sources
     /*
@@ -22,17 +31,15 @@ case class Query(dataSources: Set[DatasetID],
     else
       Seq.empty
     */
-    ???
   })
 
   def solutions: Iterator[DatasetID] = {
-    //QuerySpace(metaEntries, dataSources.toSeq)
-    //  .allSolutions(dsIDSetSatisfiesQuery).flatMap(_.solutions)
-    ???
+    QuerySpace(dataSpace, domainSpace, valueSpace)
+      .allSolutions(dsIDSetSatisfiesQuery)
+      .flatMap(_.solutions)
   }
 
   def allDerivations: Iterator[DatasetID] = {
-    DataSourceArgumentSpace(dataSources.toSeq)
-      .allSolutions(JoinSpace.joinedSet).flatMap(_.solutions)
+    ???
   }
 }

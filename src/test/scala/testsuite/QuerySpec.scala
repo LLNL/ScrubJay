@@ -1,47 +1,39 @@
 package testsuite
 
-import scrubjay._
-import scrubjay.datasource._
-import scrubjay.schema._
 import scrubjay.query._
-
-import org.scalactic.source.Position
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 
 
 class QuerySpec extends ScrubJaySpec {
 
-  val dataSources: Set[DatasetID] = Set(
-    CSVDatasetID(clusterLayoutFilename, CSVSchema(clusterLayoutMetaFilename)),
-    CSVDatasetID(nodeFlopsFilename, CSVSchema(nodeFlopsMetaFilename)),
-    CSVDatasetID(temperatureFilename, CSVSchema(temperatureMetaFilename)),
-    CSVDatasetID(jobQueueFilename, CSVSchema(jobQueueMetaFilename))
-  )
+  val dataSpace: DataSpace = DataSpace.fromJsonFile(jobAnalysisDataSpaceFilename)
 
-  describe("Query with single datasource solution") {
+  describe("Query with single original dataset solution") {
 
-    val jobTimeQuery = Set(
-      metaEntryFromStrings("domain", "job", "identifier"),
-      metaEntryFromStrings("value", "time", "seconds")
-    )
+    val domainDimensions = DimensionSpace(Array(
+      dataSpace.dimension("job")
+    ))
 
-    lazy val solutions = Query(dataSources, jobTimeQuery)
-      .solutions
-      .toList
+    val valueDimensions = DimensionSpace(Array(
+      dataSpace.dimension("time")
+    ))
 
-    it("should have at least one solution") {
-      assert(solutions.nonEmpty)
-    }
-    it("should find the correct datasource") {
-      //solutions.head.describe()
-      assert(solutions.head.realize.collect.toSet == trueJobQueue)
-    }
-    it("should pickle/unpickle correctly") {
-      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
+    val query = Query(dataSpace, domainDimensions, valueDimensions)
+
+    lazy val solutions = query.solutions.toList
+
+    it("should find the correct solution") {
+      solutions.foreach(solution => {
+        println("Solution: ")
+        solution.realize(dataSpace.dimensionSpace).show(false)
+      })
+      //assert(solutions.head.realize.collect.toSet == trueJobQueue)
     }
   }
 
   describe("Query with single derived datasource solution") {
 
+    /*
     val jobTimeQuery = Set(
       metaEntryFromStrings("domain", "job", "identifier"),
       metaEntryFromStrings("domain", "time", "datetimestamp")
@@ -61,10 +53,12 @@ class QuerySpec extends ScrubJaySpec {
     it("should pickle/unpickle correctly") {
       assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
+    */
   }
 
   describe("Query with multiple datasources") {
 
+    /*
     val rackFlopsQuery = Set(
       metaEntryFromStrings("domain", "rack", "identifier"),
       metaEntryFromStrings("value", "flops", "count")
@@ -84,10 +78,12 @@ class QuerySpec extends ScrubJaySpec {
     it("should pickle/unpickle correctly") {
       assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
+    */
   }
 
   describe("Query with multiple datasources and single derivations") {
 
+    /*
     val jobFlopsQuery = Set(
       metaEntryFromStrings("domain", "job", "identifier"),
       metaEntryFromStrings("value", "flops", "count")
@@ -108,9 +104,11 @@ class QuerySpec extends ScrubJaySpec {
     it("should pickle/unpickle correctly") {
       assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
     }
+    */
   }
 
   describe("Enumerate all possible derivations") {
+    /*
     lazy val solutions = Query(dataSources, Set.empty)
       .allDerivations
 
@@ -120,5 +118,6 @@ class QuerySpec extends ScrubJaySpec {
       })
       assert(true)
     }
+    */
   }
 }
