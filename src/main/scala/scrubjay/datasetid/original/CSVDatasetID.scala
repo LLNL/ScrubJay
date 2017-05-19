@@ -2,7 +2,7 @@ package scrubjay.datasetid.original
 
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayUDFParser
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import scrubjay.datasetid.{DatasetID, ScrubJaySchema, SparkSchema}
+import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 
 case class CSVDatasetID(csvFileName: String,
@@ -10,6 +10,10 @@ case class CSVDatasetID(csvFileName: String,
                         scrubJaySchema: ScrubJaySchema,
                         options: Map[String, String] = Map.empty)
   extends OriginalDatasetID(scrubJaySchema) {
+
+  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = {
+    scrubJaySchema.withGeneratedFieldNames
+  }
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
     new java.io.File(csvFileName).exists()
@@ -22,7 +26,7 @@ case class CSVDatasetID(csvFileName: String,
         .schema(sparkSchema)
         .options(options)
         .csv(csvFileName)
-    )
+    ).updateSparkSchemaNames(scrubJaySchema)
   }
 }
 

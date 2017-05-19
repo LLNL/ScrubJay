@@ -31,6 +31,12 @@ import scrubjay.util.{readFileToString, writeStringToFile}
 ))
 abstract class DatasetID extends Serializable {
 
+  def asOption(dimensionSpace: DimensionSpace): Option[DatasetID] = {
+    if (isValid(dimensionSpace))
+      Some(this)
+    else
+      None
+  }
   def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean
   def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema
   def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame

@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
 import scrubjay.query._
-import scrubjay.dataspace.{DataSpace, DimensionSpace}
+import scrubjay.dataspace.DataSpace
 
 
 class QuerySpec extends ScrubJaySpec {
@@ -58,33 +58,32 @@ class QuerySpec extends ScrubJaySpec {
     lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
+      solutions.foreach(solution => {
+        println("Solution: ")
+        solution.realize(dataSpace.dimensionSpace).show(false)
+      })
       assert(solutions.nonEmpty)
     }
   }
 
   describe("Query with multiple datasources") {
 
-    /*
-    val rackFlopsQuery = Set(
-      metaEntryFromStrings("domain", "rack", "identifier"),
-      metaEntryFromStrings("value", "flops", "count")
-    )
+    val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "rack"),
+      ScrubJayField(domain = false, dimension = "flops")
+    ))
 
-    lazy val solutions = Query(dataSources, rackFlopsQuery)
-      .solutions
-      .toList
+    val query = Query(dataSpace, queryTarget)
 
-    it("should have at least one solution") {
+    lazy val solutions = query.solutions.toList
+
+    it("should find the correct solution") {
+      solutions.foreach(solution => {
+        println("Solution: ")
+        solution.realize(dataSpace.dimensionSpace).show(false)
+      })
       assert(solutions.nonEmpty)
     }
-    it("should derive the correct datasource") {
-      //solutions.head.describe()
-      assert(solutions.head.realize.collect.toSet == trueNodeRackTimeFlops)
-    }
-    it("should pickle/unpickle correctly") {
-      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
-    }
-    */
   }
 
   describe("Query with multiple datasources and single derivations") {

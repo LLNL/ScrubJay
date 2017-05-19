@@ -23,5 +23,3 @@ abstract class OriginalDatasetID(scrubJaySchema: ScrubJaySchema) extends Dataset
   override def dependencies: Seq[DatasetID] = Seq.empty
   override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = scrubJaySchema
 }
-
-

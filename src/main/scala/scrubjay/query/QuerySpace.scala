@@ -12,7 +12,7 @@ case class QuerySpace(dataSpace: DataSpace,
     // For all combinations of size 1 to N
     1.to(dataSpace.datasets.length).toIterator.flatMap(
       dataSpace.datasets.combinations(_).map(c => {
-        Seq(c.toSet[DatasetID], target)
+        Seq(DataSpace(dataSpace.dimensionSpace, c), target)
       })
     )
   }

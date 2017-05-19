@@ -14,5 +14,9 @@ class DataSpaceSpec extends ScrubJaySpec {
       // TODO: implement isEqual for DataSpace
       // assert(reloaded == jobData)
     }
+
+    it("should create the correct dataframes") {
+      jobData.datasets.foreach(_.realize(jobData.dimensionSpace).show(false))
+    }
   }
 }

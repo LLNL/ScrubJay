@@ -96,6 +96,105 @@
           }
         ]
       }
+    },
+    {
+      "type": "CSVDatasetID",
+      "csvFileName": "target/scala-2.11/test-classes/clusterLayout.csv",
+      "options": {
+        "header": "true",
+        "delimiter": ","
+      },
+      "sparkSchema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "node",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "rack",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "scrubJaySchema": {
+        "fields": [
+          {
+            "name" : "node",
+            "dimension" : "node",
+            "units" : "identifier",
+            "domain" : true
+          },
+          {
+            "name" : "rack",
+            "dimension" : "rack",
+            "units" : "identifier",
+            "domain" : true
+          }
+        ]
+      }
+    },
+    {
+      "type": "CSVDatasetID",
+      "csvFileName": "target/scala-2.11/test-classes/nodeFlops.csv",
+      "options": {
+        "header": "true",
+        "delimiter": ","
+      },
+      "sparkSchema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "node",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "time",
+            "type": "string",
+            "nullable": true,
+            "metadata": {
+              "scrubjay_parser": {
+                "type": "LocalDateTimeString",
+                "dateformat": "yyyy-MM-dd'T'HH:mm:ss"
+              }
+            }
+          },
+          {
+            "name": "flops",
+            "type": "integer",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "scrubJaySchema": {
+        "fields": [
+          {
+            "name" : "node",
+            "dimension" : "node",
+            "units" : "identifier",
+            "domain" : true
+          },
+          {
+            "name" : "time",
+            "dimension" : "time",
+            "units" : "datetimestamp",
+            "domain" : true
+          },
+          {
+            "name" : "flops",
+            "dimension" : "flops",
+            "units" : "int",
+            "domain" : false
+          }
+        ]
+      }
     }
   ]
 }

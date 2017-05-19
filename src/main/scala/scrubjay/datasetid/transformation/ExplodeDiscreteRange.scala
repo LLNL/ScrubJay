@@ -43,8 +43,9 @@ case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   }
 
   override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
-    val DF = dsID.realize(dimensionSpace)
-    DF.withColumn(column, ExplodeDiscreteRange.dfExpression(DF(column)))
+    val df = dsID.realize(dimensionSpace)
+    df.withColumn(column, ExplodeDiscreteRange.dfExpression(df(column)))
+      .updateSparkSchemaNames(scrubJaySchema(dimensionSpace))
   }
 }
 

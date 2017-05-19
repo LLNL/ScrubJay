@@ -20,10 +20,12 @@ class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
     )
   )
 
-  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeDiscreteRange(jobQueue, "nodelist")
+  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeDiscreteRange(jobQueue, "domain:node:list<identifier>")
 
   describe("Derive exploded node list") {
     it("should be defined") {
+      println("Before explode:")
+      jobQueue.realize(dataSpace.dimensionSpace).show(false)
       assert(jobQueueExplodeNodeList.isValid(dataSpace.dimensionSpace))
     }
     it("should exist") {
