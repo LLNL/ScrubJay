@@ -50,7 +50,7 @@ class QuerySpec extends ScrubJaySpec {
 
     val queryTarget = ScrubJaySchema(Array(
       ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = false, dimension = "node", units = "identifier")
+      ScrubJayField(domain = true, dimension = "node", units = "identifier")
     ))
 
     val query = Query(dataSpace, queryTarget)

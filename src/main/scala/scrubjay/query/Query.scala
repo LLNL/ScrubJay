@@ -3,7 +3,7 @@ package scrubjay.query
 import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.datasetid.transformation.ExplodeDiscreteRange
-import scrubjay.dataspace.{DataSpace, DimensionSpace}
+import scrubjay.dataspace.DataSpace
 
 
 case class Query(dataSpace: DataSpace,
@@ -12,18 +12,37 @@ case class Query(dataSpace: DataSpace,
   // Can I derive a datasource from the set of datasources that satisfies my query?
   lazy val dsIDSetSatisfiesQuery: Constraint[DatasetID] = memoize(args => {
 
-    // Filter on all datasets in our dataspace
+    // Find datasets satisfying the query with no derivation
     val singleSolutions = dataSpace.datasets.filter(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).containsMatchesFor(target)
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(target)
     })
 
-    val derivedSolutions = dataSpace.datasets.map(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.map(column =>
-        ExplodeDiscreteRange(dataset, column)
-      )
+    // Find all datasets containing all dimensions (but possibly not units)
+    val queryDomainDimensions = target.domainDimensions
+    val queryValueDimensions = target.valueDimensions
+    val satisfiesDimensions = dataSpace.datasets.filter(dataset => {
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).containsDomainDimensions(queryDomainDimensions) &&
+        dataset.scrubJaySchema(dataSpace.dimensionSpace).containsValueDimensions(queryValueDimensions)
     })
 
-    singleSolutions
+    // Run all derivations and check if their results satisfy the query
+    val derivedSolutions = satisfiesDimensions.flatMap(dataset => {
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.flatMap(column => {
+        val explodeDiscreteRange = ExplodeDiscreteRange(dataset, column)
+        if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
+          Some(explodeDiscreteRange)
+        } else {
+          None
+        }
+      })
+    }).filter(dataset => {
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(target)
+    })
+
+    singleSolutions ++ derivedSolutions
+
+    /*
+     */
 
     // Fun case: queried meta entries exist in a data source derived from multiple data sources
     /*

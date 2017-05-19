@@ -7,14 +7,14 @@ case class ScrubJayField(domain: Boolean,
                          dimension: String = "*",
                          units: String = "*") {
   def matches(other: ScrubJayField): Boolean = {
-    domain == other.domain &&
-      Array(dimension, units).zip(Array(other.dimension, other.units))
-        .forall{
-          case (left, right) => {
-            // Either one side is a wildcard, or they're exactly the same, otherwise no match
-            Set(left, right).intersect(ScrubJayField.wildcards).nonEmpty || left == right
-          }
-        }
+    val domainMatches = domain == other.domain
+    val dimensionMatches = dimension == other.dimension ||
+      ScrubJayField.wildcards.contains(dimension) ||
+      ScrubJayField.wildcards.contains(other.dimension)
+    val unitsMatches = units == other.units ||
+      ScrubJayField.wildcards.contains(units) ||
+      ScrubJayField.wildcards.contains(other.units)
+    domainMatches && dimensionMatches && unitsMatches
   }
 }
 
@@ -25,6 +25,13 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   def dimensions: Array[String] = fields.map(_.dimension)
   def units: Array[String] = fields.map(_.units)
 
+  def domainDimensions: Array[String] = fields.filter(_.domain).map(_.dimension)
+  def valueDimensions: Array[String] = fields.filterNot(_.domain).map(_.dimension)
+
+  def containsDimensions(dimensions: Array[String]): Boolean = dimensions.forall(dimensions.contains)
+  def containsDomainDimensions(dimensions: Array[String]): Boolean = dimensions.forall(domainDimensions.contains)
+  def containsValueDimensions(dimensions: Array[String]): Boolean = dimensions.forall(valueDimensions.contains)
+
   override def equals(obj: scala.Any): Boolean = {
     obj match {
       case s: ScrubJaySchema => map == s.map
@@ -32,7 +39,7 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
     }
   }
 
-  def containsMatchesFor(other: ScrubJaySchema): Boolean = {
+  def satisfiesQuerySchema(other: ScrubJaySchema): Boolean = {
     // Every field in "other" has a match here
     other.fields.forall(otherField => fields.exists(_.matches(otherField)))
   }
