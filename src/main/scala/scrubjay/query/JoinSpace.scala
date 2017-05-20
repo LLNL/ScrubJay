@@ -59,3 +59,17 @@ object JoinSpace {
   })
 
 }
+
+case class JoinSpace(dataSpace: DataSpace, queryTarget: ScrubJaySchema) {
+  // If set satisfies query target, return the joined set
+  def solutions: Seq[DatasetID] = {
+    val setSatisfiesQuery = queryTarget.fields.forall(queryField =>
+      dataSpace.datasets.exists(_.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(ScrubJaySchema(Array(queryField))))
+    )
+
+    if (setSatisfiesQuery)
+      JoinSpace.joinedSet(Seq(dataSpace))
+    else
+      Seq()
+  }
+}

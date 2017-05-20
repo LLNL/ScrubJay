@@ -12,6 +12,16 @@
         "continuous": false
       },
       {
+        "name": "rack",
+        "ordered": false,
+        "continuous": false
+      },
+      {
+        "name": "flops",
+        "ordered": true,
+        "continuous": true
+      },
+      {
         "name": "node",
         "ordered": false,
         "continuous": false

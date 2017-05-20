@@ -57,31 +57,6 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   def containsDomainDimensions(dimensions: Array[String]): Boolean = dimensions.forall(domainDimensions.contains)
   def containsValueDimensions(dimensions: Array[String]): Boolean = dimensions.forall(valueDimensions.contains)
 
-  def createComparableFields(compareDomain: Boolean = true,
-                             compareName: Boolean = false,
-                             compareDimension: Boolean = true,
-                             compareUnits: Boolean = true): Set[ScrubJayField] = {
-    // Generate fields with specified comparator
-    fields.map(field =>
-      new ScrubJayField(field.domain) {
-        override def equals(obj: scala.Any): Boolean = obj match {
-          case f: ScrubJayField => compareElements(f, compareDomain, compareName, compareDimension, compareUnits)
-          case _ => false
-        }
-      }
-    ).toSet
-  }
-
-  def commonFields(other: ScrubJaySchema,
-                   compareDomain: Boolean = true,
-                   compareName: Boolean = false,
-                   compareDimension: Boolean = true,
-                   compareUnits: Boolean = true): Array[ScrubJayField] = {
-    createComparableFields(compareDomain, compareName, compareDimension, compareUnits)
-      .intersect(other.createComparableFields(compareDomain, compareName, compareDimension, compareUnits))
-      .toArray
-  }
-
   override def equals(obj: scala.Any): Boolean = {
     obj match {
       case s: ScrubJaySchema => map == s.map
@@ -97,11 +72,13 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   def joinSchema(other: ScrubJaySchema): Option[ScrubJaySchema] = {
 
     // Find common fields across domain, dimension, units
-    val commonDomainDimensionUnits = commonFields(other,
-      compareDomain = true, compareName = false, compareDimension = true, compareUnits = true)
+    val commonDomainDimensionUnits = domainFields.filter(domainField => other.domainFields.exists(otherDomainField =>
+      domainField.dimension == otherDomainField.dimension &&
+        domainField.units == otherDomainField.units
+    ))
 
     // If all domain fields are common, we have a join
-    if (commonDomainDimensionUnits.length == domainDimensions.length)
+    if (commonDomainDimensionUnits.nonEmpty)
       Some(ScrubJaySchema(commonDomainDimensionUnits ++ valueFields ++ other.valueFields))
     else
       None

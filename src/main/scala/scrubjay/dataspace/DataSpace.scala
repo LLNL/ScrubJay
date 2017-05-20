@@ -25,6 +25,7 @@ object DataSpace {
   }
 
   def fromJsonString(json: String): DataSpace = {
+    // TODO: check if all dimensions are defined
     DatasetID.objectMapper.readValue[DataSpace](json, classOf[DataSpace])
   }
 

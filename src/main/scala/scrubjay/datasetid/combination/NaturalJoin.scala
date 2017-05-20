@@ -24,9 +24,7 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
     val df1 = dsID1.realize(dimensionSpace)
     val df2 = dsID2.realize(dimensionSpace)
-    val commonColumns = joinedSchema(dimensionSpace)
-      .getOrElse(throw new RuntimeException("Invalid realization requested!"))
-      .fieldNames
+    val commonColumns = scrubJaySchema(dimensionSpace).domainFields.map(_.name)
 
     df1.join(df2, commonColumns)
   }

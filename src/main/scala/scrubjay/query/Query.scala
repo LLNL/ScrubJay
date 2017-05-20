@@ -5,25 +5,41 @@ import scrubjay.datasetid._
 import scrubjay.datasetid.transformation.ExplodeDiscreteRange
 import scrubjay.dataspace.DataSpace
 
-
 case class Query(dataSpace: DataSpace,
-                 target: ScrubJaySchema) {
+                 queryTarget: ScrubJaySchema) {
 
   // TODO: remove repeat solutions
 
+  def solutions: Iterator[DatasetID] = {
+    QuerySpace(dataSpace, queryTarget)
+      .allSolutions(Query.dsIDSetSatisfiesQuery)
+      .flatMap(_.solutions)
+  }
+
+  def allDerivations: Iterator[DatasetID] = {
+    ???
+  }
+}
+
+object Query {
   lazy val noDerivationSolutions: Constraint[DatasetID] = memoize(args => {
+    val dataSpace = args(0).as[DataSpace]
+    val queryTarget = args(1).as[ScrubJaySchema]
+
     // Find datasets satisfying the query with no derivation
     dataSpace.datasets.filter(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(target)
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(queryTarget)
     })
   })
 
   // Can I derive a datasource from the set of datasources that satisfies my query?
   lazy val dsIDSetSatisfiesQuery: Constraint[DatasetID] = memoize(args => {
+    val dataSpace = args(0).as[DataSpace]
+    val queryTarget = args(1).as[ScrubJaySchema]
 
     // Find all datasets containing all dimensions (but possibly not units)
-    val queryDomainDimensions = target.domainDimensions
-    val queryValueDimensions = target.valueDimensions
+    val queryDomainDimensions = queryTarget.domainDimensions
+    val queryValueDimensions = queryTarget.valueDimensions
     val satisfiesDimensions = dataSpace.datasets.filter(dataset => {
       dataset.scrubJaySchema(dataSpace.dimensionSpace).containsDomainDimensions(queryDomainDimensions) &&
         dataset.scrubJaySchema(dataSpace.dimensionSpace).containsValueDimensions(queryValueDimensions)
@@ -40,35 +56,12 @@ case class Query(dataSpace: DataSpace,
         }
       })
     }).filter(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(target)
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(queryTarget)
     })
 
-    val allJoins = JoinSpace.joinedSet(Seq(dataSpace))
+    val allJoinSolutions = JoinSpace(dataSpace, queryTarget).solutions
 
-    noDerivationSolutions(args) ++ singleDerivationSolutions ++ allJoins
-
-    /*
-     */
-
-    // Fun case: queried meta entries exist in a data source derived from multiple data sources
-    /*
-    val dsIDMeta = dsIDSet.toSeq.map(_.sparkSchema.values.toSet).reduce(_ union _)
-    val metaSatisfied = query.intersect(dsIDMeta).size == query.size
-
-    if (metaSatisfied)
-      JoinSpace.joinedSet(Seq(dsIDSet))
-    else
-      Seq.empty
-    */
+    noDerivationSolutions(args) ++ singleDerivationSolutions ++ allJoinSolutions
   })
 
-  def solutions: Iterator[DatasetID] = {
-    QuerySpace(dataSpace, target)
-      .allSolutions(dsIDSetSatisfiesQuery)
-      .flatMap(_.solutions)
-  }
-
-  def allDerivations: Iterator[DatasetID] = {
-    ???
-  }
 }
