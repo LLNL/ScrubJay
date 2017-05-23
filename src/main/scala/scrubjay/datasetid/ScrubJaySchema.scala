@@ -6,6 +6,11 @@ case class ScrubJayField(domain: Boolean,
                          name: String = "*",
                          dimension: String = "*",
                          units: String = "*") {
+
+  override def toString: String = {
+    s"ScrubJayField(domain=$domain, name=$name, dimension=$dimension, units=$units)"
+  }
+
   def matches(other: ScrubJayField): Boolean = {
     val domainMatches = domain == other.domain
     val dimensionMatches = dimension == other.dimension ||
@@ -39,7 +44,12 @@ case class ScrubJayField(domain: Boolean,
 }
 
 case class ScrubJaySchema(fields: Array[ScrubJayField]) {
+
   def apply(fieldName: String): ScrubJayField = map(fieldName)
+
+  override def toString: String = {
+    "ScrubJaySchema\n|--" + fields.mkString("\n|--")
+  }
 
   def withGeneratedFieldNames: ScrubJaySchema = ScrubJaySchema(fields.map(_.withGeneratedFieldName))
 
@@ -64,22 +74,32 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
     }
   }
 
-  def satisfiesQuerySchema(other: ScrubJaySchema): Boolean = {
-    // Every field in "other" has a match here
-    other.fields.forall(otherField => fields.exists(_.matches(otherField)))
+  /**
+    * This schema satisfies a target schema if every field in the target has a match here
+    */
+  def satisfiesQuerySchema(target: ScrubJaySchema): Boolean = {
+    target.fields.forall(targetField => fields.exists(_.matches(targetField)))
   }
 
-  def joinSchema(other: ScrubJaySchema): Option[ScrubJaySchema] = {
-
-    // Find common fields across domain, dimension, units
-    val commonDomainDimensionUnits = domainFields.filter(domainField => other.domainFields.exists(otherDomainField =>
+  /**
+    * Joinable fields are domain fields with dimension and units in common
+    */
+  def joinableFields(other: ScrubJaySchema): Array[ScrubJayField] = {
+    domainFields.filter(domainField => other.domainFields.exists(otherDomainField =>
       domainField.dimension == otherDomainField.dimension &&
         domainField.units == otherDomainField.units
     ))
+  }
 
-    // If all domain fields are common, we have a join
-    if (commonDomainDimensionUnits.nonEmpty)
-      Some(ScrubJaySchema(commonDomainDimensionUnits ++ valueFields ++ other.valueFields))
+  /**
+    * When joined with "other", the resulting schema
+    */
+  def joinSchema(other: ScrubJaySchema): Option[ScrubJaySchema] = {
+    if (joinableFields(other).nonEmpty)
+      Some(ScrubJaySchema(
+        domainFields.toSet.union(other.domainFields.toSet).toArray
+          ++ valueFields
+          ++ other.valueFields))
     else
       None
   }

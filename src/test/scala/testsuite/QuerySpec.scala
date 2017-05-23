@@ -37,6 +37,10 @@ class QuerySpec extends ScrubJaySpec {
     lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
       solutions.foreach(solution => {
         println("Solution: ")
         solution.realize(dataSpace.dimensionSpace).show(false)
@@ -58,6 +62,10 @@ class QuerySpec extends ScrubJaySpec {
     lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
       solutions.foreach(solution => {
         println("Solution: ")
         solution.realize(dataSpace.dimensionSpace).show(false)
@@ -78,6 +86,10 @@ class QuerySpec extends ScrubJaySpec {
     lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
       solutions.foreach(solution => {
         println("Solution: ")
         solution.realize(dataSpace.dimensionSpace).show(false)
