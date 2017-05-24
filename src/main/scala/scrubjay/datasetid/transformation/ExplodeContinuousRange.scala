@@ -1,6 +1,7 @@
 package scrubjay.datasetid.transformation
 
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionDescription, Generator, UnaryExpression}
 import org.apache.spark.sql.catalyst.util.ArrayData
@@ -11,7 +12,7 @@ import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 
-case class ExplodeContinuousRange(override val dsID: DatasetID, column: String)
+case class ExplodeContinuousRange(override val dsID: DatasetID, column: String, interval: Double)
   extends Transformation {
 
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
@@ -30,56 +31,46 @@ case class ExplodeContinuousRange(override val dsID: DatasetID, column: String)
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
     val DF = dsID.realize(dimensionSpace: DimensionSpace)
-    DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column)))
+    DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column), interval))
   }
 }
 
 object ExplodeContinuousRange {
 
   @ExpressionDescription(
-    usage = "_FUNC_(expr) - Separates the elements of array `expr` into multiple rows, or the elements of map `expr` into multiple rows and columns.",
+    usage = "_FUNC_(expr) - Separates the elements of continuous range `expr` into multiple rows.",
     extended = """
     Examples:
       > SELECT _FUNC_(array(10, 20));
        10
        20
   """)
-  case class ExpressionClass(child: Expression)
+  case class ExpressionClass(child: Expression, interval: Double)
     extends UnaryExpression with Generator with CodegenFallback with Serializable {
 
-    override def elementSchema: SparkSchema = {
-      val dtype = child.dataType
-      dtype match {
-        case c: ContinuousRangeStringUDTObject => new StructType().add("col", c.explodedType)
-        case _ => throw new RuntimeException("Cannot explode continuous range for type " + dtype)
+    override def checkInputDataTypes(): TypeCheckResult = {
+      if (child.dataType.isInstanceOf[ContinuousRangeStringUDTObject]) {
+        TypeCheckResult.TypeCheckSuccess
+      } else {
+        TypeCheckResult.TypeCheckFailure(
+          s"input to function explodeContinuous should extend ContinuousRangeStringUDTObject type, not ${child.dataType}")
       }
     }
 
-    override def eval(input: InternalRow): TraversableOnce[InternalRow] = {
-      val dtype = child.dataType
-      dtype match {
-        case c: ContinuousRangeStringUDTObject => {
-          ArrayData
-          val inputString = child.eval(input).asInstanceOf[UTF8String]
-          val rows = c.explodedValues(inputString, 30000)
-          rows
-          /*
-          if (inputArray == null) {
-            Nil
-          } else {
-            val rows = new Array[InternalRow](inputArray.numElements())
-            inputArray.foreach(c.explodedType, (i, e) => {
-              rows(i) = InternalRow(e)
-            })
-            rows
-          }
-          */
-        }
+    override def elementSchema: SparkSchema = child.dataType match {
+      case c: ContinuousRangeStringUDTObject => new StructType().add("col", c.explodedType)
+    }
+
+    override def eval(input: InternalRow): TraversableOnce[InternalRow] = child.dataType match {
+      case c: ContinuousRangeStringUDTObject => {
+        ArrayData
+        val inputString = child.eval(input).asInstanceOf[UTF8String]
+        c.explodedValues(inputString, interval)
       }
     }
 
   }
 
-  def dfExpression(column: Column): Column = withExpr { ExpressionClass(column.expr) }
+  def dfExpression(column: Column, interval: Double): Column = withExpr { ExpressionClass(column.expr, interval) }
 }
 

@@ -20,7 +20,7 @@ class ExplodeContinuousRangeSpec extends ScrubJaySpec {
     )
   )
 
-  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeContinuousRange(jobQueue, "domain:time:datetimespan")
+  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeContinuousRange(jobQueue, "domain:time:datetimespan", 30000)
 
   describe("Derive exploded node list") {
     it("should be defined") {

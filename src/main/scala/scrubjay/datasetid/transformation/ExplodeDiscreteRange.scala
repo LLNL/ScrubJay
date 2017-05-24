@@ -68,7 +68,7 @@ object ExplodeDiscreteRange {
         TypeCheckResult.TypeCheckSuccess
       } else {
         TypeCheckResult.TypeCheckFailure(
-          s"input to function explode should be array or map type, not ${child.dataType}")
+          s"input to function explodeDiscrete should be array or map type, not ${child.dataType}")
       }
     }
 
