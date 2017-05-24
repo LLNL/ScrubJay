@@ -13,7 +13,8 @@ import scrubjay.datasetid.DatasetID
   property = "type"
 )
 @JsonSubTypes(Array(
-  new Type(value = classOf[ExplodeDiscreteRange], name = "ExplodeDiscreteRange")
+  new Type(value = classOf[ExplodeDiscreteRange], name = "ExplodeDiscreteRange"),
+  new Type(value = classOf[ExplodeContinuousRange], name = "ExplodeContinuousRange")
 ))
 abstract class Transformation extends DatasetID {
   val dsID: DatasetID

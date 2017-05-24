@@ -2,12 +2,13 @@ package org.apache.spark.sql.types.scrubjayunits
 
 import java.time.format.DateTimeFormatter
 
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.{Column, DataFrame, types}
 import org.apache.spark.unsafe.types.UTF8String
 
-@SQLUserDefinedType(udt = classOf[ScrubJayLocalDateTimeRange_String.LocalDateTimeRangeStringUDT])
+@SQLUserDefinedType(udt = classOf[ScrubJayLocalDateTimeRange_String.SJLocalDateTimeRangeStringUDT])
 class ScrubJayLocalDateTimeRange_String(val start: ScrubJayLocalDateTime_String, val end: ScrubJayLocalDateTime_String)
   extends ScrubJayUnits {
 
@@ -28,18 +29,29 @@ class ScrubJayLocalDateTimeRange_String(val start: ScrubJayLocalDateTime_String,
   }
 }
 
-object ScrubJayLocalDateTimeRange_String {
+object ScrubJayLocalDateTimeRange_String extends ScrubJayUDTObject {
 
   private val defaultPattern = "yyyy-MM-dd HH:mm:ss"
   private val dateFormatKey: String = "dateformat"
   private val defaultFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(defaultPattern)
 
-  class LocalDateTimeRangeStringUDT extends UserDefinedType[ScrubJayLocalDateTimeRange_String] {
-    override def sqlType: DataType = StringType
+  class SJLocalDateTimeRangeStringUDT
+    extends UserDefinedType[ScrubJayLocalDateTimeRange_String]
+      with ContinuousRangeStringUDTObject {
+
+    override def sqlType: DataType = ScrubJayLocalDateTimeRange_String.sqlType
     override def serialize(p: ScrubJayLocalDateTimeRange_String): UTF8String = ScrubJayLocalDateTimeRange_String.serialize(p)
     override def deserialize(datum: Any): ScrubJayLocalDateTimeRange_String = ScrubJayLocalDateTimeRange_String.deserialize(datum)
     override def userClass: Class[ScrubJayLocalDateTimeRange_String] = classOf[ScrubJayLocalDateTimeRange_String]
+
+    override def explodedType: DataType = new types.scrubjayunits.ScrubJayLocalDateTime_String.SJLocalDateTimeStringUDT
+
+    override def explodedValues(s: UTF8String, interval: Double): Array[InternalRow] = {
+      deserialize(s).discretize(interval).map(instant => InternalRow(ScrubJayLocalDateTime_String.serialize(instant)))
+    }
   }
+
+  override def sqlType: DataType = StringType
 
   def serialize(p: ScrubJayLocalDateTimeRange_String, dateTimeFormatter: DateTimeFormatter = defaultFormatter): UTF8String = {
     UTF8String.fromString("[" +
