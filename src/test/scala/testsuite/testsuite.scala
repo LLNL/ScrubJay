@@ -6,8 +6,7 @@ package object testsuite {
    * Test CSV file paths from test resources directory
    */
 
-  val temperatureMetaFilename: String = getClass.getResource("/temperatureMeta.csv").getPath
-  val temperatureFilename: String = getClass.getResource("/temperature.csv").getPath
+  val temperatureFilename: String = getClass.getResource("/rackTemp.csv").getPath
 
   val flopsMetaFilename: String = getClass.getResource("/flopsMeta.csv").getPath
   val flopsFilename: String = getClass.getResource("/flops.csv").getPath

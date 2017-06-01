@@ -17,6 +17,7 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
       .withGeneratedFieldNames
   }
 
+  // FIXME: also check whether join dimensions are unordered, else need interpolation join
   override def isValid(dimensionSpace: DimensionSpace): Boolean = {
     joinedSchema(dimensionSpace).isDefined
   }
