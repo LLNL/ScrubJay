@@ -100,6 +100,27 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with multiple datasources and single derivations") {
 
+    val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "flops")
+    ))
+
+    val query = Query(dataSpace, queryTarget)
+
+    lazy val solutions = query.solutions.toList
+
+    it("should find the correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
+      solutions.foreach(solution => {
+        println("Solution: ")
+        solution.realize(dataSpace.dimensionSpace).show(false)
+      })
+      assert(solutions.nonEmpty)
+    }
+
     /*
     val jobFlopsQuery = Set(
       metaEntryFromStrings("domain", "job", "identifier"),
