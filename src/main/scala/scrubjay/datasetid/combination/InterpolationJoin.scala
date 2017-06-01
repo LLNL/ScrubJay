@@ -1,10 +1,9 @@
 package scrubjay.datasetid.combination
 
 import scala.language.existentials
-
 import org.apache.spark.sql.DataFrame
 import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
-import scrubjay.dataspace.DimensionSpace
+import scrubjay.dataspace.{Dimension, DimensionSpace}
 
 case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
   extends Combination {
@@ -20,7 +19,15 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
   }
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = {
-    joinedSchema(dimensionSpace).isDefined
+    joinedSchema(dimensionSpace).isDefined &&
+    dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
+      // At least one joinable field must be ordered, else must use natural join
+      .exists(field => {
+      dimensionSpace.findDimension(field.dimension)
+        // if dimension unrecognized, assume unordered, non-continuous
+        .getOrElse(Dimension(field.dimension, false, false))
+        .ordered == true
+    })
   }
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
