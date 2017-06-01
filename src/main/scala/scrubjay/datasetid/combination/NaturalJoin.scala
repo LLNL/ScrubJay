@@ -2,7 +2,7 @@ package scrubjay.datasetid.combination
 
 import org.apache.spark.sql.DataFrame
 import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
-import scrubjay.dataspace.DimensionSpace
+import scrubjay.dataspace.{Dimension, DimensionSpace}
 
 case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
   extends Combination {
@@ -17,10 +17,15 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
       .withGeneratedFieldNames
   }
 
-  // FIXME: also check whether join dimensions are unordered, else need interpolation join
-  override def isValid(dimensionSpace: DimensionSpace): Boolean = {
-    joinedSchema(dimensionSpace).isDefined
-  }
+  override def isValid(dimensionSpace: DimensionSpace): Boolean = joinedSchema(dimensionSpace).isDefined &&
+    dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
+      // All joinable fields must be unordered, else must use interpolation join
+      .forall(field => {
+        dimensionSpace.dimensions.find(_.name == field.dimension)
+          // if dimension unrecognized, assume unordered, non-continuous
+          .getOrElse(Dimension(field.dimension, false, false))
+          .ordered == false
+      })
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
     val df1 = dsID1.realize(dimensionSpace)
