@@ -16,13 +16,13 @@ trait RealValued {
   def realValue: Double
 }
 
-trait Aggregator[T] {
+trait Aggregator[T] extends Serializable {
   def aggregate(xs: Seq[T]): T
 }
 
 // FIXME: should use type class instead of Any everywhere...
 
-trait Interpolator {
+trait Interpolator extends Serializable {
   def interpolate(points: Seq[(Double, Any)], x: Double): Any
 }
 

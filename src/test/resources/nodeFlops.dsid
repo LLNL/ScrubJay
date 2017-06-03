@@ -33,7 +33,7 @@
     "fields": [
       {
         "name" : "node",
-        "dimension" : "job",
+        "dimension" : "node",
         "units" : "identifier",
         "domain" : true
       },

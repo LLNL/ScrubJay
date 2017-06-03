@@ -84,6 +84,11 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     })
 
     // Create 1 to N mapping from each row in df1 to rows in df2
+    // ..also remove existing unordered join fields from df2
+    val removeIndices = unorderedJoinFieldNames2.map(name => df2.schema.fieldIndex(name))
+    val rowMask = (0 to df2.schema.fields.length).map(removeIndices.contains)
+    val maskRow = (row: Row) =>
+      Row.fromSeq(row.toSeq.zip(rowMask).flatMap{case (c, false) => Some(c); case _ => None})
     val oneToNMapping = binnedRdd1.cogroup(binnedRdd2)
       .flatMap {
       case (_, (l1, l2)) => l1.map(l1row => {
@@ -97,36 +102,41 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     }
       // Combine all ds2 rows that map to the same ds1 row, without repeat rows
       .aggregateByKey(Set[Row]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
-      .mapValues(_.toArray)
+      .mapValues(_.toArray.map(maskRow))
 
-    //val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.sparkSchema)
+    // Get new index of ordered key column in df2
+    val df2NewFieldInfo = df2.schema.fields.zipWithIndex.zip(rowMask).flatMap{case ((c, i), false) => Some((c, i)); case _ => None}
+    val df2NewSparkFields = df2NewFieldInfo.map(_._1)
+    val df2OldOrderedIndex = df2.schema.fieldIndex(orderedJoinFieldName2)
+    val df2NewOrderedIndex = df2NewFieldInfo.indexWhere(_._2 == df2OldOrderedIndex)
 
-    val df2ScrubJayFields = spark.sparkContext.broadcast(dsID2.scrubJaySchema(dimensionSpace).fields)
-    val df2SparkFields = spark.sparkContext.broadcast(dsID2.realize(dimensionSpace).schema.fields)
+    val df2NewSJFields = dsID2.scrubJaySchema(dimensionSpace).fields.zip(rowMask).flatMap{case (c, false) => Some(c); case _ => None}
 
-    def projection(row: Row, keyColumn: String, mappedRows: Array[Row], mappedKeyColumn: String): Row = {
+    val df2Interpolators = df2NewSJFields.zip(df2NewSparkFields)
+      .map{ case (sjfield, sparkfield) => Interpolator.get(sjfield.units, sjfield.interpolator, sparkfield.dataType)}
+
+    val df2InterpolatorsBcast = spark.sparkContext.broadcast(df2Interpolators)
+
+    def projection(row: Row, keyColumn: String, mappedRows: Array[Row], mappedKeyIndex: Int): Row = {
 
       val xv = row.getAs[RealValued](keyColumn).realValue
-      val xs = mappedRows.map(_.getAs[RealValued](mappedKeyColumn).realValue)
+      val xs = mappedRows.map(_.getAs[RealValued](mappedKeyIndex).realValue)
 
       val allYs = mappedRows.map(_.toSeq.toArray).transpose
 
-      val interpolationInfo = allYs.map(ys => xs.zip(ys)).zip(df2ScrubJayFields.value).zip(df2SparkFields.value)
+      val interpolationInfo = allYs.map(ys => xs.zip(ys)).zip(df2InterpolatorsBcast.value)
 
       val interpolatedValues = interpolationInfo.map{
-        case ((points, sjfield), sparkfield) => {
-          val interpolator = Interpolator.get(sjfield.units, sjfield.interpolator, sparkfield.dataType)
-          interpolator.interpolate(points, xv)
-        }
+        case (points, interpolator) => interpolator.interpolate(points, xv)
       }
 
       Row.fromSeq(row.toSeq ++ interpolatedValues)
     }
 
     val interpolated = oneToNMapping.map{case (row, mappedRows) =>
-      projection(row, orderedJoinFieldName1, mappedRows, orderedJoinFieldName2)}
+      projection(row, orderedJoinFieldName1, mappedRows, df2NewOrderedIndex)}
 
-    spark.createDataFrame(interpolated, StructType(df1.schema.fields ++ df2.schema.fields)) // FIXME: new spark schema
+    spark.createDataFrame(interpolated, StructType(df1.schema.fields ++ df2NewSparkFields)) // FIXME: new spark schema
   }
 }
 
