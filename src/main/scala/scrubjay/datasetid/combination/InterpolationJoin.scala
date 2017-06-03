@@ -104,27 +104,28 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
       .aggregateByKey(Set[Row]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
       .mapValues(_.toArray.map(maskRow))
 
-    // Get new index of ordered key column in df2
+    // Determine new fields and indices of df2
     val df2NewFieldInfo = df2.schema.fields.zipWithIndex.zip(rowMask).flatMap{case ((c, i), false) => Some((c, i)); case _ => None}
-    val df2NewSparkFields = df2NewFieldInfo.map(_._1)
     val df2OldOrderedIndex = df2.schema.fieldIndex(orderedJoinFieldName2)
     val df2NewOrderedIndex = df2NewFieldInfo.indexWhere(_._2 == df2OldOrderedIndex)
-
+    val df2NewSparkFields = df2NewFieldInfo.map(_._1).patch(df2NewOrderedIndex, Nil, 1)
     val df2NewSJFields = dsID2.scrubJaySchema(dimensionSpace).fields.zip(rowMask).flatMap{case (c, false) => Some(c); case _ => None}
 
+    // Determine interpolators for all values in df2
     val df2Interpolators = df2NewSJFields.zip(df2NewSparkFields)
       .map{ case (sjfield, sparkfield) => Interpolator.get(sjfield.units, sjfield.interpolator, sparkfield.dataType)}
-
     val df2InterpolatorsBcast = spark.sparkContext.broadcast(df2Interpolators)
 
+    // Run interpolators on all mapped values
     def projection(row: Row, keyColumn: String, mappedRows: Array[Row], mappedKeyIndex: Int): Row = {
 
       val xv = row.getAs[RealValued](keyColumn).realValue
       val xs = mappedRows.map(_.getAs[RealValued](mappedKeyIndex).realValue)
 
-      val allYs = mappedRows.map(_.toSeq.toArray).transpose
+      val allYs = mappedRows.map(_.toSeq.toArray.patch(mappedKeyIndex, Nil, 1)).transpose
 
-      val interpolationInfo = allYs.map(ys => xs.zip(ys)).zip(df2InterpolatorsBcast.value)
+      val interpolationInfo = allYs.map(ys => xs.zip(ys))
+        .zip(df2InterpolatorsBcast.value)
 
       val interpolatedValues = interpolationInfo.map{
         case (points, interpolator) => interpolator.interpolate(points, xv)

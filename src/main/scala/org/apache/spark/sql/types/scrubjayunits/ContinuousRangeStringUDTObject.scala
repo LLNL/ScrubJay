@@ -1,7 +1,8 @@
 package org.apache.spark.sql.types.scrubjayunits
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 
+import breeze.linalg.DenseVector
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types
 import org.apache.spark.sql.types._
@@ -38,7 +39,11 @@ object AverageAggregatorDouble extends AverageAggregator[Double] {
 }
 
 object LinearInterpolatorSJLocalDateTime extends LinearInterpolator {
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = new ScrubJayLocalDateTime_String(LocalDateTime.now())
+  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
+    val dpoints = points.map{case (x, y) => (x, y.asInstanceOf[ScrubJayLocalDateTime_String].realValue)}
+    val dval = LinearInterpolatorDouble.interpolate(dpoints, x).asInstanceOf[Double]
+    new ScrubJayLocalDateTime_String(LocalDateTime.ofEpochSecond(dval.toInt, ((dval - dval.toInt)*1e9).toInt, ZoneOffset.UTC))
+  }
 }
 
 object LinearInterpolatorString extends LinearInterpolator {
@@ -50,7 +55,17 @@ object LinearInterpolatorInt extends LinearInterpolator {
 }
 
 object LinearInterpolatorDouble extends LinearInterpolator {
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = 888.8
+  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
+    if (points.length == 1) {
+      points.head._2
+    } else {
+      val (xs, ys) = points.unzip
+      val xdv = DenseVector(xs: _*)
+      val ydv = DenseVector(ys.map(_.asInstanceOf[Double]): _*)
+      val interpolator = breeze.interpolation.LinearInterpolator(xdv, ydv)
+      interpolator(x)
+    }
+  }
 }
 
 object Interpolator {

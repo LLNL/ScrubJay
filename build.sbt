@@ -32,9 +32,9 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 // Breeze
-// resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-// libraryDependencies += "org.scalanlp" %% "breeze" % "0.12"
-// libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+libraryDependencies += "org.scalanlp" %% "breeze" % "0.12"
+libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
 
 // Msgpack (serialization)
 libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
