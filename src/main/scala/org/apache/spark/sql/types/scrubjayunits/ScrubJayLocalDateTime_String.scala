@@ -1,6 +1,6 @@
 package org.apache.spark.sql.types.scrubjayunits
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
 import org.apache.spark.sql.{Column, DataFrame}
@@ -11,7 +11,9 @@ import org.apache.spark.unsafe.types.UTF8String
 
 @SQLUserDefinedType(udt = classOf[ScrubJayLocalDateTime_String.SJLocalDateTimeStringUDT])
 class ScrubJayLocalDateTime_String(val value: LocalDateTime)
-  extends ScrubJayUnits {
+  extends ScrubJayUnits with RealValued {
+
+  override def realValue: Double = value.toEpochSecond(ZoneOffset.UTC)
 
   override def toString: String = {
     "LocalDateTime(" + value + ")"
@@ -44,6 +46,10 @@ object ScrubJayLocalDateTime_String extends ScrubJayUDTObject {
   }
 
   override def sqlType: DataType = StringType
+
+  def interpolate(points: Set[(RealValued, ScrubJayLocalDateTime_String)]): ScrubJayLocalDateTime_String = {
+    ???
+  }
 
   def serialize(p: ScrubJayLocalDateTime_String, dateTimeFormatter: DateTimeFormatter = defaultFormatter): UTF8String = {
     UTF8String.fromString(p.value.format(dateTimeFormatter))

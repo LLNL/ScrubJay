@@ -1,0 +1,54 @@
+{
+  "type" : "CSVDatasetID",
+  "csvFileName" : "target/scala-2.11/test-classes/nodeTemp.csv",
+  "options" : {
+    "header" : "true",
+    "delimiter" : ","
+  },
+  "sparkSchema" : {
+    "type" : "struct",
+    "fields" : [ {
+      "name" : "node",
+      "type" : "string",
+      "nullable" : true,
+      "metadata" : { }
+    }, {
+      "name" : "time",
+      "type" : "string",
+      "nullable" : true,
+      "metadata" : {
+        "scrubjay_parser" : {
+          "type" : "LocalDateTimeString",
+          "dateformat" : "yyyy-MM-dd'T'HH:mm:ss"
+        }
+      }
+    }, {
+      "name" : "temp",
+      "type" : "double",
+      "nullable" : true,
+      "metadata" : { }
+    } ]
+  },
+  "scrubJaySchema": {
+    "fields": [
+      {
+        "name" : "node",
+        "dimension" : "job",
+        "units" : "identifier",
+        "domain" : true
+      },
+      {
+        "name" : "time",
+        "dimension" : "time",
+        "units" : "datetimestamp",
+        "domain" : true
+      },
+      {
+        "name" : "temp",
+        "dimension" : "temperature",
+        "units" : "degrees celsius",
+        "domain" : false
+      }
+    ]
+  }
+}

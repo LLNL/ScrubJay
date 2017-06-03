@@ -1,11 +1,13 @@
 package scrubjay.datasetid.combination
 
 import scala.language.existentials
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql._
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.scrubjayunits.{Interpolator, RealValued}
 import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
-import scrubjay.dataspace.{Dimension, DimensionSpace}
+import scrubjay.dataspace.DimensionSpace
 
-case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
+case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID, window: Double)
   extends Combination {
 
   def joinedSchema(dimensionSpace: DimensionSpace): Option[ScrubJaySchema] = {
@@ -21,57 +23,116 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = {
     joinedSchema(dimensionSpace).isDefined &&
     dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
-      // At least one joinable field must be ordered, else must use natural join
-      .exists(field => {
-      dimensionSpace.findDimension(field.dimension)
-        // if dimension unrecognized, assume unordered, non-continuous
-        .getOrElse(Dimension(field.dimension, false, false))
-        .ordered == true
-    })
+      // Exactly one join field must be ordered
+      // TODO: multiple ordered join fields
+      .count(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered) == 1
   }
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
+
+    val spark = SparkSession.builder().getOrCreate()
+
     val df1 = dsID1.realize(dimensionSpace)
     val df2 = dsID2.realize(dimensionSpace)
-    val commonColumns = dsID1.scrubJaySchema(dimensionSpace)
-      .joinableFields(dsID2.scrubJaySchema(dimensionSpace)).map(_.name)
+    val joinFields = dsID1.scrubJaySchema(dimensionSpace)
+      .joinableFields(dsID2.scrubJaySchema(dimensionSpace))
 
-    df1.join(df2, commonColumns)
+    // Get ordered and unordered join fields for each dataset
+    val (unorderedJoinFields1, unorderedJoinFields2) = {
+      joinFields.filterNot(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered)
+        .unzip
+    }
+    val (orderedJoinFields1, orderedJoinFields2) = {
+      joinFields.filter(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered)
+        .unzip
+    }
+
+    // Get field names for join keys
+    val unorderedJoinFieldNames1 = unorderedJoinFields1.map(_.name)
+    val unorderedJoinFieldNames2 = unorderedJoinFields2.map(_.name)
+    val allUnorderedJoinFieldNames = unorderedJoinFieldNames1 ++ unorderedJoinFieldNames2;
+
+    val orderedJoinFieldName1 = orderedJoinFields1.map(_.name).head // TODO: multiple ordered join fields
+    val orderedJoinFieldName2 = orderedJoinFields2.map(_.name).head // TODO: multiple ordered join fields
+
+    // Create column "keys" containing array of all join fields
+    val binField = StructField("key", StringType)
+    val df1BinnedSchema = StructType(binField +: df1.schema.fields)
+    val df2BinnedSchema = StructType(binField +: df2.schema.fields)
+
+    // Create keys, including unordered column values and ordered column bins (2 bins offset by window)
+    val binMul = 1.0 / (2.0 * window)
+    val binnedRdd1 = df1.rdd.flatMap(row => {
+      val unorderedJoinFieldValues = unorderedJoinFieldNames1.map(row.getAs[String]).mkString(",")
+      val binIndex = row.getAs[RealValued](orderedJoinFieldName1).realValue * binMul
+      val bin1 = unorderedJoinFieldValues + binIndex.toInt
+      val bin2 = unorderedJoinFieldValues + (binIndex + 0.5).toInt
+      Seq(
+        (bin1, row),
+        (bin2, row)
+      )
+    })
+    val binnedRdd2 = df2.rdd.flatMap(row => {
+      val unorderedJoinFieldValues = unorderedJoinFieldNames2.map(row.getAs[String]).mkString(",")
+      val binIndex = row.getAs[RealValued](orderedJoinFieldName2).realValue * binMul
+      val bin1 = unorderedJoinFieldValues + binIndex.toInt
+      val bin2 = unorderedJoinFieldValues + (binIndex + 0.5).toInt
+      Seq(
+        (bin1, row),
+        (bin2, row)
+      )
+    })
+
+    // Create 1 to N mapping from each row in df1 to rows in df2
+    val oneToNMapping = binnedRdd1.cogroup(binnedRdd2)
+      .flatMap {
+      case (_, (l1, l2)) => l1.map(l1row => {
+        // Filter out cells that are farther than `window` away
+        val l1v = l1row.getAs[RealValued](orderedJoinFieldName1).realValue
+        (l1row, l2.filter(l2row => {
+          val l2v = l2row.getAs[RealValued](orderedJoinFieldName2).realValue
+          Math.abs(l1v - l2v) < window
+        }))
+      })
+    }
+      // Combine all ds2 rows that map to the same ds1 row, without repeat rows
+      .aggregateByKey(Set[Row]())((set, rows) => set ++ rows, (set1, set2) => set1 ++ set2)
+      .mapValues(_.toArray)
+
+    //val ds2MetaEntries = cogrouped.sparkContext.broadcast(dsID2.sparkSchema)
+
+    val df2ScrubJayFields = spark.sparkContext.broadcast(dsID2.scrubJaySchema(dimensionSpace).fields)
+    val df2SparkFields = spark.sparkContext.broadcast(dsID2.realize(dimensionSpace).schema.fields)
+
+    def projection(row: Row, keyColumn: String, mappedRows: Array[Row], mappedKeyColumn: String): Row = {
+
+      val xv = row.getAs[RealValued](keyColumn).realValue
+      val xs = mappedRows.map(_.getAs[RealValued](mappedKeyColumn).realValue)
+
+      val allYs = mappedRows.map(_.toSeq.toArray).transpose
+
+      val interpolationInfo = allYs.map(ys => xs.zip(ys)).zip(df2ScrubJayFields.value).zip(df2SparkFields.value)
+
+      val interpolatedValues = interpolationInfo.map{
+        case ((points, sjfield), sparkfield) => {
+          val interpolator = Interpolator.get(sjfield.units, sjfield.interpolator, sparkfield.dataType)
+          interpolator.interpolate(points, xv)
+        }
+      }
+
+      Row.fromSeq(row.toSeq ++ interpolatedValues)
+    }
+
+    val interpolated = oneToNMapping.map{case (row, mappedRows) =>
+      projection(row, orderedJoinFieldName1, mappedRows, orderedJoinFieldName2)}
+
+    spark.createDataFrame(interpolated, StructType(df1.schema.fields ++ df2.schema.fields)) // FIXME: new spark schema
   }
 }
 
 /*
 case class InterpolationJoin(dsID1: DatasetID, dsID2: DatasetID, window: Double)
   extends DatasetID(dsID1, dsID2) {
-
-  // Determine common (point, point) dimension pairs on continuous domains, and all common discrete dimensions
-  val commonDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = MetaSource.commonDimensionEntries(dsID1.sparkSchema, dsID2.sparkSchema)
-  val commonContinuousDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
-    d._1.dimensionType == DimensionSpace.CONTINUOUS &&
-    d._2.units.unitsTag.domainType == DomainType.POINT &&
-    d._2.relationType == MetaRelationType.DOMAIN &&
-    d._3.units.unitsTag.domainType == DomainType.POINT &&
-    d._3.relationType == MetaRelationType.DOMAIN)
-  val commonDiscreteDimensions: Seq[(MetaDimension, MetaEntry, MetaEntry)] = commonDimensions.filter(d =>
-    d._1.dimensionType == DimensionSpace.DISCRETE &&
-    d._2.relationType == MetaRelationType.DOMAIN &&
-    d._3.relationType == MetaRelationType.DOMAIN)
-
-  lazy val continuousDimColumn1: String = commonContinuousDimensions.flatMap { case (_, me1, _) => dsID1.sparkSchema.columnForEntry(me1) }.head
-  lazy val continuousDimColumn2: String = commonContinuousDimensions.flatMap { case (_, _, me2) => dsID2.sparkSchema.columnForEntry(me2) }.head
-
-  lazy val discreteDimColumns1: Seq[String] = commonDiscreteDimensions.flatMap { case (_, me1, _) => dsID1.sparkSchema.columnForEntry(me1) }
-  lazy val discreteDimColumns2: Seq[String] = commonDiscreteDimensions.flatMap { case (_, _, me2) => dsID2.sparkSchema.columnForEntry(me2) }
-  lazy val allDiscreteColumns: Seq[String] = discreteDimColumns1 ++ discreteDimColumns2
-
-  // Single continuous axis for now
-  def isValid: Boolean = commonContinuousDimensions.length == 1 && commonDiscreteDimensions.forall(d => {
-    d._2.units.unitsTag.domainType == d._3.units.unitsTag.domainType
-  })
-
-  lazy val sparkSchema: MetaSource = dsID2.sparkSchema
-    .withoutColumns(continuousDimColumn2 +: discreteDimColumns2)
-    .withMetaEntries(dsID1.sparkSchema)
 
   def realize: ScrubJayRDD = {
 

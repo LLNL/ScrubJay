@@ -8,6 +8,7 @@ case class DimensionSpace(dimensions: Array[Dimension]) {
   @JsonIgnore
   val map: Map[String, Dimension] = dimensions.map(d => (d.name, d)).toMap
   def findDimension(name: String): Option[Dimension] = map.get(name)
+  def findDimensionOrDefault(name: String): Dimension = map.getOrElse(name, Dimension(name, ordered=false, continuous=false))
 }
 
 object DimensionSpace {

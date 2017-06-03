@@ -2,13 +2,17 @@ package scrubjay.datasetid
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
+import scrubjay.util._
+
 case class ScrubJayField(domain: Boolean,
                          name: String = "*",
                          dimension: String = "*",
-                         units: String = "*") {
+                         units: String = "*",
+                         aggregator: String = "average",
+                         interpolator: String = "linear") {
 
   override def toString: String = {
-    s"ScrubJayField(domain=$domain, name=$name, dimension=$dimension, units=$units)"
+    s"ScrubJayField(domain=$domain, name=$name, dimension=$dimension, units=$units, aggregator=$aggregator, interpolator=$interpolator)"
   }
 
   def matches(other: ScrubJayField): Boolean = {
@@ -84,11 +88,12 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   /**
     * Joinable fields are domain fields with dimension and units in common
     */
-  def joinableFields(other: ScrubJaySchema): Array[ScrubJayField] = {
-    domainFields.filter(domainField => other.domainFields.exists(otherDomainField =>
-      domainField.dimension == otherDomainField.dimension &&
-        domainField.units == otherDomainField.units
-    ))
+  def joinableFields(other: ScrubJaySchema): Array[(ScrubJayField, ScrubJayField)] = {
+    domainFields.flatMap(domainField => {
+      val otherMatch: Option[ScrubJayField] = other.domainFields.find(otherDomainField =>
+        domainField.dimension == otherDomainField.dimension && domainField.units == otherDomainField.units)
+      otherMatch.fold(None: Option[(ScrubJayField, ScrubJayField)])(f => Some(domainField, f))
+    })
   }
 
   /**

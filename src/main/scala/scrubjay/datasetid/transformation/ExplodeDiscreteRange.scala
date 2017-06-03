@@ -17,8 +17,8 @@ case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
         // Modify column units from list to whatever was inside the list
-        case ScrubJayField(domain, `column`, dimension, units) => {
-          ScrubJayField(domain, column, dimension, units.stripPrefix("list<").stripSuffix(">"))
+        case ScrubJayField(domain, `column`, dimension, units, aggregator, interpolator) => {
+          ScrubJayField(domain, column, dimension, units.stripPrefix("list<").stripSuffix(">"), aggregator, interpolator)
         }
         case other => other
       }

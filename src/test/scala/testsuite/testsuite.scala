@@ -3,24 +3,13 @@
 package object testsuite {
 
   /*
-   * Test CSV file paths from test resources directory
+   * File paths for testing
    */
 
-  val temperatureFilename: String = getClass.getResource("/rackTemp.csv").getPath
-
-  val flopsMetaFilename: String = getClass.getResource("/flopsMeta.csv").getPath
-  val flopsFilename: String = getClass.getResource("/flops.csv").getPath
-
-  //val jobQueueMetaFilename: String = getClass.getResource("/jobQueueMeta.json").getPath
-  val jobQueueFilename: String = getClass.getResource("/jobQueue.csv").getPath
-
-  val nodeFlopsMetaFilename: String = getClass.getResource("/nodeFlopsMeta.csv").getPath
-  val nodeFlopsFilename: String = getClass.getResource("/nodeFlops.csv").getPath
-
-  val clusterLayoutMetaFilename: String = getClass.getResource("/clusterLayoutMeta.csv").getPath
-  val clusterLayoutFilename: String = getClass.getResource("/clusterLayout.csv").getPath
-
+  val nodeFlopsDatasetIDFilename: String = getClass.getResource("/nodeFlops.dsid").getPath
+  val nodeTempDatasetIDFilename: String = getClass.getResource("/nodeTemp.dsid").getPath
   val jobQueueDatasetIDFilename: String = getClass.getResource("/jobQueue.dsid").getPath
+  val clusterLayoutFilename: String = getClass.getResource("/clusterLayout.csv").getPath
 
   val jobAnalysisDataSpaceFilename: String = getClass.getResource("/jobAnalysis.sj").getPath
 

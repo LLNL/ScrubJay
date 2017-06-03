@@ -93,6 +93,8 @@ class QuerySpec extends ScrubJaySpec {
       solutions.foreach(solution => {
         println("Solution: ")
         solution.realize(dataSpace.dimensionSpace).show(false)
+        println("ScrubJaySchema: ")
+        println(solution.scrubJaySchema(dataSpace.dimensionSpace))
       })
       assert(solutions.nonEmpty)
     }

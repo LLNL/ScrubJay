@@ -29,7 +29,8 @@ class ScrubJayLocalDateTimeRange_String(val start: ScrubJayLocalDateTime_String,
   }
 }
 
-object ScrubJayLocalDateTimeRange_String extends ScrubJayUDTObject {
+object ScrubJayLocalDateTimeRange_String
+  extends ScrubJayUDTObject {
 
   private val defaultPattern = "yyyy-MM-dd HH:mm:ss"
   private val dateFormatKey: String = "dateformat"
