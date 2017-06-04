@@ -34,7 +34,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
     }
 
     describe("One-to-many projection") {
-      lazy val interjoined = InterpolationJoin(nodeTemp, nodeFlops, 60000)
+      lazy val interjoined = InterpolationJoin(nodeTemp, nodeFlops, 60)
 
       it("should be defined") {
         assert(interjoined.isValid(dimensionSpace))

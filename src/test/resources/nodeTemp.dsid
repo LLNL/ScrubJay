@@ -17,7 +17,7 @@
       "type" : "string",
       "nullable" : true,
       "metadata" : {
-        "scrubjay_parser" : {
+        "scrubJayType" : {
           "type" : "LocalDateTimeString",
           "dateformat" : "yyyy-MM-dd'T'HH:mm:ss"
         }
@@ -33,21 +33,32 @@
     "fields": [
       {
         "name" : "node",
+        "domain" : true,
         "dimension" : "node",
-        "units" : "identifier",
-        "domain" : true
+        "units" : {
+          "name" : "identifier",
+          "elementType" : "POINT"
+        }
       },
       {
         "name" : "time",
+        "domain" : true,
         "dimension" : "time",
-        "units" : "datetimestamp",
-        "domain" : true
+        "units" : {
+          "name" : "datetimestamp",
+          "elementType" : "POINT"
+        }
       },
       {
         "name" : "temp",
+        "domain" : false,
         "dimension" : "temperature",
-        "units" : "degrees celsius",
-        "domain" : false
+        "units" : {
+          "name" : "degrees celsius",
+          "elementType" : "POINT",
+          "aggregator" : "AVERAGE",
+          "interpolator" : "LINEAR"
+        }
       }
     ]
   }

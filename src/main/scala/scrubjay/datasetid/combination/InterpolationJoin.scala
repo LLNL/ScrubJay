@@ -113,7 +113,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
 
     // Determine interpolators for all values in df2
     val df2Interpolators = df2NewSJFields.zip(df2NewSparkFields)
-      .map{ case (sjfield, sparkfield) => Interpolator.get(sjfield.units, sjfield.interpolator, sparkfield.dataType)}
+      .map{ case (sjfield, sparkfield) => Interpolator.get(sjfield.units, sparkfield.dataType)}
     val df2InterpolatorsBcast = spark.sparkContext.broadcast(df2Interpolators)
 
     // Run interpolators on all mapped values

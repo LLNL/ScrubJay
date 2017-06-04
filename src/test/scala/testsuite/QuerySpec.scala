@@ -1,6 +1,6 @@
 package testsuite
 
-import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
+import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.query._
 import scrubjay.dataspace.DataSpace
 
@@ -54,7 +54,7 @@ class QuerySpec extends ScrubJaySpec {
 
     val queryTarget = ScrubJaySchema(Array(
       ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = true, dimension = "node", units = "identifier")
+      ScrubJayField(domain = true, dimension = "node", units = ScrubJayUnitsField("identifier", "*", "*", "*"))
     ))
 
     val query = Query(dataSpace, queryTarget)

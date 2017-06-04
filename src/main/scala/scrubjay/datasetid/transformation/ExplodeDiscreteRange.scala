@@ -13,12 +13,14 @@ import scrubjay.dataspace.DimensionSpace
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
+  // TODO: make units actually composite (right now hacking with name string)
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
         // Modify column units from list to whatever was inside the list
-        case ScrubJayField(domain, `column`, dimension, units, aggregator, interpolator) => {
-          ScrubJayField(domain, column, dimension, units.stripPrefix("list<").stripSuffix(">"), aggregator, interpolator)
+        case ScrubJayField(domain, `column`, dimension, units) => {
+          val newUnits = ScrubJayUnitsField(units.name.stripPrefix("list<").stripSuffix(">"), units.elementType, units.aggregator, units.interpolator)
+          ScrubJayField(domain, column, dimension, newUnits)
         }
         case other => other
       }
@@ -27,7 +29,7 @@ case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
 
   def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
     val columnUnits = dsID.scrubJaySchema(dimensionSpace)(column).units
-    columnUnits.startsWith("list<") && columnUnits.endsWith(">")
+    columnUnits.name.startsWith("list<") && columnUnits.name.endsWith(">")
   }
 
   def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {

@@ -29,7 +29,7 @@ object Query {
     val queryTarget = args(1).as[ScrubJaySchema]
 
     // Run all possible joins of this entire set
-    val allJoins = JoinSpace(dataSpace, queryTarget).allJoinedDatasets
+    val allJoins = JoinSet(dataSpace, queryTarget).allJoinedDatasets
 
     // Run all derivations on the joined results
     val allDerivations = allJoins.flatMap(dataset => {

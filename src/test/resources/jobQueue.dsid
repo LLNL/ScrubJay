@@ -17,7 +17,7 @@
       "type" : "string",
       "nullable" : true,
       "metadata" : {
-        "scrubjay_parser" : {
+        "scrubJayType" : {
           "type" : "ArrayString",
           "delimiter" : ","
         }
@@ -27,7 +27,7 @@
       "type" : "integer",
       "nullable" : true,
       "metadata" : {
-        "scrubjay_parser_UNIMPLEMENTED" : {
+        "scrubJayType_UNIMPLEMENTED" : {
           "type" : "Seconds"
         }
       }
@@ -36,7 +36,7 @@
       "type" : "string",
       "nullable" : true,
       "metadata" : {
-        "scrubjay_parser" : {
+        "scrubJayType" : {
           "type" : "LocalDateTimeRangeString",
           "dateformat" : "yyyy-MM-dd'T'HH:mm:ss"
         }
@@ -47,27 +47,39 @@
     "fields": [
       {
         "name" : "jobid",
+        "domain" : true,
         "dimension" : "job",
-        "units" : "identifier",
-        "domain" : true
+        "units" : {
+          "name" : "identifier",
+          "elementType" : "POINT"
+        }
       },
       {
         "name" : "nodelist",
         "dimension" : "node",
-        "units" : "list<identifier>",
-        "domain" : true
+        "domain" : true,
+        "units" : {
+          "name" : "list<identifier>",
+          "elementType" : "MULTIPOINT"
+        }
       },
       {
         "name" : "elapsed",
         "dimension" : "time",
-        "units" : "seconds",
-        "domain" : false
+        "domain" : false,
+        "units" : {
+          "name" : "seconds",
+          "elementType" : "POINT"
+        }
       },
       {
         "name" : "timespan",
         "dimension" : "time",
-        "units" : "datetimespan",
-        "domain" : true
+        "domain" : true,
+        "units" : {
+          "name" : "datetimespan",
+          "elementType" : "RANGE"
+        }
       }
     ]
   }

@@ -4,25 +4,36 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 
 import scrubjay.util._
 
+case class ScrubJayUnitsField(name: String,
+                              elementType: String,
+                              aggregator: String,
+                              interpolator: String) {
+  def matches(other: ScrubJayUnitsField): Boolean = {
+    val nameMatches = wildMatch(name, other.name)
+    val elementTypeMatches = wildMatch(elementType, other.elementType)
+    val aggregatorMatches = wildMatch(aggregator, other.aggregator)
+    val interpolatorMatches = wildMatch(interpolator, other.interpolator)
+    nameMatches && elementTypeMatches && aggregatorMatches && interpolatorMatches
+  }
+}
+
+object ScrubJayUnitsField {
+  val any: ScrubJayUnitsField = ScrubJayUnitsField(WILDCARD_STRING, WILDCARD_STRING, WILDCARD_STRING, WILDCARD_STRING)
+}
+
 case class ScrubJayField(domain: Boolean,
-                         name: String = "*",
-                         dimension: String = "*",
-                         units: String = "*",
-                         aggregator: String = "average",
-                         interpolator: String = "linear") {
+                         name: String = WILDCARD_STRING,
+                         dimension: String = WILDCARD_STRING,
+                         units: ScrubJayUnitsField = ScrubJayUnitsField.any) {
 
   override def toString: String = {
-    s"ScrubJayField(domain=$domain, name=$name, dimension=$dimension, units=$units, aggregator=$aggregator, interpolator=$interpolator)"
+    s"ScrubJayField(domain=$domain, name=$name, dimension=$dimension, units=$units)"
   }
 
   def matches(other: ScrubJayField): Boolean = {
     val domainMatches = domain == other.domain
-    val dimensionMatches = dimension == other.dimension ||
-      ScrubJayField.wildcards.contains(dimension) ||
-      ScrubJayField.wildcards.contains(other.dimension)
-    val unitsMatches = units == other.units ||
-      ScrubJayField.wildcards.contains(units) ||
-      ScrubJayField.wildcards.contains(other.units)
+    val dimensionMatches = wildMatch(dimension, other.dimension)
+    val unitsMatches = units.matches(other.units)
     domainMatches && dimensionMatches && unitsMatches
   }
 
@@ -39,7 +50,7 @@ case class ScrubJayField(domain: Boolean,
 
   def generateFieldName: String = {
     val domainType = if (domain) "domain" else "value"
-    domainType + ":" + dimension + ":" + units
+    domainType + ":" + dimension + ":" + units.name
   }
 
   def withGeneratedFieldName: ScrubJayField = {
@@ -59,7 +70,7 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
   def fieldNames: Array[String] = fields.map(_.name)
   def dimensions: Array[String] = fields.map(_.dimension)
-  def units: Array[String] = fields.map(_.units)
+  def units: Array[ScrubJayUnitsField] = fields.map(_.units)
 
   def domainFields: Array[ScrubJayField] = fields.filter(_.domain)
   def valueFields: Array[ScrubJayField] = fields.filterNot(_.domain)
@@ -88,10 +99,10 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   /**
     * Joinable fields are domain fields with dimension and units in common
     */
-  def joinableFields(other: ScrubJaySchema): Array[(ScrubJayField, ScrubJayField)] = {
+  def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Array[(ScrubJayField, ScrubJayField)] = {
     domainFields.flatMap(domainField => {
       val otherMatch: Option[ScrubJayField] = other.domainFields.find(otherDomainField =>
-        domainField.dimension == otherDomainField.dimension && domainField.units == otherDomainField.units)
+        domainField.dimension == otherDomainField.dimension && (!testUnits || domainField.units == otherDomainField.units))
       otherMatch.fold(None: Option[(ScrubJayField, ScrubJayField)])(f => Some(domainField, f))
     })
   }
@@ -99,8 +110,8 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   /**
     * When joined with "other", the resulting schema
     */
-  def joinSchema(other: ScrubJaySchema): Option[ScrubJaySchema] = {
-    if (joinableFields(other).nonEmpty)
+  def joinSchema(other: ScrubJaySchema, testUnits: Boolean = true): Option[ScrubJaySchema] = {
+    if (joinableFields(other, testUnits).nonEmpty)
       Some(ScrubJaySchema(
         domainFields.toSet.union(other.domainFields.toSet).toArray
           ++ valueFields
@@ -111,8 +122,4 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
   @JsonIgnore
   val map: Map[String, ScrubJayField] = fields.map(field => (field.name, field)).toMap
-}
-
-object ScrubJayField {
-  final val wildcards = Set("*", "any")
 }

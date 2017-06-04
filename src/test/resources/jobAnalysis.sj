@@ -29,80 +29,87 @@
     ] },
   "datasets": [
     {
-      "type": "CSVDatasetID",
-      "csvFileName": "target/scala-2.11/test-classes/jobQueue.csv",
-      "options": {
-        "header": "true",
-        "delimiter": "|"
+      "type" : "CSVDatasetID",
+      "csvFileName" : "target/scala-2.11/test-classes/jobQueue.csv",
+      "options" : {
+        "header" : "true",
+        "delimiter" : "|"
       },
-      "sparkSchema": {
-        "type": "struct",
-        "fields": [
-          {
-            "name": "jobid",
-            "type": "string",
-            "nullable": true,
-            "metadata": {}
-          },
-          {
-            "name": "nodelist",
-            "type": "string",
-            "nullable": true,
-            "metadata": {
-              "scrubjay_parser": {
-                "type": "ArrayString",
-                "delimiter": ","
-              }
-            }
-          },
-          {
-            "name": "elapsed",
-            "type": "integer",
-            "nullable": true,
-            "metadata": {
-              "scrubjay_parser_UNIMPLEMENTED": {
-                "type": "Seconds"
-              }
-            }
-          },
-          {
-            "name": "timespan",
-            "type": "string",
-            "nullable": true,
-            "metadata": {
-              "scrubjay_parser": {
-                "type": "LocalDateTimeRangeString",
-                "dateformat": "yyyy-MM-dd'T'HH:mm:ss"
-              }
+      "sparkSchema" : {
+        "type" : "struct",
+        "fields" : [ {
+          "name" : "jobid",
+          "type" : "string",
+          "nullable" : true,
+          "metadata" : { }
+        }, {
+          "name" : "nodelist",
+          "type" : "string",
+          "nullable" : true,
+          "metadata" : {
+            "scrubJayType" : {
+              "type" : "ArrayString",
+              "delimiter" : ","
             }
           }
-        ]
+        }, {
+          "name" : "elapsed",
+          "type" : "integer",
+          "nullable" : true,
+          "metadata" : {
+            "scrubJayType_UNIMPLEMENTED" : {
+              "type" : "Seconds"
+            }
+          }
+        }, {
+          "name" : "timespan",
+          "type" : "string",
+          "nullable" : true,
+          "metadata" : {
+            "scrubJayType" : {
+              "type" : "LocalDateTimeRangeString",
+              "dateformat" : "yyyy-MM-dd'T'HH:mm:ss"
+            }
+          }
+        } ]
       },
       "scrubJaySchema": {
         "fields": [
           {
             "name" : "jobid",
+            "domain" : true,
             "dimension" : "job",
-            "units" : "identifier",
-            "domain" : true
+            "units" : {
+              "name" : "identifier",
+              "elementType" : "POINT"
+            }
           },
           {
             "name" : "nodelist",
             "dimension" : "node",
-            "units" : "list<identifier>",
-            "domain" : true
+            "domain" : true,
+            "units" : {
+              "name" : "list<identifier>",
+              "elementType" : "MULTIPOINT"
+            }
           },
           {
             "name" : "elapsed",
             "dimension" : "time",
-            "units" : "seconds",
-            "domain" : false
+            "domain" : false,
+            "units" : {
+              "name" : "seconds",
+              "elementType" : "POINT"
+            }
           },
           {
             "name" : "timespan",
             "dimension" : "time",
-            "units" : "datetimespan",
-            "domain" : true
+            "domain" : true,
+            "units" : {
+              "name" : "datetimespan",
+              "elementType" : "RANGE"
+            }
           }
         ]
       }
@@ -135,15 +142,21 @@
         "fields": [
           {
             "name" : "node",
+            "domain" : true,
             "dimension" : "node",
-            "units" : "identifier",
-            "domain" : true
+            "units" : {
+              "name" : "identifier",
+              "elementType" : "POINT"
+            }
           },
           {
             "name" : "rack",
+            "domain" : true,
             "dimension" : "rack",
-            "units" : "identifier",
-            "domain" : true
+            "units" : {
+              "name" : "identifier",
+              "elementType" : "POINT"
+            }
           }
         ]
       }
@@ -169,7 +182,7 @@
             "type": "string",
             "nullable": true,
             "metadata": {
-              "scrubjay_parser": {
+              "scrubJayType": {
                 "type": "LocalDateTimeString",
                 "dateformat": "yyyy-MM-dd'T'HH:mm:ss"
               }
@@ -187,21 +200,30 @@
         "fields": [
           {
             "name" : "node",
+            "domain" : true,
             "dimension" : "node",
-            "units" : "identifier",
-            "domain" : true
+            "units" : {
+              "name" : "identifier",
+              "elementType" : "POINT"
+            }
           },
           {
             "name" : "time",
+            "domain" : true,
             "dimension" : "time",
-            "units" : "datetimestamp",
-            "domain" : true
+            "units" : {
+              "name" : "datetimestamp",
+              "elementType" : "POINT"
+            }
           },
           {
             "name" : "flops",
+            "domain" : false,
             "dimension" : "flops",
-            "units" : "int",
-            "domain" : false
+            "units" : {
+              "name" : "count",
+              "elementType" : "POINT"
+            }
           }
         ]
       }

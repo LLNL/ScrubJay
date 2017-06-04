@@ -1,5 +1,0 @@
-column, relationType, dimension, units
-node, domain, node, identifier
-time, domain, time, datetimestamp
-cpuTemp, value, temperature, degrees Celsius
-flops, value, flops, count

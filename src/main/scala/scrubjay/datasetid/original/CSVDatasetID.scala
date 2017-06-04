@@ -1,6 +1,6 @@
 package scrubjay.datasetid.original
 
-import org.apache.spark.sql.types.scrubjayunits.ScrubJayUDFParser
+import org.apache.spark.sql.types.scrubjayunits.ScrubJayDFLoader
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
@@ -20,13 +20,12 @@ case class CSVDatasetID(csvFileName: String,
   }
 
   override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
-    ScrubJayUDFParser.parse(
-      SparkSession.builder().getOrCreate()
-        .read
+    val spark = SparkSession.builder().getOrCreate()
+    val rawDF = spark.read
         .schema(sparkSchema)
         .options(options)
         .csv(csvFileName)
-    ).updateSparkSchemaNames(scrubJaySchema)
+    ScrubJayDFLoader.load(rawDF, scrubJaySchema)
   }
 }
 

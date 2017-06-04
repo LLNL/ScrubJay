@@ -4,6 +4,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 
 import org.apache.spark.sql.types
 import org.apache.spark.sql.types._
+import scrubjay.datasetid.ScrubJayUnitsField
 
 // FIXME: should use type class instead of Any everywhere...
 trait ScrubJayInterpolator extends Serializable {
@@ -53,10 +54,10 @@ object LinearInterpolatorSJLocalDateTime extends LinearInterpolator {
 
 object Interpolator {
   val SJLocalDateTimeDataType = new types.scrubjayunits.ScrubJayLocalDateTime_String.SJLocalDateTimeStringUDT
-  def get(units: String, kind: String, dataType: DataType): ScrubJayInterpolator = (units, kind, dataType) match {
-    case (_, _, SJLocalDateTimeDataType) => LinearInterpolatorSJLocalDateTime
-    case (_, _, StringType) => LinearInterpolatorString
-    case (_, _, IntegerType) => LinearInterpolatorInt
-    case (_, _, DoubleType) => LinearInterpolatorDouble
+  def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = (units, dataType) match {
+    case (_, SJLocalDateTimeDataType) => LinearInterpolatorSJLocalDateTime
+    case (_, StringType) => LinearInterpolatorString
+    case (_, IntegerType) => LinearInterpolatorInt
+    case (_, DoubleType) => LinearInterpolatorDouble
   }
 }

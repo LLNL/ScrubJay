@@ -1,24 +1,11 @@
 package scrubjay.query
 
 import scrubjay.datasetid._
-import scrubjay.datasetid.combination.NaturalJoin
-import scrubjay.dataspace.{DataSpace, DimensionSpace}
-//import scrubjay.datasetid.combination.UberJoin
+import scrubjay.dataspace.DataSpace
 
 import gov.llnl.ConstraintSolver._
 
-object JoinSpace {
-
-  // Figure out what kind of join to do, then do it
-  lazy val joinedPair: Constraint[DatasetID] = memoize(args => {
-    val dimensionSpace = args(0).as[DimensionSpace]
-    val dsID1 = args(1).as[DatasetID]
-    val dsID2 = args(2).as[DatasetID]
-
-    Seq(NaturalJoin(dsID1, dsID2).asOption(dimensionSpace)).flatten
-    //UberJoin(dsID1, dsID2)
-  })
-
+object JoinSet {
 
   // Can we join a set of datasources dsIDSet?
   lazy val joinedSet: Constraint[DatasetID] = memoize(args => {
@@ -33,17 +20,17 @@ object JoinSpace {
       case Seq(dsID1) => Seq(dsID1)
 
       // Two elements, check joined pair
-      case Seq(dsID1, dsID2) => joinedPair(Seq(dataSpace.dimensionSpace, dsID1, dsID2))
+      case Seq(dsID1, dsID2) => JoinPair.joinedPair(Seq(dataSpace.dimensionSpace, dsID1, dsID2))
 
       // More than two elements...
       case head +: tail =>
 
         // joinPair( head, joinSet(tail) )
         val restThenPair = joinedSet(Seq(DataSpace(dataSpace.dimensionSpace, tail.toArray)))
-          .flatMap(tailSolution => joinedPair(Seq(dataSpace.dimensionSpace, head, tailSolution)))
+          .flatMap(tailSolution => JoinPair.joinedPair(Seq(dataSpace.dimensionSpace, head, tailSolution)))
 
         // Set of all joinable pairs between head and some t in tail
-        val head2TailPairs = new ArgumentSpace(Seq(dataSpace.dimensionSpace), Seq(head), tail.toSeq).allSolutions(joinedPair)
+        val head2TailPairs = new ArgumentSpace(Seq(dataSpace.dimensionSpace), Seq(head), tail.toSeq).allSolutions(JoinPair.joinedPair)
 
         // joinSet( joinPair(head, t) +: rest )
         val pairThenRest = head2TailPairs.flatMap(pair => {
@@ -60,9 +47,9 @@ object JoinSpace {
 
 }
 
-case class JoinSpace(dataSpace: DataSpace, queryTarget: ScrubJaySchema) {
+case class JoinSet(dataSpace: DataSpace, queryTarget: ScrubJaySchema) {
   // If set satisfies query target, return the joined set
   def allJoinedDatasets: Seq[DatasetID] = {
-    JoinSpace.joinedSet(Seq(dataSpace))
+    JoinSet.joinedSet(Seq(dataSpace))
   }
 }
