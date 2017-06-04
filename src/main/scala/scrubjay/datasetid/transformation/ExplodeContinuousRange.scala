@@ -15,16 +15,29 @@ import scrubjay.dataspace.DimensionSpace
 case class ExplodeContinuousRange(override val dsID: DatasetID, column: String, interval: Double)
   extends Transformation {
 
+  // Modify column units from range to the units of points within the range
+  def newField(dimensionSpace: DimensionSpace): ScrubJayField = {
+    val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
+    val newUnits = columnField.units.subUnits("rangeUnits")
+    columnField.copy(units = newUnits).withGeneratedFieldName
+  }
+
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
-    dsID.scrubJaySchema(dimensionSpace)
+    ScrubJaySchema(
+      dsID.scrubJaySchema(dimensionSpace).fields.map{
+        case ScrubJayField(domain, `column`, dimension, units) => newField(dimensionSpace)
+        case other => other
+      }
+    )
   }
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
-    val dimensionName = dsID.scrubJaySchema(dimensionSpace)(column).dimension
+    val columnUnits = dsID.scrubJaySchema(dimensionSpace).getField(column).units
+    val dimensionName = dsID.scrubJaySchema(dimensionSpace).getField(column).dimension
     val dimensionToExplode = dimensionSpace.dimensions.find(_.name == dimensionName)
 
     if (dimensionToExplode.isDefined)
-      dimensionToExplode.get.continuous
+      dimensionToExplode.get.continuous && columnUnits.name == "range"
     else
       false
   }
@@ -32,6 +45,7 @@ case class ExplodeContinuousRange(override val dsID: DatasetID, column: String, 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
     val DF = dsID.realize(dimensionSpace: DimensionSpace)
     DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column), interval))
+      .withColumnRenamed(column, newField(dimensionSpace).name)
   }
 }
 

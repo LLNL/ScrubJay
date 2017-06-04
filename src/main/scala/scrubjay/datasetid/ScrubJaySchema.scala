@@ -7,7 +7,8 @@ import scrubjay.util._
 case class ScrubJayUnitsField(name: String,
                               elementType: String,
                               aggregator: String,
-                              interpolator: String) {
+                              interpolator: String,
+                              subUnits: Map[String, ScrubJayUnitsField]) {
   def matches(other: ScrubJayUnitsField): Boolean = {
     val nameMatches = wildMatch(name, other.name)
     val elementTypeMatches = wildMatch(elementType, other.elementType)
@@ -18,7 +19,12 @@ case class ScrubJayUnitsField(name: String,
 }
 
 object ScrubJayUnitsField {
-  val any: ScrubJayUnitsField = ScrubJayUnitsField(WILDCARD_STRING, WILDCARD_STRING, WILDCARD_STRING, WILDCARD_STRING)
+  val any: ScrubJayUnitsField = ScrubJayUnitsField(
+    WILDCARD_STRING,
+    WILDCARD_STRING,
+    WILDCARD_STRING,
+    WILDCARD_STRING,
+    Map.empty)
 }
 
 case class ScrubJayField(domain: Boolean,
@@ -60,7 +66,7 @@ case class ScrubJayField(domain: Boolean,
 
 case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
-  def apply(fieldName: String): ScrubJayField = map(fieldName)
+  def getField(fieldName: String): ScrubJayField = map(fieldName)
 
   override def toString: String = {
     "ScrubJaySchema\n|--" + fields.mkString("\n|--")

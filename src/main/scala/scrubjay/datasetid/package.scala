@@ -13,7 +13,7 @@ package object datasetid {
   implicit class RichDataFrame(df: DataFrame) {
     def updateSparkSchemaNames(scrubJaySchema: ScrubJaySchema): DataFrame = {
       val newSchemaNames = df.schema.map(field => {
-        scrubJaySchema(field.name).generateFieldName
+        scrubJaySchema.getField(field.name).generateFieldName
       })
       df.toDF(newSchemaNames:_*)
     }

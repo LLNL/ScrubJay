@@ -34,7 +34,7 @@ object JoinSet {
 
         // joinSet( joinPair(head, t) +: rest )
         val pairThenRest = head2TailPairs.flatMap(pair => {
-          val pairArgs = pair.arguments.map(_.as[DatasetID])
+          val pairArgs = pair.arguments.tail.map(_.as[DatasetID])
           val rest = dataSpace.datasets.filterNot(pairArgs.contains)
           pair.solutions.flatMap(sol => {
             joinedSet(Seq(DataSpace(dataSpace.dimensionSpace, rest :+ sol)))
@@ -45,11 +45,4 @@ object JoinSet {
     }
   })
 
-}
-
-case class JoinSet(dataSpace: DataSpace, queryTarget: ScrubJaySchema) {
-  // If set satisfies query target, return the joined set
-  def allJoinedDatasets: Seq[DatasetID] = {
-    JoinSet.joinedSet(Seq(dataSpace))
-  }
 }

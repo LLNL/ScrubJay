@@ -11,7 +11,7 @@ object ScrubJayDFLoader {
 
     // For each column, if we can convert to a high-level scrubjaytype, convert it
     DF.schema.fields.foldLeft(DF)((newDF, sparkSchemaField) => {
-      parseUDFForColumnSchema(newDF, sparkSchemaField, scrubJaySchema(sparkSchemaField.name))
+      parseUDFForColumnSchema(newDF, sparkSchemaField, scrubJaySchema.getField(sparkSchemaField.name))
     })
       // And update the spark schema to have scrubjay-formatted names "domain:dimension:units"
       .updateSparkSchemaNames(scrubJaySchema)

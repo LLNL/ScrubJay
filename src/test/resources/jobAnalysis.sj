@@ -89,8 +89,14 @@
             "dimension" : "node",
             "domain" : true,
             "units" : {
-              "name" : "list<identifier>",
-              "elementType" : "MULTIPOINT"
+              "name": "list",
+              "elementType": "MULTIPOINT",
+              "subUnits": {
+                "listUnits": {
+                  "name" : "identifier",
+                  "elementType" : "POINT"
+                }
+              }
             }
           },
           {
@@ -107,8 +113,14 @@
             "dimension" : "time",
             "domain" : true,
             "units" : {
-              "name" : "datetimespan",
-              "elementType" : "RANGE"
+              "name" : "range",
+              "elementType" : "RANGE",
+              "subUnits" : {
+                "rangeUnits" : {
+                  "name" : "datetimestamp",
+                  "elementType" : "POINT"
+                }
+              }
             }
           }
         ]

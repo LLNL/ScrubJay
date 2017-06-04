@@ -20,7 +20,7 @@ object JoinPair {
   }
 
   def orderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
-    if (f.units.elementType == "POINT") {
+    if (f.units.elementType == "RANGE") {
       ExplodeContinuousRange(ds, f.name, explodePeriod)
     } else {
       ds

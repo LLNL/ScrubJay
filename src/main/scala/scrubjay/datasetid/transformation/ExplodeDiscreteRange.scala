@@ -13,23 +13,25 @@ import scrubjay.dataspace.DimensionSpace
 case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   extends Transformation {
 
-  // TODO: make units actually composite (right now hacking with name string)
+  // Modify column units from list to whatever was inside the list
+  def newField(dimensionSpace: DimensionSpace): ScrubJayField = {
+    val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
+    val newUnits = columnField.units.subUnits("listUnits")
+    columnField.copy(units = newUnits).withGeneratedFieldName
+  }
+
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
-        // Modify column units from list to whatever was inside the list
-        case ScrubJayField(domain, `column`, dimension, units) => {
-          val newUnits = ScrubJayUnitsField(units.name.stripPrefix("list<").stripSuffix(">"), units.elementType, units.aggregator, units.interpolator)
-          ScrubJayField(domain, column, dimension, newUnits)
-        }
+        case ScrubJayField(domain, `column`, dimension, units) => newField(dimensionSpace)
         case other => other
       }
     )
   }
 
   def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
-    val columnUnits = dsID.scrubJaySchema(dimensionSpace)(column).units
-    columnUnits.name.startsWith("list<") && columnUnits.name.endsWith(">")
+    val columnUnits = dsID.scrubJaySchema(dimensionSpace).getField(column).units
+    columnUnits.name == "list"
   }
 
   def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
@@ -47,7 +49,7 @@ case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
   override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
     val df = dsID.realize(dimensionSpace)
     df.withColumn(column, ExplodeDiscreteRange.dfExpression(df(column)))
-      .updateSparkSchemaNames(scrubJaySchema(dimensionSpace))
+      .withColumnRenamed(column, newField(dimensionSpace).name)
   }
 }
 
