@@ -21,11 +21,11 @@ class ScrubJayLocalDateTimeRange_String(val start: ScrubJayLocalDateTime_String,
     case _ => false
   }
 
-  def discretize(milliseconds: Double): Array[ScrubJayLocalDateTime_String] = {
+  def discretize(seconds: Double): Array[ScrubJayLocalDateTime_String] = {
     val timeIterator: Iterator[ScrubJayLocalDateTime_String] = Iterator.iterate(start) { current =>
-      new ScrubJayLocalDateTime_String(current.value.plusNanos((milliseconds * 1000000).toLong))
+      new ScrubJayLocalDateTime_String(current.value.plusNanos((seconds * 1000000000).toLong))
     }
-    timeIterator.takeWhile(_ < end).toArray
+    timeIterator.takeWhile(t => t < end || t == end).toArray
   }
 }
 

@@ -24,15 +24,13 @@ class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      println("Before explode:")
-      jobQueue.realize(dataSpace.dimensionSpace).show(false)
       assert(jobQueueExplodeNodeList.isValid(dataSpace.dimensionSpace))
     }
-    it("should exist") {
-      println("DataFrame:")
-      jobQueueExplodeNodeList.realize(dataSpace.dimensionSpace).show(false)
-      println("SparkSchema")
-      jobQueueExplodeNodeList.realize(dataSpace.dimensionSpace).printSchema()
+    it("should lookCorrect") {
+      println("Before:")
+      jobQueue.debugPrint(dataSpace.dimensionSpace)
+      println("After:")
+      jobQueueExplodeNodeList.debugPrint(dataSpace.dimensionSpace)
     }
     it("should serialize/deserialize correctly") {
       val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)

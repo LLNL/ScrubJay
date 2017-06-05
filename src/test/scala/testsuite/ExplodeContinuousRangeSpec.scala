@@ -20,27 +20,23 @@ class ExplodeContinuousRangeSpec extends ScrubJaySpec {
     )
   )
 
-  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeContinuousRange(jobQueue, "domain:time:range", 30000)
+  lazy val jobQueueExplodeTimeRange: DatasetID = ExplodeContinuousRange(jobQueue, "domain:time:range", 30)
 
-  describe("Derive exploded node list") {
+  describe("Derive exploded time range") {
     it("should be defined") {
-      println("Before explode:")
-      jobQueue.realize(dataSpace.dimensionSpace).show(false)
-      println("SparkSchema:")
-      jobQueue.realize(dataSpace.dimensionSpace).printSchema()
-      assert(jobQueueExplodeNodeList.isValid(dataSpace.dimensionSpace))
+      assert(jobQueueExplodeTimeRange.isValid(dataSpace.dimensionSpace))
     }
-    it("should exist") {
-      println("DataFrame:")
-      jobQueueExplodeNodeList.realize(dataSpace.dimensionSpace).show(false)
-      println("SparkSchema:")
-      jobQueueExplodeNodeList.realize(dataSpace.dimensionSpace).printSchema()
+    it("should look correct") {
+      println("Before:")
+      jobQueue.debugPrint(dataSpace.dimensionSpace)
+      println("After:")
+      jobQueueExplodeTimeRange.debugPrint(dataSpace.dimensionSpace)
     }
     it("should serialize/deserialize correctly") {
-      val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)
+      val json: String = DatasetID.toJsonString(jobQueueExplodeTimeRange)
       println("JSON:")
       println(json)
-      assert(DatasetID.fromJsonString(json) == jobQueueExplodeNodeList)
+      assert(DatasetID.fromJsonString(json) == jobQueueExplodeTimeRange)
     }
   }
 }

@@ -24,12 +24,10 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       it("should be defined") {
         assert(interjoined.isValid(dimensionSpace))
       }
-      it("should look correct...") {
-        println(interjoined.scrubJaySchema(dimensionSpace))
-        interjoined.realize(dimensionSpace).printSchema()
-        interjoined.realize(dimensionSpace).show(false)
+      it("should look correct"){
+        interjoined.debugPrint(dimensionSpace)
       }
-      it("should pickle/unpickle correctly") {
+      it("should serialize/deserialize correctly") {
         assert(DatasetID.fromJsonString(DatasetID.toJsonString(interjoined)) == interjoined)
       }
     }
@@ -40,12 +38,10 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       it("should be defined") {
         assert(interjoined.isValid(dimensionSpace))
       }
-      it("should look correct...") {
-        println(interjoined.scrubJaySchema(dimensionSpace))
-        interjoined.realize(dimensionSpace).printSchema()
-        interjoined.realize(dimensionSpace).show(false)
+      it("should look correct") {
+        interjoined.debugPrint(dimensionSpace)
       }
-      it("should pickle/unpickle correctly") {
+      it("should serialize/deserialize correctly") {
         assert(DatasetID.fromJsonString(DatasetID.toJsonString(interjoined)) == interjoined)
       }
     }

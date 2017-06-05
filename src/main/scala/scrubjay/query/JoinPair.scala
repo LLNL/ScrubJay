@@ -9,7 +9,7 @@ import scrubjay.datasetid.transformation.{ExplodeContinuousRange, ExplodeDiscret
 object JoinPair {
 
   val interJoinWindow = 60
-  val explodePeriod = 30000
+  val explodePeriod = 30
 
   def unorderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
     if (f.units.elementType == "MULTIPOINT") {
