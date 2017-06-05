@@ -20,7 +20,7 @@ class QuerySpec extends ScrubJaySpec {
 
     lazy val solutions = query.solutions.toList
 
-    ignore("should find no correct solution") {
+    it("should find no correct solution") {
       assert(solutions.isEmpty)
     }
   }
@@ -36,7 +36,7 @@ class QuerySpec extends ScrubJaySpec {
 
     lazy val solutions = query.solutions.toList
 
-    ignore("should find the correct solution") {
+    it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
@@ -61,7 +61,7 @@ class QuerySpec extends ScrubJaySpec {
 
     lazy val solutions = query.solutions.toList
 
-    ignore("should find the correct solution") {
+    it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
@@ -85,7 +85,7 @@ class QuerySpec extends ScrubJaySpec {
 
     lazy val solutions = query.solutions.toList
 
-    ignore("should find the correct solution") {
+    it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)

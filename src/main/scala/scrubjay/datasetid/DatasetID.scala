@@ -41,6 +41,13 @@ abstract class DatasetID extends Serializable {
   def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema
   def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame
 
+  def debugPrint(dimensionSpace: DimensionSpace): Unit = {
+    val df = realize(dimensionSpace)
+    df.printSchema()
+    println(scrubJaySchema(dimensionSpace))
+    df.show(false)
+  }
+
   def dependencies: Seq[DatasetID]
 }
 

@@ -48,7 +48,7 @@ object LinearInterpolatorSJLocalDateTime extends LinearInterpolator {
   override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
     val dpoints = points.map{case (x, y) => (x, y.asInstanceOf[ScrubJayLocalDateTime_String].realValue)}
     val dval = LinearInterpolatorDouble.doubleInterpolate(dpoints, x)
-    new ScrubJayLocalDateTime_String(LocalDateTime.ofEpochSecond(dval.toInt, ((dval - dval.toInt)*1e9).toInt, ZoneOffset.UTC))
+    new ScrubJayLocalDateTime_String(LocalDateTime.ofEpochSecond(dval.toInt, ((dval % 1)*1e9).toInt, ZoneOffset.UTC))
   }
 }
 
