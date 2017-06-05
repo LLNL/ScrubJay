@@ -43,8 +43,13 @@ abstract class DatasetID extends Serializable {
 
   def debugPrint(dimensionSpace: DimensionSpace): Unit = {
     val df = realize(dimensionSpace)
+    println(Console.YELLOW + "Spark Schema:")
     df.printSchema()
+    println(Console.BLUE + "ScrubJay Schema:")
     println(scrubJaySchema(dimensionSpace))
+    println(Console.GREEN + "Derivation Graph:")
+    println(DatasetID.toAsciiGraphString(this))
+    println(Console.RESET + "DataFrame:")
     df.show(false)
   }
 
@@ -69,16 +74,46 @@ object DatasetID {
     "h" + toJsonString(dsID).sha256.hex
   }
 
-  def toDotString(dsID: DatasetID): String = {
+  def toDotGraphString(dsID: DatasetID): String = {
 
     val (nodes, edges) = toNodeEdgeTuple(dsID)
 
     val header = "digraph {"
-    val nodeSection = nodes.map("\t" + _).mkString("\n")
-    val edgeSection = edges.map("\t\t" + _).mkString("\n")
+    val nodeSection = nodes.map{case GraphNode(hash, derivation, columns) => {
+      val columnString = columns.mkString(" X ")
+      val style = derivation match {
+        case "NaturalJoin" => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\\n" + columnString + "\""
+        case "InterpolationJoin" => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\\n" + columnString + "\""
+        case "ExplodeDiscreteRange" => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\\n" + columnString + "\""
+        case  "ExplodeContinuousRange" =>"style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\\n" + columnString + "\""
+        case "CSVDataset" =>"style=filled, fillcolor=\"darkorange\", label=\"CSV\\n" + columnString + "\""
+        case "CassandraDataset" => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
+        case "LocalDataset" => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
+        case "UNKNOWN" => "label=\"UNKNOWN\""
+      }
+      "\t" + hash + " [" + style + "];"
+    }}.mkString("\n")
+    val edgeSection = edges.map{case GraphEdge(left, right) => {
+      "\t\t" + left.hash + " -> " + right.hash + " [penwidth=2];"
+    }}.mkString("\n")
     val footer = "}"
 
     Seq(header, nodeSection, edgeSection, footer).mkString("\n")
+  }
+
+  def toAsciiGraphString(dsID: DatasetID): String = {
+    import com.github.mdr.ascii.graph.Graph
+    import com.github.mdr.ascii.layout.GraphLayout
+
+    def node2AsciiVertex(n: GraphNode): String = n.derivation + "\n" + n.columns.mkString(",\n")
+
+    val (nodes, edges) = toNodeEdgeTuple(dsID)
+    val graph = Graph(
+      nodes.map(node2AsciiVertex).toSet,
+      edges.map(e => node2AsciiVertex(e.left) -> node2AsciiVertex(e.right)).toList
+    )
+
+    GraphLayout.renderGraph(graph)
   }
 
   def fromJsonFile(filename: String): DatasetID = {
@@ -98,47 +133,40 @@ object DatasetID {
   }
 
   def writeToDotFile(dsID: DatasetID, filename: String): Unit = {
-    writeStringToFile(toDotString(dsID), filename)
+    writeStringToFile(toDotGraphString(dsID), filename)
   }
 
-  private def toNodeEdgeTuple(dsID: DatasetID, parentName: Option[String] = None): (Seq[String], Seq[String]) = {
+  sealed case class GraphNode(hash: String, derivation: String, columns: Array[String])
+  sealed case class GraphEdge(left: GraphNode, right: GraphNode)
+
+  private def toNodeEdgeTuple(dsID: DatasetID, parent: Option[GraphNode] = None): (Seq[GraphNode], Seq[GraphEdge]) = {
 
     val hash: String = toHash(dsID)
 
-    // Create string of columns Node X Flops X Time, etc
-    val columnString = dsID.scrubJaySchema(DimensionSpace.empty).fieldNames.mkString(" X ")
-
-    // Graph node
-    val style = dsID match {
-
-      // Combined data sources
-      // case _: NaturalJoin => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\\n" + columnString + "\""
-      // case _: InterpolationJoin => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\\n" + columnString + "\""
-
-      // Transformed data sources
-      case _: ExplodeDiscreteRange => "style=filled, fillcolor=\"deepskyblue\", label=\"ExplodeDiscrete\\n" + columnString + "\""
-      // case _: ExplodeContinuousRange => "style=filled, fillcolor=\"lightskyblue\", label=\"ExplodeContinuous\\n" + columnString + "\""
-
-      // Original data sources
-      case _: CSVDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"CSV\\n" + columnString + "\""
-      case _: CassandraDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Cassandra\\n" + columnString + "\""
-      // case _: LocalDatasetID => "style=filled, fillcolor=\"darkorange\", label=\"Local\\n" + columnString + "\""
-
-      // Unknown
-      case _ => "label='unknown'"
+    val derivation = dsID match {
+      case _: NaturalJoin => "NaturalJoin"
+      case _: InterpolationJoin => "InterpolationJoin"
+      case _: ExplodeDiscreteRange => "ExplodeDiscreteRange"
+      case _: ExplodeContinuousRange =>  "ExplodeContinuousRange"
+      case _: CSVDatasetID => "CSVDataset"
+      case _: CassandraDatasetID => "CassandraDataset"
+      case _: LocalDatasetID => "LocalDataset"
+      case _ => "UNKNOWN"
     }
-    val node: String = hash + " [" + style + "]"
 
-    // Graph edge
-    val edge: Seq[String] = {
-      if (parentName.isDefined)
-        Seq(parentName.get + " -> " + hash + " [penwidth=2]")
+    val columns = dsID.scrubJaySchema(DimensionSpace.empty).fieldNames
+
+    val node = GraphNode(hash, derivation, columns)
+
+    val edge = {
+      if (parent.isDefined)
+        Seq(GraphEdge(node, parent.get))
       else
         Seq()
     }
 
-    val (childNodes: Seq[String], childEdges: Seq[String]) = dsID.dependencies
-      .map(toNodeEdgeTuple(_, Some(hash)))
+    val (childNodes, childEdges) = dsID.dependencies
+      .map(toNodeEdgeTuple(_, Some(node)))
       .fold((Seq.empty, Seq.empty))((a, b) => (a._1 ++ b._1, a._2 ++ b._2))
 
     (node +: childNodes, edge ++ childEdges)

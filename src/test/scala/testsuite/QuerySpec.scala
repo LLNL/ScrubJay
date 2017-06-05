@@ -41,9 +41,9 @@ class QuerySpec extends ScrubJaySpec {
       println("Query:")
       println(queryTarget)
 
-      solutions.foreach(solution => {
-        println("Solution: ")
-        solution.realize(dataSpace.dimensionSpace).show(false)
+      solutions.zipWithIndex.foreach(solution => {
+        println("Solution: " + solution._2)
+        solution._1.debugPrint(dataSpace.dimensionSpace)
       })
       assert(solutions.nonEmpty)
     }
@@ -66,9 +66,9 @@ class QuerySpec extends ScrubJaySpec {
       println("Query:")
       println(queryTarget)
 
-      solutions.foreach(solution => {
-        println("Solution: ")
-        solution.realize(dataSpace.dimensionSpace).show(false)
+      solutions.zipWithIndex.foreach(solution => {
+        println("Solution: " + solution._2)
+        solution._1.debugPrint(dataSpace.dimensionSpace)
       })
       assert(solutions.nonEmpty)
     }
@@ -90,11 +90,9 @@ class QuerySpec extends ScrubJaySpec {
       println("Query:")
       println(queryTarget)
 
-      solutions.foreach(solution => {
-        println("Solution: ")
-        solution.realize(dataSpace.dimensionSpace).show(false)
-        println("ScrubJaySchema: ")
-        println(solution.scrubJaySchema(dataSpace.dimensionSpace))
+      solutions.zipWithIndex.foreach(solution => {
+        println("Solution: " + solution._2)
+        solution._1.debugPrint(dataSpace.dimensionSpace)
       })
       assert(solutions.nonEmpty)
     }
@@ -103,7 +101,7 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with multiple datasources and single derivations") {
 
     val queryTarget = ScrubJaySchema(Array(
-      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = true, dimension = "rack"),
       ScrubJayField(domain = false, dimension = "flops")
     ))
 
@@ -116,35 +114,13 @@ class QuerySpec extends ScrubJaySpec {
       println("Query:")
       println(queryTarget)
 
-      solutions.foreach(solution => {
-        println("Solution: ")
-        solution.realize(dataSpace.dimensionSpace).show(false)
+      solutions.zipWithIndex.foreach(solution => {
+        println("Solution: " + solution._2)
+        solution._1.debugPrint(dataSpace.dimensionSpace)
       })
       assert(solutions.nonEmpty)
     }
 
-    /*
-    val jobFlopsQuery = Set(
-      metaEntryFromStrings("domain", "job", "identifier"),
-      metaEntryFromStrings("value", "flops", "count")
-    )
-
-    lazy val solutions = Query(dataSources, jobFlopsQuery)
-      .solutions
-      .toList
-
-    it("should have at least one solution") {
-      assert(solutions.nonEmpty)
-    }
-    it("should derive the correct datasource") {
-      //solutions.head.describe()
-      //println(DatasetID.toDotString(solutions.head))
-      assert(solutions.head.realize.collect.toSet == trueNodeTimeJobFlops)
-    }
-    it("should pickle/unpickle correctly") {
-      assert(DatasetID.fromJsonString(DatasetID.toJsonString(solutions.head)) == solutions.head)
-    }
-    */
   }
 
   describe("Enumerate all possible derivations") {
