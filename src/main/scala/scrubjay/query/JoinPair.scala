@@ -4,7 +4,7 @@ import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.dataspace._
 import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin}
-import scrubjay.datasetid.transformation.{ExplodeContinuousRange, ExplodeDiscreteRange}
+import scrubjay.datasetid.transformation.{ExplodeRange, ExplodeList}
 
 object JoinPair {
 
@@ -13,7 +13,7 @@ object JoinPair {
 
   def unorderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
     if (f.units.elementType == "MULTIPOINT") {
-      ExplodeDiscreteRange(ds, f.name)
+      ExplodeList(ds, f.name)
     } else {
       ds
     }
@@ -21,7 +21,7 @@ object JoinPair {
 
   def orderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
     if (f.units.elementType == "RANGE") {
-      ExplodeContinuousRange(ds, f.name, explodePeriod)
+      ExplodeRange(ds, f.name, explodePeriod)
     } else {
       ds
     }

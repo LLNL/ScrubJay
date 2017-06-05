@@ -2,10 +2,10 @@ package testsuite
 
 import scrubjay.datasetid._
 import scrubjay.dataspace.{DataSpace, Dimension, DimensionSpace}
-import scrubjay.datasetid.transformation.ExplodeDiscreteRange
+import scrubjay.datasetid.transformation.ExplodeList
 
 
-class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
+class ExplodeListSpec extends ScrubJaySpec {
 
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
 
@@ -20,7 +20,7 @@ class ExplodeDiscreteRangeSpec extends ScrubJaySpec {
     )
   )
 
-  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeDiscreteRange(jobQueue, "domain:node:list")
+  lazy val jobQueueExplodeNodeList: DatasetID = ExplodeList(jobQueue, "domain:node:list")
 
   describe("Derive exploded node list") {
     it("should be defined") {

@@ -2,10 +2,10 @@ package testsuite
 
 import scrubjay.datasetid._
 import scrubjay.dataspace.{DataSpace, Dimension, DimensionSpace}
-import scrubjay.datasetid.transformation.ExplodeContinuousRange
+import scrubjay.datasetid.transformation.ExplodeRange
 
 
-class ExplodeContinuousRangeSpec extends ScrubJaySpec {
+class ExplodeRangeSpec extends ScrubJaySpec {
 
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
 
@@ -20,7 +20,7 @@ class ExplodeContinuousRangeSpec extends ScrubJaySpec {
     )
   )
 
-  lazy val jobQueueExplodeTimeRange: DatasetID = ExplodeContinuousRange(jobQueue, "domain:time:range", 30)
+  lazy val jobQueueExplodeTimeRange: DatasetID = ExplodeRange(jobQueue, "domain:time:range", 30)
 
   describe("Derive exploded time range") {
     it("should be defined") {

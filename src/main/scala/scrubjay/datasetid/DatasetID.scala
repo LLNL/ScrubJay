@@ -146,8 +146,8 @@ object DatasetID {
     val derivation = dsID match {
       case _: NaturalJoin => "NaturalJoin"
       case _: InterpolationJoin => "InterpolationJoin"
-      case _: ExplodeDiscreteRange => "ExplodeDiscreteRange"
-      case _: ExplodeContinuousRange =>  "ExplodeContinuousRange"
+      case _: ExplodeList => "ExplodeDiscreteRange"
+      case _: ExplodeRange =>  "ExplodeContinuousRange"
       case _: CSVDatasetID => "CSVDataset"
       case _: CassandraDatasetID => "CassandraDataset"
       case _: LocalDatasetID => "LocalDataset"

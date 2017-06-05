@@ -12,7 +12,7 @@ import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 
-case class ExplodeContinuousRange(override val dsID: DatasetID, column: String, interval: Double)
+case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
   extends Transformation {
 
   // Modify column units from range to the units of points within the range
@@ -44,12 +44,12 @@ case class ExplodeContinuousRange(override val dsID: DatasetID, column: String, 
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
     val DF = dsID.realize(dimensionSpace: DimensionSpace)
-    DF.withColumn(column, ExplodeContinuousRange.dfExpression(DF(column), interval))
+    DF.withColumn(column, ExplodeRange.dfExpression(DF(column), interval))
       .withColumnRenamed(column, newField(dimensionSpace).name)
   }
 }
 
-object ExplodeContinuousRange {
+object ExplodeRange {
 
   @ExpressionDescription(
     usage = "_FUNC_(expr) - Separates the elements of continuous range `expr` into multiple rows.",

@@ -2,7 +2,7 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
-import scrubjay.datasetid.transformation.ExplodeDiscreteRange
+import scrubjay.datasetid.transformation.ExplodeList
 import scrubjay.dataspace.DataSpace
 
 case class Query(dataSpace: DataSpace,
@@ -34,7 +34,7 @@ object Query {
     // Run all derivations on the joined results
     val allDerivations = allJoins.flatMap(dataset => {
       dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.flatMap(column => {
-        val explodeDiscreteRange = ExplodeDiscreteRange(dataset, column)
+        val explodeDiscreteRange = ExplodeList(dataset, column)
         if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
           Some(explodeDiscreteRange)
         } else {

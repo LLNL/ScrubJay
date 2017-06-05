@@ -1,7 +1,5 @@
 package testsuite
 
-import scrubjay.datasetid.combination._
-import scrubjay.datasetid.transformation._
 import scrubjay.dataspace.DataSpace
 
 class DataSpaceSpec extends ScrubJaySpec {

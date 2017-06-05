@@ -10,7 +10,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 
-case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
+case class ExplodeList(override val dsID: DatasetID, column: String)
   extends Transformation {
 
   // Modify column units from list to whatever was inside the list
@@ -48,13 +48,13 @@ case class ExplodeDiscreteRange(override val dsID: DatasetID, column: String)
 
   override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
     val df = dsID.realize(dimensionSpace)
-    df.withColumn(column, ExplodeDiscreteRange.dfExpression(df(column)))
+    df.withColumn(column, ExplodeList.dfExpression(df(column)))
       .withColumnRenamed(column, newField(dimensionSpace).name)
   }
 }
 
 
-object ExplodeDiscreteRange {
+object ExplodeList {
 
   @ExpressionDescription(
     usage = "_FUNC_(expr) - Separates the elements of array `expr` into multiple rows, or the elements of map `expr` into multiple rows and columns.",
