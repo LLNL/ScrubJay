@@ -11,8 +11,7 @@ case class LocalDatasetID(rawData: Seq[Row],
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = true
 
-  override def realize(dimensionSpace: DimensionSpace): DataFrame = {
-    val spark = SparkSession.builder().getOrCreate()
+  override def load: DataFrame = {
     val rdd = spark.sparkContext.parallelize(rawData)
     spark.createDataFrame(rdd, sparkSchema)
   }

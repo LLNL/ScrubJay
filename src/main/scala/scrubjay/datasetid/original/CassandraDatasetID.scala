@@ -1,7 +1,6 @@
 package scrubjay.datasetid.original
 
-import org.apache.spark.sql.types.scrubjayunits.ScrubJayDFLoader
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.DataFrame
 import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 import scrubjay.dataspace.DimensionSpace
 
@@ -14,13 +13,11 @@ case class CassandraDatasetID(keyspace: String,
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
-    val spark = SparkSession.builder().getOrCreate()
-    val rawDF = spark.read
+  override def load: DataFrame = {
+    spark.read
       .schema(sparkSchema)
       .format("org.apache.spark.sql.cassandra")
       .load()
-    ScrubJayDFLoader.load(rawDF, scrubJaySchema)
   }
 }
 

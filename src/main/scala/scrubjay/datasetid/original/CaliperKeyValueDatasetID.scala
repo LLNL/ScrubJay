@@ -11,5 +11,5 @@ case class CaliperKeyValueDatasetID(ckvFileName: String,
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = ???
+  override def load: DataFrame = ???
 }

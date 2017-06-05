@@ -1,6 +1,5 @@
 package scrubjay.datasetid.original
 
-import org.apache.spark.sql.types.scrubjayunits.ScrubJayDFLoader
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
@@ -19,13 +18,11 @@ case class CSVDatasetID(csvFileName: String,
     new java.io.File(csvFileName).exists()
   }
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
-    val spark = SparkSession.builder().getOrCreate()
-    val rawDF = spark.read
-        .schema(sparkSchema)
-        .options(options)
-        .csv(csvFileName)
-    ScrubJayDFLoader.load(rawDF, scrubJaySchema)
+  override def load: DataFrame = {
+    spark.read
+      .schema(sparkSchema)
+      .options(options)
+      .csv(csvFileName)
   }
 }
 
