@@ -4,7 +4,6 @@ import org.apache.spark.sql.types.scrubjayunits.ScrubJayDFLoader
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
-import scrubjay.dataspace.Dimension
 
 case class CSVDatasetID(csvFileName: String,
                         sparkSchema: SparkSchema,

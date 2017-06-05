@@ -12,28 +12,28 @@ package object scrubjay {
     */
 
   // Dataspace
-  type DataSpace = scrubjay.dataspace.DataSpace
-  type DimensionSpace = scrubjay.dataspace.DimensionSpace
-  type Dimension = scrubjay.dataspace.Dimension
+  val DataSpace = scrubjay.dataspace.DataSpace
+  val DimensionSpace = scrubjay.dataspace.DimensionSpace
+  val Dimension = scrubjay.dataspace.Dimension
 
   // Query
-  type Query = scrubjay.query.Query
+  val Query = scrubjay.query.Query
 
   // Schema
-  type ScrubJaySchema = scrubjay.datasetid.ScrubJaySchema
-  type ScrubJayField = scrubjay.datasetid.ScrubJayField
-  type ScrubJayUnitsField = scrubjay.datasetid.ScrubJayUnitsField
+  val ScrubJaySchema = scrubjay.datasetid.ScrubJaySchema
+  val ScrubJayField = scrubjay.datasetid.ScrubJayField
+  val ScrubJayUnitsField = scrubjay.datasetid.ScrubJayUnitsField
 
   // Original datasets
-  type LocalDatasetID = scrubjay.datasetid.original.LocalDatasetID
-  type CSVDatasetID = scrubjay.datasetid.original.CSVDatasetID
-  type CassandraDatasetID = scrubjay.datasetid.original.CassandraDatasetID
+  val LocalDatasetID = scrubjay.datasetid.original.LocalDatasetID
+  val CSVDatasetID = scrubjay.datasetid.original.CSVDatasetID
+  val CassandraDatasetID = scrubjay.datasetid.original.CassandraDatasetID
 
   // Transformations
-  type ExplodeList = scrubjay.datasetid.transformation.ExplodeList
-  type ExplodeRange = scrubjay.datasetid.transformation.ExplodeRange
+  val ExplodeList = scrubjay.datasetid.transformation.ExplodeList
+  val ExplodeRange = scrubjay.datasetid.transformation.ExplodeRange
 
   // Combinations
-  type NaturalJoin = scrubjay.datasetid.combination.NaturalJoin
-  type InterpolationJoin = scrubjay.datasetid.combination.InterpolationJoin
+  val NaturalJoin = scrubjay.datasetid.combination.NaturalJoin
+  val InterpolationJoin = scrubjay.datasetid.combination.InterpolationJoin
 }
