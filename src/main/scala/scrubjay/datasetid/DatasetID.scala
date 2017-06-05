@@ -37,9 +37,9 @@ abstract class DatasetID extends Serializable {
     else
       None
   }
-  def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean
-  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema
-  def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame
+  def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean
+  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema
+  def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame
 
   def debugPrint(dimensionSpace: DimensionSpace): Unit = {
     val df = realize(dimensionSpace)
@@ -154,7 +154,7 @@ object DatasetID {
       case _ => "UNKNOWN"
     }
 
-    val columns = dsID.scrubJaySchema(DimensionSpace.empty).fieldNames
+    val columns = dsID.scrubJaySchema(DimensionSpace.unknown).fieldNames
 
     val node = GraphNode(hash, derivation, columns)
 

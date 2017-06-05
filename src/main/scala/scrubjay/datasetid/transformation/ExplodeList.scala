@@ -20,7 +20,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     columnField.copy(units = newUnits).withGeneratedFieldName
   }
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): ScrubJaySchema = {
+  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
         case ScrubJayField(domain, `column`, dimension, units) => newField(dimensionSpace)
@@ -29,12 +29,12 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     )
   }
 
-  def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+  def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
     val columnUnits = dsID.scrubJaySchema(dimensionSpace).getField(column).units
     columnUnits.name == "list"
   }
 
-  def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+  def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
     dsID.realize(dimensionSpace).schema(column).dataType match {
       case ArrayType(_, _) => true
       case MapType(_, _, _) => true
@@ -42,11 +42,11 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     }
   }
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = {
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
     validScrubJaySchema(dimensionSpace) && validSparkSchema(dimensionSpace)
   }
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
+  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
     val df = dsID.realize(dimensionSpace)
     df.withColumn(column, ExplodeList.dfExpression(df(column)))
       .withColumnRenamed(column, newField(dimensionSpace).name)

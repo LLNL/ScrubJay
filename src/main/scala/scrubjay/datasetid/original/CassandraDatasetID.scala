@@ -12,9 +12,9 @@ case class CassandraDatasetID(keyspace: String,
                               scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID(scrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = true
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = {
+  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
     val spark = SparkSession.builder().getOrCreate()
     val rawDF = spark.read
       .schema(sparkSchema)

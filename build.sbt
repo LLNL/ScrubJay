@@ -2,15 +2,15 @@ name := "ScrubJay"
 
 version := "1.0"
 
-//scalaVersion := "2.10.6"
 scalaVersion := "2.11.8"
+
+// Don't run tests in `sbt assembly`
+test in assembly := {}
 
 scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
-//val sparkVersion = "1.6.2"
 val sparkVersion = "2.1.0"
 
-//val sparkCassandraConnectorVersion = "1.6.0"
 val sparkCassandraConnectorVersion = "2.0.0"
 
 val hadoopVersion = "2.6.2"

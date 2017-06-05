@@ -1,8 +1,12 @@
 package scrubjay.dataspace
 
-import org.codehaus.jackson.annotate.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 case class Dimension(name: String, ordered: Boolean, continuous: Boolean)
+
+object Dimension {
+  def unknown: Dimension = Dimension("UNKNOWN", false, false)
+}
 
 case class DimensionSpace(dimensions: Array[Dimension]) {
   @JsonIgnore
@@ -12,6 +16,6 @@ case class DimensionSpace(dimensions: Array[Dimension]) {
 }
 
 object DimensionSpace {
-  def empty: DimensionSpace = DimensionSpace(Array())
+  def unknown: DimensionSpace = DimensionSpace(Array(Dimension.unknown))
 }
 

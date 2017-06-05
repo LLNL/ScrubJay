@@ -38,4 +38,7 @@ object DataSpace {
     fromJsonString(fileContents)
   }
 
+  def generateSkeletonFor(datasets: Array[DatasetID]): DataSpace = {
+    DataSpace(DimensionSpace.unknown, datasets)
+  }
 }

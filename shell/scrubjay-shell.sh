@@ -23,7 +23,7 @@ SPARK_MASTER="local[*]"
 CASSANDRA_HOST="localhost"
 CASSANDRA_USER="cassandra"
 CASSANDRA_PASSWORD="cassandra"
-INPUT_SCRIPT="import scrubjay._"
+INPUT_SCRIPT="/dev/null"
 
 # Parse arguments
 while [[ $# -gt 1 ]]

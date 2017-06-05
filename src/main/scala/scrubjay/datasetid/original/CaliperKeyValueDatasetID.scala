@@ -9,7 +9,7 @@ case class CaliperKeyValueDatasetID(ckvFileName: String,
                                     scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID(scrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.empty): Boolean = true
+  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.empty): DataFrame = ???
+  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = ???
 }

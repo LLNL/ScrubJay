@@ -1,7 +1,7 @@
 package scrubjay.datasetid
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-
+import scrubjay.dataspace.Dimension
 import scrubjay.util._
 
 case class ScrubJayUnitsField(name: String,
@@ -25,6 +25,13 @@ object ScrubJayUnitsField {
     WILDCARD_STRING,
     WILDCARD_STRING,
     Map.empty)
+  val unknown: ScrubJayUnitsField = ScrubJayUnitsField(
+    "UNKNOWN",
+    "POINT",
+    "maxcount",
+    "nearest",
+    Map.empty
+  )
 }
 
 case class ScrubJayField(domain: Boolean,
@@ -128,4 +135,11 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
   @JsonIgnore
   val map: Map[String, ScrubJayField] = fields.map(field => (field.name, field)).toMap
+}
+
+object ScrubJaySchema {
+  def unknown(sparkSchema: SparkSchema): ScrubJaySchema = {
+    ScrubJaySchema(sparkSchema.fieldNames.map(name =>
+      ScrubJayField(domain = false, name, Dimension.unknown.name, ScrubJayUnitsField.unknown)))
+  }
 }
