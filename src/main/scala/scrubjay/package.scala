@@ -27,6 +27,7 @@ package object scrubjay {
   // Original datasets
   val LocalDatasetID = scrubjay.datasetid.original.LocalDatasetID
   val CSVDatasetID = scrubjay.datasetid.original.CSVDatasetID
+  val ParquetDatasetID = scrubjay.datasetid.original.ParquetDatasetID
   val CassandraDatasetID = scrubjay.datasetid.original.CassandraDatasetID
 
   // Transformations
