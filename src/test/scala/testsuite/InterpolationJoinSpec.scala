@@ -2,7 +2,6 @@ package testsuite
 
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.datasetid.DatasetID
-import org.scalactic.source.Position
 import scrubjay.dataspace.{Dimension, DimensionSpace}
 
 class InterpolationJoinSpec extends ScrubJaySpec {

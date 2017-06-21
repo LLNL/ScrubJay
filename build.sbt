@@ -28,8 +28,8 @@ libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % spa
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion excludeAll ExclusionRule(organization = "javax.servlet")
 
 // Testing
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
 // Breeze
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
