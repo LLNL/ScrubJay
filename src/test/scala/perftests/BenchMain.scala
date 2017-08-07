@@ -1,5 +1,7 @@
 package perftests
 
+import org.apache.spark.sql.SparkSession
+
 trait BenchMain[T] {
 
   protected val argGenerator: Iterator[T]
@@ -9,7 +11,10 @@ trait BenchMain[T] {
   def main(args: Array[String]): Unit = {
 
     // Warmup Spark
-    GenerateInputs.timeXTemp(100).realize(GenerateInputs.dimensionSpace).collect()
+    println("Warming up Spark...")
+    val v = GenerateInputs.timeXTemp(10000).realize(GenerateInputs.dimensionSpace).collect()
+    SparkSession.builder().getOrCreate().sqlContext.clearCache()
+    println("Ready!")
 
     // Collect benchmark results
     val benchResults = argGenerator.map(bench)

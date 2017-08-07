@@ -1,5 +1,6 @@
 package perftests
 
+import org.apache.spark.sql.SparkSession
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.util.returnTime
 
@@ -12,12 +13,13 @@ object InterpolationJoinBench extends BenchMain[Long] {
     val timeTemp = GenerateInputs.timeXTemp(numRows)
     val timeFlops = GenerateInputs.timeXFlops(numRows)
 
-    //timeTemp.realize(GenerateInputs.dimensionSpace).show(false)
-    //timeFlops.realize(GenerateInputs.dimensionSpace).show(false)
-
     lazy val interjoined = InterpolationJoin(timeTemp, timeFlops, 6)
-    numRows -> returnTime {
+    val result = numRows -> returnTime {
       interjoined.realize(GenerateInputs.dimensionSpace).collect()
     }
+
+    SparkSession.builder().getOrCreate().sqlContext.clearCache()
+
+    result
   }
 }

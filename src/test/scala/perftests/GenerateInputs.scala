@@ -1,5 +1,7 @@
 package perftests
 
+import org.apache.spark.sql.catalyst.expressions.GenericRow
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayLocalDateTime_String
 import scrubjay.datasetid.{DatasetID, ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.datasetid.original.LocalDatasetID
@@ -26,16 +28,23 @@ object GenerateInputs extends WithSparkSession {
     // Start time at birth
     val start: ScrubJayLocalDateTime_String = ScrubJayLocalDateTime_String.deserialize("1988-05-14 00:00:00")
 
-    // Create numRows timestamps spaced apart by 1 second
-    val rows = for (i <- 30L to numRows) yield {
-      val t = new ScrubJayLocalDateTime_String(start.value.plusNanos(i * 1000000000L))
-      val d = 100.0*randGen.nextDouble()
-      (t, d)
-    }
+    // Create timestamps
+    val timestampUDF = udf((i: Long) => {
+      new ScrubJayLocalDateTime_String(start.value.plusNanos(i * 1000000000L))
+    })
 
-    // Create local dataset id
-    val df = spark.createDataFrame(rows).toDF("timestamp", "temperature")
+    // Create flops
+    val temperatureUDF = udf(() => {
+      randGen.nextDouble()*100.0
+    })
 
+    // Generate dataframe
+    val df = spark.range(numRows).toDF("timestamp")
+      .withColumn("timestamp", timestampUDF(col("timestamp")))
+      .withColumn("temperature", temperatureUDF())
+      .cache
+
+    // Create ScrubJaySchema
     val sjSchema = new ScrubJaySchema(Array(
       ScrubJayField(
         domain=true,
@@ -57,16 +66,23 @@ object GenerateInputs extends WithSparkSession {
     // Start time at birth
     val start: ScrubJayLocalDateTime_String = ScrubJayLocalDateTime_String.deserialize("1988-05-14 00:00:00")
 
-    // Create numRows timestamps spaced apart by 1 second
-    val rows = for (i <- 1L to numRows) yield {
-      val t = new ScrubJayLocalDateTime_String(start.value.plusNanos(i * 1000000000L))
-      val d = randGen.nextInt(1000000)
-      (t, d)
-    }
+    // Create timestamps
+    val timestampUDF = udf((i: Long) => {
+      new ScrubJayLocalDateTime_String(start.value.plusNanos(i * 1000000000L))
+    })
 
-    // Create local dataset id
-    val df = spark.createDataFrame(rows).toDF("timestamp", "flops")
+    // Create flops
+    val flopsUDF = udf(() => {
+      randGen.nextInt(1000000)
+    })
 
+    // Generate dataframe
+    val df = spark.range(numRows).toDF("timestamp")
+      .withColumn("timestamp", timestampUDF(col("timestamp")))
+      .withColumn("flops", flopsUDF())
+      .cache
+
+    // Create ScrubJaySchema
     val sjSchema = new ScrubJaySchema(Array(
       ScrubJayField(
         domain=true,
