@@ -1,29 +1,23 @@
 package perftests
 
-//import org.scalameter.api._
+import scrubjay.datasetid.combination.InterpolationJoin
+import scrubjay.util.returnTime
 
-import scrubjay.util.argTimeTuple
+object InterpolationJoinBench extends BenchMain[Long] {
 
-object InterpolationJoinBench {
+  override protected val argGenerator: Iterator[Long] = 10000L to 30000L by 10000L toIterator
 
-  val numRowsRange = 1000L to 10000L by 1000L
+  override protected def bench(numRows: Long): (Long, Double) = {
 
-  def bench(numRows: Long): Unit = {
-    GenerateInputs.timeXTemp(numRows)
-  }
+    val timeTemp = GenerateInputs.timeXTemp(numRows)
+    val timeFlops = GenerateInputs.timeXFlops(numRows)
 
-  def main(args: Array[String]): Unit = {
+    //timeTemp.realize(GenerateInputs.dimensionSpace).show(false)
+    //timeFlops.realize(GenerateInputs.dimensionSpace).show(false)
 
-    // Warmup Spark
-    GenerateInputs.timeXTemp(1)
-
-    // Collect benchmark results
-    val benchResults = numRowsRange.map(numRows => argTimeTuple(numRows, bench))
-
-    // Print benchmark results
-    benchResults.foreach( t => {
-      val printTime = String.format("Input: %-30s Time(s): %s", t._1.toString, t._2.toString)
-      println(printTime)
-    })
+    lazy val interjoined = InterpolationJoin(timeTemp, timeFlops, 6)
+    numRows -> returnTime {
+      interjoined.realize(GenerateInputs.dimensionSpace).collect()
+    }
   }
 }

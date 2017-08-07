@@ -10,6 +10,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
     DimensionSpace(Array(
       Dimension("job", ordered = false, continuous = false),
       Dimension("node", ordered = false, continuous = false),
+      Dimension("flops", ordered = true, continuous = true),
       Dimension("time", ordered = true, continuous = true))
     )
 

@@ -16,11 +16,11 @@ package object util {
     result
   }
 
-  def argTimeTuple[A,O](arg: A, fun: A => O): (A,Double) = {
+  def returnTime[R](block: => R): Double = {
     val t0 = System.nanoTime()
-    val result = fun(arg)
+    val result = block
     val t1 = System.nanoTime()
-    (arg, (t1 - t0) / 1000000000.0)
+    (t1 - t0) / 1000000000.0
   }
 
   def niceAttempt[T: ClassTag](block: => T): Option[T] = {

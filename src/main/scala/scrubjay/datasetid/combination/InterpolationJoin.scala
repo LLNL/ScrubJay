@@ -128,6 +128,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
       val allYs = mappedRows.map(_.toSeq.toArray.patch(mappedKeyIndex, Nil, 1)).transpose
 
       val interpolationInfo = allYs.map(ys => xs.zip(ys))
+        .map(_.groupBy(_._1).map(_._2.head).toSeq)
         .zip(df2InterpolatorsBcast.value)
 
       val interpolatedValues = interpolationInfo.map{

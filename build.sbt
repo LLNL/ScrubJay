@@ -48,6 +48,9 @@ libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"
 // Log4j
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 
+// Plotly
+libraryDependencies += "org.plotly-scala" %% "plotly-core" % "0.3.2"
+
 // ScalaMeter (performance tests)
 libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "test"
 //testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
