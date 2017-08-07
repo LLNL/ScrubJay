@@ -48,6 +48,11 @@ libraryDependencies += "com.roundeights" %% "hasher" % "1.2.0"
 // Log4j
 libraryDependencies += "log4j" % "log4j" % "1.2.17"
 
+// ScalaMeter (performance tests)
+libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "test"
+//testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
+//logBuffered := false
+
 // Fix dependency relocation for xml-apis
 libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
 

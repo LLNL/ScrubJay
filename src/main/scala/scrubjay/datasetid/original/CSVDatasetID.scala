@@ -10,10 +10,6 @@ case class CSVDatasetID(csvFileName: String,
                         options: Map[String, String] = Map.empty)
   extends OriginalDatasetID(scrubJaySchema) {
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = {
-    scrubJaySchema.withGeneratedFieldNames
-  }
-
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
     new java.io.File(csvFileName).exists()
   }

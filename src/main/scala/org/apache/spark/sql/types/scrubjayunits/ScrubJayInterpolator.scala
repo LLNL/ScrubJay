@@ -56,7 +56,7 @@ object ScrubJayLinearInterpolatorSJLocalDateTime extends ScrubJayLinearInterpola
 }
 
 object Interpolator {
-  val SJLocalDateTimeDataType = new types.scrubjayunits.ScrubJayLocalDateTime_String.SJLocalDateTimeStringUDT
+  val SJLocalDateTimeDataType = new types.scrubjayunits.SJLocalDateTimeStringUDT
   def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = (units, dataType) match {
 
     // Nearest interpolator

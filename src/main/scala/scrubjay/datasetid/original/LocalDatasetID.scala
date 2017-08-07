@@ -1,19 +1,17 @@
 package scrubjay.datasetid.original
 
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
+import org.apache.spark.sql.{DataFrame, Dataset}
+import scrubjay.datasetid.{ScrubJaySchema}
 import scrubjay.dataspace.DimensionSpace
 
-case class LocalDatasetID(rawData: Seq[Row],
-                          sparkSchema: SparkSchema,
+case class LocalDatasetID(dataframe: DataFrame,
                           scrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID(scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = true
 
   override def load: DataFrame = {
-    val rdd = spark.sparkContext.parallelize(rawData)
-    spark.createDataFrame(rdd, sparkSchema)
+    dataframe
   }
 }
 

@@ -9,7 +9,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
 
-@SQLUserDefinedType(udt = classOf[ScrubJayLocalDateTime_String.SJLocalDateTimeStringUDT])
+@SQLUserDefinedType(udt = classOf[SJLocalDateTimeStringUDT])
 class ScrubJayLocalDateTime_String(val value: LocalDateTime)
   extends ScrubJayUnits with RealValued {
 
@@ -34,16 +34,6 @@ object ScrubJayLocalDateTime_String extends ScrubJayUDTObject {
   private val defaultPattern = "yyyy-MM-dd HH:mm:ss"
   private val dateFormatKey: String = "dateformat"
   private val defaultFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(defaultPattern)
-
-  class SJLocalDateTimeStringUDT
-    extends UserDefinedType[ScrubJayLocalDateTime_String] {
-
-    override def sqlType: DataType = ScrubJayLocalDateTime_String.sqlType
-    override def serialize(p: ScrubJayLocalDateTime_String): UTF8String = ScrubJayLocalDateTime_String.serialize(p)
-    override def deserialize(datum: Any): ScrubJayLocalDateTime_String = ScrubJayLocalDateTime_String.deserialize(datum)
-    override def userClass: Class[ScrubJayLocalDateTime_String] = classOf[ScrubJayLocalDateTime_String]
-
-  }
 
   override def sqlType: DataType = StringType
 
@@ -73,3 +63,13 @@ object ScrubJayLocalDateTime_String extends ScrubJayUDTObject {
     parseUDF(df(structField.name))
   }
 }
+
+class SJLocalDateTimeStringUDT
+  extends UserDefinedType[ScrubJayLocalDateTime_String] {
+
+  override def sqlType: DataType = ScrubJayLocalDateTime_String.sqlType
+  override def serialize(p: ScrubJayLocalDateTime_String): UTF8String = ScrubJayLocalDateTime_String.serialize(p)
+  override def deserialize(datum: Any): ScrubJayLocalDateTime_String = ScrubJayLocalDateTime_String.deserialize(datum)
+  override def userClass: Class[ScrubJayLocalDateTime_String] = classOf[ScrubJayLocalDateTime_String]
+}
+

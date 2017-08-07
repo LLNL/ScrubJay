@@ -9,7 +9,7 @@ trait ScrubJaySpec extends FunSpec with BeforeAndAfterAll {
 
   override protected def beforeAll: Unit = {
     spark = SparkSession.builder()
-      .appName("ScrubJayTests")
+      .appName("ScrubJayFunctionalTests")
       .master("local[*]")
       .getOrCreate()
 
