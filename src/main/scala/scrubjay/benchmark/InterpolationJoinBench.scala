@@ -9,7 +9,7 @@ class InterpolationJoinBench(startRows: Long = 10000L,
                              stepRows: Long = 10000L)
   extends BenchMark[Long] {
 
-  override protected val argGenerator: Iterator[Long] = startRows to endRows by stepRows toIterator
+  override protected val argGenerator: Iterator[Long] = (startRows to endRows by stepRows).toIterator
 
   override protected def bench(numRows: Long): (Long, Double) = {
 
