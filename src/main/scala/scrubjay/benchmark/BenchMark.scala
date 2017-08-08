@@ -1,12 +1,14 @@
 package scrubjay.benchmark
 
 import org.apache.spark.sql.SparkSession
+import scrubjay.datasetid.combination.InterpolationJoin
+import scrubjay.util.returnTime
 
 trait BenchMark[T] {
 
   protected val argGenerator: Iterator[T]
 
-  protected def bench(arg: T): (T, Double)
+  protected def bench(arg: T): Seq[Any]
 
   def run(spark: SparkSession): Unit = {
 
@@ -14,18 +16,28 @@ trait BenchMark[T] {
 
     // Warmup Spark
     println("Warming up Spark...")
-    val v = GenerateInputs.timeXTemp(10000).realize(GenerateInputs.dimensionSpace).collect()
-    SparkSession.builder().getOrCreate().sqlContext.clearCache()
-    println("Ready!")
+
+    {
+      val numRows = 1000
+      val timeTemp = GenerateInputs.timeXTemp(numRows)
+      val timeFlops = GenerateInputs.timeXFlops(numRows)
+
+      val warmup = {
+        lazy val interjoined = InterpolationJoin(timeTemp, timeFlops, 6)
+        val t = returnTime(interjoined.realize(GenerateInputs.dimensionSpace).collect())
+        println(t)
+      }
+
+      spark.sqlContext.clearCache()
+    }
+
+    println("Done! Running benchmarks...")
 
     // Collect benchmark results
     val benchResults = argGenerator.map(bench)
 
     // Print benchmark results
-    benchResults.foreach( t => {
-      val printTime = String.format("Input: %-30s Time(s): %s", t._1.toString, t._2.toString)
-      println(printTime)
-    })
+    benchResults.foreach(results => results.foreach(println))
 
     spark.stop()
   }
