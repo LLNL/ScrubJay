@@ -1,5 +1,6 @@
 package perftests
 
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.expressions.GenericRow
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayLocalDateTime_String
@@ -9,11 +10,11 @@ import scrubjay.dataspace.{Dimension, DimensionSpace}
 
 import scala.util.Random
 
-object GenerateInputs extends WithSparkSession {
-
-  startSpark()
+object GenerateInputs {
 
   val randGen = new Random(100)
+
+  def spark: SparkSession = SparkSession.builder().getOrCreate()
 
   def dimensionSpace: DimensionSpace = {
     DimensionSpace(Array(

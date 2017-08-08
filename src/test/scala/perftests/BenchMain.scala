@@ -10,6 +10,15 @@ trait BenchMain[T] {
 
   def main(args: Array[String]): Unit = {
 
+    val master = if (args.nonEmpty) args.head else "local[*]"
+
+    val spark = SparkSession.builder()
+      .appName("ScrubJayPerformanceTests")
+      .master(master)
+      .getOrCreate()
+
+    spark.sparkContext.setLogLevel("WARN")
+
     // Warmup Spark
     println("Warming up Spark...")
     val v = GenerateInputs.timeXTemp(10000).realize(GenerateInputs.dimensionSpace).collect()
@@ -24,6 +33,8 @@ trait BenchMain[T] {
       val printTime = String.format("Input: %-30s Time(s): %s", t._1.toString, t._2.toString)
       println(printTime)
     })
+
+    spark.stop()
   }
 
 }
