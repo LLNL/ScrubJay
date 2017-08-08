@@ -8,9 +8,7 @@ trait BenchMark[T] {
 
   protected def bench(arg: T): (T, Double)
 
-  def run: Unit = {
-
-    val spark = SparkSession.builder().getOrCreate()
+  def run(spark: SparkSession): Unit = {
 
     spark.sparkContext.setLogLevel("WARN")
 
