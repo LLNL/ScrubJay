@@ -4,9 +4,12 @@ import org.apache.spark.sql.SparkSession
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.util.returnTime
 
-object InterpolationJoinBench extends BenchMark[Long] {
+class InterpolationJoinBench(startRows: Long = 10000L,
+                             endRows: Long = 50000L,
+                             stepRows: Long = 10000L)
+  extends BenchMark[Long] {
 
-  override protected val argGenerator: Iterator[Long] = 10000L to 30000L by 10000L toIterator
+  override protected val argGenerator: Iterator[Long] = startRows to endRows by stepRows toIterator
 
   override protected def bench(numRows: Long): (Long, Double) = {
 
