@@ -1,21 +1,16 @@
-package perftests
+package scrubjay.benchmark
 
 import org.apache.spark.sql.SparkSession
 
-trait BenchMain[T] {
+trait BenchMark[T] {
 
   protected val argGenerator: Iterator[T]
 
   protected def bench(arg: T): (T, Double)
 
-  def main(args: Array[String]): Unit = {
+  def run: Unit = {
 
-    val master = if (args.nonEmpty) args.head else "local[*]"
-
-    val spark = SparkSession.builder()
-      .appName("ScrubJayPerformanceTests")
-      .master(master)
-      .getOrCreate()
+    val spark = SparkSession.builder().getOrCreate()
 
     spark.sparkContext.setLogLevel("WARN")
 

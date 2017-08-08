@@ -1,11 +1,10 @@
-package perftests
+package scrubjay.benchmark
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.expressions.GenericRow
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayLocalDateTime_String
-import scrubjay.datasetid.{DatasetID, ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.datasetid.original.LocalDatasetID
+import scrubjay.datasetid.{DatasetID, ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.dataspace.{Dimension, DimensionSpace}
 
 import scala.util.Random

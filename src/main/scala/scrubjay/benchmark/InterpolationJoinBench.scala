@@ -1,10 +1,10 @@
-package perftests
+package scrubjay.benchmark
 
 import org.apache.spark.sql.SparkSession
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.util.returnTime
 
-object InterpolationJoinBench extends BenchMain[Long] {
+object InterpolationJoinBench extends BenchMark[Long] {
 
   override protected val argGenerator: Iterator[Long] = 10000L to 30000L by 10000L toIterator
 
