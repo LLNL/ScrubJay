@@ -1,10 +1,10 @@
 package scrubjay.benchmark
 
 import org.apache.spark.sql.SparkSession
-import scrubjay.datasetid.combination.InterpolationJoin
+import scrubjay.datasetid.combination.NaturalJoin
 import scrubjay.util.returnTime
 
-class InterpolationJoinBench(repeats: Long = 10,
+class NaturalJoinBench(repeats: Long = 10,
                              startRows: Long = 10000L,
                              endRows: Long = 50000L,
                              stepRows: Long = 10000L)
@@ -14,15 +14,15 @@ class InterpolationJoinBench(repeats: Long = 10,
 
   override protected def bench(numRows: Long): Seq[(Long, Long, Double)] = {
 
-    val timeTemp = GenerateInputs.timeXTemp(numRows)
-    val timeFlops = GenerateInputs.timeXFlops(numRows)
+    val nodeTemp = GenerateInputs.nodeXFlops(numRows)
+    val nodeFlops = GenerateInputs.nodeXTemperature(numRows)
 
     val results = for (r <- 1L to repeats) yield {
-      lazy val interJoined = InterpolationJoin(timeTemp, timeFlops, 6)
+      lazy val naturalJoined = NaturalJoin(nodeTemp, nodeFlops)
       (
         r,
         numRows,
-        returnTime(interJoined.realize(GenerateInputs.dimensionSpace).collect())
+        returnTime(naturalJoined.realize(GenerateInputs.dimensionSpace).collect())
       )
     }
 
@@ -31,3 +31,4 @@ class InterpolationJoinBench(repeats: Long = 10,
     results
   }
 }
+
