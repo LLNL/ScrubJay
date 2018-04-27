@@ -101,6 +101,7 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with multiple datasources and single derivations") {
 
     val queryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
       ScrubJayField(domain = true, dimension = "rack"),
       ScrubJayField(domain = false, dimension = "flops")
     ))

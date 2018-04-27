@@ -3,6 +3,7 @@ package scrubjay.benchmark
 import org.apache.spark.sql.SparkSession
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.util.returnTime
+import scala.language.postfixOps
 
 class InterpolationJoinBench(repeats: Long = 10,
                              startRows: Long = 10000L,
