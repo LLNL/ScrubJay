@@ -9,11 +9,7 @@ test in assembly := {}
 
 scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
-val sparkVersion = "2.1.0"
-
-val sparkCassandraConnectorVersion = "2.0.0"
-
-val hadoopVersion = "2.6.2"
+val sparkVersion = "2.3.0"
 val cassandraVersion = "3.4.0"
 
 // Spark
@@ -22,10 +18,8 @@ libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
 
 // Cassandra
-libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkCassandraConnectorVersion excludeAll ExclusionRule(organization = "javax.servlet")
-
-// Hadoop
-libraryDependencies += "org.apache.hadoop" % "hadoop-common" % hadoopVersion excludeAll ExclusionRule(organization = "javax.servlet")
+resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
+libraryDependencies += "datastax" % "spark-cassandra-connector" % "2.3.0-s_2.11"
 
 // Testing
 libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
@@ -67,6 +61,7 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", _*) => MergeStrategy.discard
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
   case _ => MergeStrategy.first
 }
