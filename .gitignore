@@ -4,3 +4,6 @@ project/
 target/
 
 .idea/
+
+doc/build
+doc/venv
