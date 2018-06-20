@@ -19,6 +19,10 @@ libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
 // Spark Cassandra Connector
 libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkVersion
 
+// Hadoop
+libraryDependencies += "org.apache.hadoop" % "hadoop-hdfs" % "2.7.0"
+libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0"
+
 // Testing
 libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
@@ -57,6 +61,7 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", "services", "org.apache.hadoop.fs.FileSystem") => MergeStrategy.filterDistinctLines
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
   case _ => MergeStrategy.first
