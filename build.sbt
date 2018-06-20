@@ -10,16 +10,14 @@ test in assembly := {}
 scalacOptions := Seq("-feature", "-unchecked", "-deprecation")
 
 val sparkVersion = "2.3.0"
-val cassandraVersion = "3.4.0"
 
 // Spark
 libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
 
-// Cassandra
-resolvers += "Spark Packages Repo" at "https://dl.bintray.com/spark-packages/maven"
-libraryDependencies += "datastax" % "spark-cassandra-connector" % "2.3.0-s_2.11"
+// Spark Cassandra Connector
+libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % sparkVersion
 
 // Testing
 libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
@@ -47,8 +45,6 @@ libraryDependencies += "org.plotly-scala" %% "plotly-core" % "0.3.2"
 
 // ScalaMeter (performance tests)
 libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "test"
-//testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
-//logBuffered := false
 
 // Fix dependency relocation for xml-apis
 libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"

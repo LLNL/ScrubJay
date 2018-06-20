@@ -16,10 +16,9 @@ case class CSVDatasetID(csvFileName: String,
 
   override def load: DataFrame = {
     spark.read
-      .format("csv")
       .schema(sparkSchema)
       .options(options)
-      .load(csvFileName)
+      .csv(csvFileName)
   }
 }
 
