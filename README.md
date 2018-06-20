@@ -22,6 +22,8 @@ With ScrubJay, we simply specify the data columns that we want, and it automatic
 First, we load a "data space" which describes the dimensions and datasets we are using.
 
 ```scala
+  import scrubjay.dataspace.DataSpace
+  
   val dataSpace = DataSpace.fromJsonFile("jobAnalysis.sj")
 ```
 
@@ -29,9 +31,12 @@ Then, we create a "query target" which is just the schema of the dataset that we
 For example, if we want to get FLOPs values aggregated across racks, we write:
 
 ```scala
+  import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
+  
   val queryTarget = ScrubJaySchema(Array(
     ScrubJayField(domain = true, dimension = "rack"),
     ScrubJayField(domain = false, dimension = "flops")
+  ))
 ```
 
 Because `domain = true` for the "rack" dimension, values will be aggregated into racks, and because `domain = false` for 
