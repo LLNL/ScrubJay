@@ -29,8 +29,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
 
 // Breeze
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-libraryDependencies += "org.scalanlp" %% "breeze" % "0.12"
-libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.12"
+libraryDependencies += "org.scalanlp" %% "breeze" % "0.13.2"
+libraryDependencies += "org.scalanlp" %% "breeze-natives" % "0.13.2"
 
 // Msgpack (serialization)
 libraryDependencies += "org.msgpack" %% "msgpack-scala" % "0.6.11"
@@ -51,7 +51,7 @@ libraryDependencies += "org.plotly-scala" %% "plotly-core" % "0.3.2"
 libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "test"
 
 // Fix dependency relocation for xml-apis
-libraryDependencies += "xml-apis" % "xml-apis" % "1.0.b2"
+libraryDependencies += "xml-apis" % "xml-apis" % "1.3.04"
 
 // Disable parallel tests since each uses spark
 parallelExecution in test := false
