@@ -21,6 +21,18 @@ The dimensions of a DataSpace are defined as a single :ref:`dimensionspace` .
 DatasetID columns each have an associated dimension in the DimensionSpace, and ScrubJay uses this information to
 compare different columns to one another.
 
+.. _domains_and_values:
+
+Domains and Values
+------------------
+
+When data is collected, some entity is being measured, and some measurement is being made. For example, a thermometer
+measures temperature at some time and place. We define the entity being measured (the time and place) as the `domain`,
+and the measurement itself (the temperature) as the `value`.
+
+Each column in a DatasetID must be defined as either a domain or a value column. This way, ScrubJay can determine
+whether two different measurements are measuring the same entity.
+
 .. _datasetid:
 
 DatasetID
@@ -46,19 +58,6 @@ Every DatasetID contains the following fields:
 
 Different types of DatasetIDs contain additional parameters. For example, a CSVDatasetID contains the path of the CSV
 file. Derived DatasetIDs contain parameters for transformations as well.
-
-.. _domains_and_values:
-
-Domains and Values
-------------------
-
-When data is collected, some entity is being measured, and some measurement is being made. For example, a thermometer
-measures temperature at some time and place. We define the entity being measured (the time and place) as the `domain`,
-and the measurement itself (the temperature) as the `value`.
-
-Each column in a DatasetID must be defined as either a domain or a value column. This way, ScrubJay can determine
-whether two different measurements are measuring the same entity.
-
 .. _dimensionspace:
 
 DimensionSpace
