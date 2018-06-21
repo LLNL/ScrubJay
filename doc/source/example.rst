@@ -1,19 +1,7 @@
-# ScrubJay
+..  _example:
 
-A framework for automatic and scalable data integration. 
-Describe your datasets (files, formats, database tables), then describe the integrated dataset(s) you desire, and let 
-ScrubJay derive it for you in a consistent and reproducible way.
-
-ScrubJay was developed for analyzing the supercomputing facilities at Lawrence Livermore National Laboratory, but is 
-not specifically tied to any one kind of data. 
-
-## Install
-
-You can use a precompiled version of ScrubJay by downloading a release jar and adding it to your classpath.
-
-todo: Create a github release jar and link to it here.
-
-## Example Usage
+Example
+=======
 
 We have three datasets:
 
@@ -27,29 +15,29 @@ With ScrubJay, we specify the data columns that we want and ask ScrubJay to gene
 
 First, we load a :ref:`dataspace` which describes the dimensions and datasets we are using.
 
-```scala
+.. code-block:: scala
+
    val dataSpace = DataSpace.fromJsonFile("jobAnalysis.sj")
-```
 
 Then, we create a query target, which is just the schema of the dataset that we want, and use it to create a query
 in the created dataspace.
 
-```scala
+.. code-block:: scala
+
    val queryTarget = ScrubJaySchema(Array(
      ScrubJayField(domain = true, dimension = "rack"),
      ScrubJayField(domain = false, dimension = "flops")
    ))
 
    val query = Query(dataSpace, queryTarget)
-```
 
 todo: Queries may be generated using the :ref:`sjql`.
 
 We find solutions to the query (there may be multiple) using:
 
-```scala
+.. code-block:: scala
+
    val solutions = query.solutions
-```
 
 This gives us all solutions as a lazily-evaluated iterator.
 A solution is a :ref:`datasetid`, which describes the resulting dataset and how to derive it.
@@ -57,19 +45,17 @@ To derive a solution as a Spark DataFrame, run the :code:`realize` function on i
 to create the query.
 For example, to derive the first solution:
 
-```scala
+.. code-block:: scala
+
    val realizedDataFrame = solutions.head.realize(dataSpace.dimensionSpace)
-```
 
 We can also see how the solution was derived in a DAG, using :code:`toAsciiGraphString`:
 
-```scala
+.. code-block:: scala
+
    DatasetID.toAsciiGraphString(solution)
-```
 
-which produces
-
-```
+which produces::
 
                               ┌──────────────────────┐
                               │      CSVDataset      │
@@ -112,4 +98,3 @@ which produces
                             │   value:time:seconds,    │
                             │    value:flops:count     │
                             └──────────────────────────┘
-```
