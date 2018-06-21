@@ -25,7 +25,7 @@ Now, lets say we want to analyze how the FLOPs of different jobs are distributed
 This requires integrating all three datasets in a non-trivial way.
 With ScrubJay, we specify the data columns that we want and ask ScrubJay to generate solutions containing them.
 
-First, we load a :ref:`dataspace` which describes the dimensions and datasets we are using.
+First, we load a DataSpace which describes the dimensions and datasets we are using.
 
 ```scala
    val dataSpace = DataSpace.fromJsonFile("jobAnalysis.sj")
@@ -43,7 +43,7 @@ in the created dataspace.
    val query = Query(dataSpace, queryTarget)
 ```
 
-todo: Queries may be generated using the :ref:`sjql`.
+todo: Queries may be generated using the ScrubJay Query Language.
 
 We find solutions to the query (there may be multiple) using:
 
@@ -52,8 +52,8 @@ We find solutions to the query (there may be multiple) using:
 ```
 
 This gives us all solutions as a lazily-evaluated iterator.
-A solution is a :ref:`datasetid`, which describes the resulting dataset and how to derive it.
-To derive a solution as a Spark DataFrame, run the :code:`realize` function on it, specifying the dimension space used
+A solution is a DatasetID, which describes the resulting dataset and how to derive it.
+To derive a solution as a Spark DataFrame, run the `realize` function on it, specifying the dimension space used
 to create the query.
 For example, to derive the first solution:
 
@@ -61,7 +61,7 @@ For example, to derive the first solution:
    val realizedDataFrame = solutions.head.realize(dataSpace.dimensionSpace)
 ```
 
-We can also see how the solution was derived in a DAG, using :code:`toAsciiGraphString`:
+We can also see how the solution was derived in a DAG, using `toAsciiGraphString`:
 
 ```scala
    DatasetID.toAsciiGraphString(solution)
