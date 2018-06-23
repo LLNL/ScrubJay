@@ -17,7 +17,7 @@ case class CassandraDatasetID(keyspace: String,
     spark.read
       .schema(sparkSchema)
       .format("org.apache.spark.sql.cassandra")
-      .options(Map( "table" -> table, "keyspace" -> keyspace))
+      .options(Map("keyspace" -> keyspace, "table" -> table))
       .load()
   }
 }
