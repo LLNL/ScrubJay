@@ -53,6 +53,10 @@ libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2" % "test"
 // Fix dependency relocation for xml-apis
 libraryDependencies += "xml-apis" % "xml-apis" % "1.3.04"
 
+// Parsing
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0"
+
+
 // Disable parallel tests since each uses spark
 parallelExecution in test := false
 

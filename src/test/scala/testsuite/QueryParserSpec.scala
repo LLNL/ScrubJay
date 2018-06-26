@@ -1,0 +1,254 @@
+package testsuite
+
+import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
+import scrubjay.query._
+
+
+class QueryParserSpec extends ScrubJaySpec {
+
+  describe("Query with NO solution") {
+
+    val expectedQueryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "marmosets")
+    ))
+
+    val qp = new QueryParser
+    val queryTarget = qp.parseQuery("SELECT DOMAINS(job) VALUES(marmosets)")
+
+    it("should find no correct solution") {
+
+      assert(expectedQueryTarget.equals(queryTarget))
+    }
+  }
+
+  describe("Query with single original dataset solution") {
+
+    val expectedQueryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = false, dimension = "time")
+    ))
+
+    val qp = new QueryParser
+    val queryTarget = qp.parseQuery("SELECT DOMAINS(job) VALUES(time)")
+
+    it("should produce same query target") {
+
+      assert(expectedQueryTarget.equals(queryTarget))
+    }
+  }
+
+
+  describe("Query with multiple datasources") {
+
+    val expectedQueryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "rack"),
+      ScrubJayField(domain = false, dimension = "flops")
+    ))
+
+    val qp = new QueryParser
+    val queryTarget = qp.parseQuery("SELECT DOMAINS(rack) VALUES(flops)")
+
+
+    it("should find the correct solution") {
+
+      assert(expectedQueryTarget.equals(queryTarget))
+    }
+  }
+
+  describe("Query with multiple datasources and single derivations") {
+
+    val expectedQueryTarget = ScrubJaySchema(Array(
+      ScrubJayField(domain = true, dimension = "job"),
+      ScrubJayField(domain = true, dimension = "rack"),
+      ScrubJayField(domain = false, dimension = "flops")
+    ))
+
+    val qp = new QueryParser
+    val queryTarget = qp.parseQuery("SELECT DOMAINS(job, rack) VALUES(flops)")
+
+
+    it("should find the correct solution") {
+      assert(expectedQueryTarget.equals(queryTarget))
+    }
+
+  }
+
+  describe("Testing Parser.") {
+
+    it("Test A1: Normal Query. Should pass.") {
+      val queryString = "SELECT DOMAINS(dx, dy) VALUES(vx, vy)"
+      val expectedDomains = Seq("dx", "dy")
+      val expectedValues = Seq("vx", "vy")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test A2: Query with Quotes. Should pass.") {
+      val queryString = """SELECT DOMAINS("dx", "dy") VALUES("vx", "vy")"""
+      val expectedDomains = Seq("dx", "dy")
+      val expectedValues = Seq("vx", "vy")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+
+    it("Test A3: Single item in list. Should pass.") {
+      val queryString = "SELECT DOMAINS (dx) VALUES (vx)"
+      val expectedDomains = Seq("dx")
+      val expectedValues = Seq("vx")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test A4: Demonstrating query is not case-sensitive. Should pass.") {
+      val queryString = "SeLEcT dOmAInS(dx, dy) vAluES(vx, vy)"
+      val expectedDomains = Seq("dx", "dy")
+      val expectedValues = Seq("vx", "vy")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test A5: Demonstrating query ignores extra spaces for domain/values lists when unquoted. Should pass.") {
+      val queryString = "SELECT DOMAINS (   dx   ,   dy   ) VALUES (  vx, vy)"
+      val expectedDomains = Seq("dx", "dy")
+      val expectedValues = Seq("vx", "vy")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test A6: More than two items in a list. Should pass.") {
+      val queryString = "SELECT DOMAINS (dx, dy, dz) VALUES (vx, vy, vz)"
+      val expectedDomains = Seq("dx", "dy", "dz")
+      val expectedValues = Seq("vx", "vy", "vz")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+    /*
+    As of this version, trailing whitespace is accounted for but leading whitespace isn't.
+    it("Test A7: Demonstrating query doesn't ignore spaces when quoted. Should pass.") {
+      val queryString = """SELECT DOMAINS ("   dx   ", "   dy   ") VALUES ("  vx", " vy")"""
+      val expectedDomains = Seq("   dx   ", "   dy   ")
+      val expectedValues = Seq("  vx", " vy")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+    */
+    it("Test A8: Demonstrating query allows for empty strings when quoted. Should pass.") {
+      val queryString = """SELECT DOMAINS ("", "") VALUES ("", "")"""
+      val expectedDomains = Seq("", "")
+      val expectedValues = Seq("", "")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test A9: Demonstrating query allows for additional characters when quoted. Should pass.") {
+      val queryString = """SELECT DOMAINS ("(dx", ", dy") VALUES ("vx)", "vy ,")"""
+      val expectedDomains = Seq("(dx", ", dy")
+      val expectedValues = Seq("vx)", "vy ,")
+      verifyParse(queryString, expectedDomains, expectedValues)
+    }
+
+    it("Test B1: Testing list should be comma-separated. Should fail.") {
+      intercept[Exception] {
+        val queryString = "SELECT DOMAINS(dx dy) VALUES(vx vy)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+
+    it("Test B2: Invalid query - missing keyword. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT MARMOSETS(dx, dy) VALUES(vx, vy)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+    it("Test B3: Invalid query - missing parentheses. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT DOMAINS dx, dy VALUES(vx, vy)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+    it("Test B4: Invalid query - Keyword misspelled. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT DMOAINS(dx, dy) VLAUES(vx, vy)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+
+    it("Test B5: Invalid query - Empty list. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT DOMAINS() VALUES()"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+
+    it("Test B6: Invalid query - Incomplete list. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT DOMAINS(dx, , dz) VALUES(vx, ,vz)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+
+    it("Test B7: Invalid query - Extra letters. Should throw Exception") {
+      intercept[Exception] {
+        val queryString = "SELECT DOMAINSS(dx, dz) VVALUES(vx, vz)"
+        val expectedDomains = Seq("dx", "dy")
+        val expectedValues = Seq("vx", "vy")
+        verifyParse(queryString, expectedDomains, expectedValues)
+      }
+    }
+  }
+
+ 
+
+    def verifyParse(queryString: String, expectedDomains: Seq[String], expectedValues: Seq[String]): Unit = {
+      val qp = new QueryParser
+      val matched = qp.parseQueryTesting(queryString)
+      assert(matched.domains.equals(expectedDomains))
+      assert(matched.values.equals(expectedValues))
+    }
+
+  describe("Enumerate all possible derivations") {
+    /*
+    lazy val solutions = Query(dataSources, Set.empty)
+      .allDerivations
+
+    it("should do things") {
+      solutions.foreach(solution => {
+        println(DatasetID.toDotString(solution))
+      })
+      assert(true)
+    }
+    */
+  }
+
+  /* TODO Next iteration of the parser
+  describe("Query with single derived datasource solution") {
+
+  val queryTarget = ScrubJaySchema(Array(
+    ScrubJayField(domain = true, dimension = "job"),
+    ScrubJayField(domain = true, dimension = "node", units = ScrubJayUnitsField("identifier", "*", "*", "*", Map.empty))
+  ))
+
+  val query = Query(dataSpace, queryTarget)
+
+  lazy val solutions = query.solutions.toList
+
+  it("should find the correct solution") {
+
+    println("Query:")
+    println(queryTarget)
+
+    solutions.zipWithIndex.foreach(solution => {
+      println("Solution: " + solution._2)
+      solution._1.debugPrint(dataSpace.dimensionSpace)
+    })
+    assert(solutions.nonEmpty)
+  }
+}
+*/
+}
