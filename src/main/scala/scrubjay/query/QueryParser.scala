@@ -71,11 +71,6 @@ class QueryParser extends RegexParsers {
     }
   }
 
-
-  //TODO Can be unordered
-  //TODO Check for one of each domain and value in the parser
-
-
   /*
   Specify each domain and value
      fields: VALUE(DIM(flops)), VALUE(DIM(time), UNITS(seconds)), DOMAIN(DIM(time), UNITS(timestamp))
@@ -112,6 +107,7 @@ class QueryParser extends RegexParsers {
       name
   }
 
+  //Work in progress
   def unitsMember: Parser[ScrubJayUnitsField] = (units ~ openParen ~
     nameArg.? ~ comma.? ~
     elementTypeArg.? ~ comma.? ~
