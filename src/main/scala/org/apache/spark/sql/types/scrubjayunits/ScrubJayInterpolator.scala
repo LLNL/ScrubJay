@@ -39,6 +39,14 @@ object ScrubJayLinearInterpolatorDouble extends ScrubJayLinearInterpolator {
   }
 }
 
+object ScrubJayLinearInterpolatorFloat extends ScrubJayLinearInterpolator {
+  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
+    val dpoints = points.map{case (x, y: Float) => (x, y.toDouble)}
+    val dval = ScrubJayLinearInterpolatorDouble.doubleInterpolate(dpoints, x)
+    dval.toFloat
+  }
+}
+
 object ScrubJayLinearInterpolatorInt extends ScrubJayLinearInterpolator {
   override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
     val dpoints = points.map{case (x, y: Int) => (x, y.toDouble)}
@@ -72,6 +80,6 @@ object Interpolator {
     case (_, StringType) => ScrubJayNearestInterpolatorAny
     case (_, IntegerType) => ScrubJayLinearInterpolatorInt
     case (_, DoubleType) => ScrubJayLinearInterpolatorDouble
-
+    case (_, FloatType) => ScrubJayLinearInterpolatorFloat
   }
 }

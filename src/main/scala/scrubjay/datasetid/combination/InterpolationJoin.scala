@@ -61,7 +61,8 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     implicit class anyWithReal(a: Any) {
       def getReal: Double = a match {
         case r: RealValued => r.realValue
-        case n: java.lang.Number => n.doubleValue()
+        case d: Decimal => d.toDouble
+        case n: java.lang.Number => n.doubleValue
       }
     }
 
