@@ -14,52 +14,42 @@ trait ScrubJayInterpolator extends Serializable {
 trait ScrubJayLinearInterpolator extends ScrubJayInterpolator
 trait ScrubJayNearestInterpolator extends ScrubJayInterpolator
 
-object ScrubJayNearestInterpolatorAny extends ScrubJayNearestInterpolator {
+class ScrubJayNearestInterpolatorAny extends ScrubJayNearestInterpolator {
   override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
     points.minBy{case (px, py) => Math.abs(px - x)}._2
   }
 }
 
-object ScrubJayLinearInterpolatorDouble extends ScrubJayLinearInterpolator {
+abstract class Converter[A, B] extends Serializable {
+  def a2b(a: A): B
+  def b2a(b: B): A
+}
 
-  def doubleInterpolate(points: Seq[(Double, Double)], x: Double): Double = {
-    if (points.length == 1) {
-      points.head._2
+class NumberDoubleConverter(toDouble: Double => Any) extends Converter[Any, Double] {
+  def a2b(a: Any): Double = a match {
+    case n: java.lang.Number => n.doubleValue
+  }
+  def b2a(b: Double): Any = toDouble(b)
+}
+
+class ScrubJayLinearInterpolatorNumeric(converter: Converter[Any, Double])
+  extends ScrubJayLinearInterpolator {
+
+  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
+
+    val dpoints: Seq[(Double, Double)] = points.map{
+      case (x, y) => (x, converter.a2b(y))
+    }
+
+    if (dpoints.length == 1) {
+      converter.b2a(dpoints.head._2)
     } else {
-      val (xs, ys) = points.unzip
+      val (xs, ys) = dpoints.unzip
       val xdv = breeze.linalg.Vector(xs: _*)
       val ydv = breeze.linalg.Vector(ys: _*)
       val interpolator = breeze.interpolation.LinearInterpolator(xdv, ydv)
-      interpolator(x)
+      converter.b2a(interpolator(x))
     }
-  }
-
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
-    doubleInterpolate(points.map{case (px: Double, py: Double) => (px, py)}, x)
-  }
-}
-
-object ScrubJayLinearInterpolatorFloat extends ScrubJayLinearInterpolator {
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
-    val dpoints = points.map{case (x, y: Float) => (x, y.toDouble)}
-    val dval = ScrubJayLinearInterpolatorDouble.doubleInterpolate(dpoints, x)
-    dval.toFloat
-  }
-}
-
-object ScrubJayLinearInterpolatorInt extends ScrubJayLinearInterpolator {
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
-    val dpoints = points.map{case (x, y: Int) => (x, y.toDouble)}
-    val dval = ScrubJayLinearInterpolatorDouble.doubleInterpolate(dpoints, x)
-    dval.round.toInt
-  }
-}
-
-object ScrubJayLinearInterpolatorSJLocalDateTime extends ScrubJayLinearInterpolator {
-  override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
-    val dpoints = points.map{case (x, y) => (x, y.asInstanceOf[ScrubJayLocalDateTime_String].realValue)}
-    val dval = ScrubJayLinearInterpolatorDouble.doubleInterpolate(dpoints, x)
-    new ScrubJayLocalDateTime_String(LocalDateTime.ofEpochSecond(dval.toInt, ((dval % 1)*1e9).toInt, ZoneOffset.UTC))
   }
 }
 
@@ -68,18 +58,37 @@ object Interpolator {
   def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = (units, dataType) match {
 
     // Nearest interpolator
-    case (ScrubJayUnitsField(_, _, _, "nearest", _), _) => ScrubJayNearestInterpolatorAny
+    case (ScrubJayUnitsField(_, _, _, "nearest", _), _) => new ScrubJayNearestInterpolatorAny
 
     // Linear interpolators for base types
-    case (ScrubJayUnitsField(_, _, _, "linear", _), SJLocalDateTimeDataType) => ScrubJayLinearInterpolatorSJLocalDateTime
-    case (ScrubJayUnitsField(_, _, _, "linear", _), IntegerType) => ScrubJayLinearInterpolatorInt
-    case (ScrubJayUnitsField(_, _, _, "linear", _), DoubleType) => ScrubJayLinearInterpolatorDouble
+    case (ScrubJayUnitsField(_, _, _, "linear", _), IntegerType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toInt))
+    case (ScrubJayUnitsField(_, _, _, "linear", _), FloatType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.toFloat))
+    case (ScrubJayUnitsField(_, _, _, "linear", _), DoubleType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d))
 
     // Default interpolators for base types
-    case (_, SJLocalDateTimeDataType) => ScrubJayLinearInterpolatorSJLocalDateTime
-    case (_, StringType) => ScrubJayNearestInterpolatorAny
-    case (_, IntegerType) => ScrubJayLinearInterpolatorInt
-    case (_, DoubleType) => ScrubJayLinearInterpolatorDouble
-    case (_, FloatType) => ScrubJayLinearInterpolatorFloat
+    case (_, StringType) => new ScrubJayNearestInterpolatorAny
+
+    case (_, SJLocalDateTimeDataType) => new ScrubJayLinearInterpolatorNumeric(new Converter[Any, Double] {
+      override def a2b(a: Any): Double = a.asInstanceOf[ScrubJayLocalDateTime_String].realValue
+      override def b2a(b: Double): Any = LocalDateTime.ofEpochSecond(b.toInt, ((b % 1)*1e9).toInt, ZoneOffset.UTC)
+    })
+
+    case (_, ByteType) | (_, DecimalType.ByteDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toByte))
+
+    case (_, ShortType) | (_, DecimalType.ShortDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toShort))
+
+    case (_, IntegerType) | (_, DecimalType.IntDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toInt))
+
+    case (_, LongType) | (_, DecimalType.LongDecimal) | (_, DecimalType.BigIntDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round))
+
+    case (_, FloatType) | (_, DecimalType.FloatDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.toFloat))
+
+    case (_, DoubleType) | (_, DecimalType.DoubleDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d))
   }
 }
