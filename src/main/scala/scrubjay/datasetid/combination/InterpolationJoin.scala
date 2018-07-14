@@ -57,11 +57,19 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     val orderedJoinFieldIndex1 = df1.schema.fieldIndex(orderedJoinFieldName1)
     val orderedJoinFieldIndex2 = df2.schema.fieldIndex(orderedJoinFieldName2)
 
+    // Get value with trait RealValued or get something that can be cast to double
+    implicit class anyWithReal(a: Any) {
+      def getReal: Double = a match {
+        case r: RealValued => r.realValue
+        case n: java.lang.Number => n.doubleValue()
+      }
+    }
+
     // Create keys, including unordered column values and ordered column bins (2 bins offset by window)
     val binMul = 1.0 / (2.0 * window)
     val binnedRdd1 = df1.rdd.flatMap(row => {
       val unorderedJoinFieldValues = unorderedJoinFieldNames1.map(row.getAs[String]).mkString(",")
-      val binIndex = row.getAs[RealValued](orderedJoinFieldIndex1).realValue * binMul
+      val binIndex = row.get(orderedJoinFieldIndex1).getReal * binMul
       val bin1 = unorderedJoinFieldValues + binIndex.toInt
       val bin2 = unorderedJoinFieldValues + (binIndex + 0.5).toInt
       Seq(
@@ -71,7 +79,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     })
     val binnedRdd2 = df2.rdd.flatMap(row => {
       val unorderedJoinFieldValues = unorderedJoinFieldNames2.map(row.getAs[String]).mkString(",")
-      val binIndex = row.getAs[RealValued](orderedJoinFieldIndex2).realValue * binMul
+      val binIndex = row.get(orderedJoinFieldIndex2).getReal * binMul
       val bin1 = unorderedJoinFieldValues + binIndex.toInt
       val bin2 = unorderedJoinFieldValues + (binIndex + 0.5).toInt
       Seq(
@@ -90,9 +98,9 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
       .flatMap {
       case (_, (l1, l2)) => l1.map(l1row => {
         // Filter out cells that are farther than `window` away
-        val l1v = l1row.getAs[RealValued](orderedJoinFieldIndex1).realValue
+        val l1v = l1row.get(orderedJoinFieldIndex1).getReal
         (l1row, l2.filter(l2row => {
-          val l2v = l2row.getAs[RealValued](orderedJoinFieldIndex2).realValue
+          val l2v = l2row.get(orderedJoinFieldIndex2).getReal
           Math.abs(l1v - l2v) < window
         }))
       })
@@ -122,8 +130,8 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     // Run interpolators on all mapped values
     def projection(row: Row, keyIndex: Int, mappedRows: Array[Row], mappedKeyIndex: Int): Row = {
 
-      val xv = row.getAs[RealValued](keyIndex).realValue
-      val xs = mappedRows.map(_.getAs[RealValued](mappedKeyIndex).realValue)
+      val xv = row.get(keyIndex).getReal
+      val xs = mappedRows.map(_.get(mappedKeyIndex).getReal)
 
       val allYs = mappedRows.map(_.toSeq.toArray.patch(mappedKeyIndex, Nil, 1)).transpose
 
