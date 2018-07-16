@@ -38,7 +38,7 @@ case class QueryToSchema(var domains: Seq[String], val values: Seq[String]){
 
 }
 
-class QueryParser extends RegexParsers {
+class QueryParserOld extends RegexParsers {
   /*
   Keywords
     Define specific words that must be matched in the query.
@@ -88,15 +88,15 @@ class QueryParser extends RegexParsers {
 
 
   //For generating ScrubJaySchema
-  def queryToSchema: Parser[ScrubJaySchema] = select ~ domains ~ list ~ values ~ list ^^ {
+  def queryToSchemaOld: Parser[ScrubJaySchema] = select ~ domains ~ list ~ values ~ list ^^ {
     case wd1 ~ wd2 ~ lst1 ~ wd3 ~ lst2 => {
       val q = QueryToSchema(lst1, lst2)
       q.generateScrubJaySchema()
     }
   }
 
-  def parseQuery(queryString: String): ScrubJaySchema = {
-    parse(queryToSchema, queryString) match {
+  def parseQueryOld(queryString: String): ScrubJaySchema = {
+    parse(queryToSchemaOld, queryString) match {
       case Success(matched, _) => matched
       case Failure(msg, _) => throw new Exception("Invalid Query.")
       case Error(msg, _) => throw new Exception("Error while parsing.")

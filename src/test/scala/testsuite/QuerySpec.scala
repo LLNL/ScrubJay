@@ -19,7 +19,6 @@ class QuerySpec extends ScrubJaySpec {
     val query = Query(dataSpace, queryTarget)
 
     lazy val solutions = query.solutions.toList
-
     it("should find no correct solution") {
       assert(solutions.isEmpty)
     }

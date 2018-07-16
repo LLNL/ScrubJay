@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import scrubjay.dataspace.Dimension
 import scrubjay.util._
 
-case class ScrubJayUnitsField(name: String,
-                              elementType: String,
-                              aggregator: String,
-                              interpolator: String,
-                              subUnits: Map[String, ScrubJayUnitsField]) {
+case class ScrubJayUnitsField(name: String = ScrubJayUnitsField.unknown.name,
+                              elementType: String = ScrubJayUnitsField.unknown.elementType,
+                              aggregator: String = ScrubJayUnitsField.unknown.aggregator,
+                              interpolator: String = ScrubJayUnitsField.unknown.interpolator,
+                              subUnits: Map[String, ScrubJayUnitsField] = ScrubJayUnitsField.unknown.subUnits) {
   def matches(other: ScrubJayUnitsField): Boolean = {
     val nameMatches = wildMatch(name, other.name)
     val elementTypeMatches = wildMatch(elementType, other.elementType)

@@ -4,7 +4,7 @@ import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema}
 import scrubjay.query._
 
 
-class QueryParserSpec extends ScrubJaySpec {
+class QueryParserSpecOld extends ScrubJaySpec {
 
   describe("Query with NO solution") {
 

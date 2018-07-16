@@ -8,11 +8,11 @@ import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scala.collection.mutable.ArrayBuffer
 /*
 TODO Find out which characters are allowed
-TODO  multiple sets of quotes?
  */
 
 
-case class Member(dim: String, unit: Option[ScrubJayUnitsField])
+case class Members(dim: String, units: ScrubJayUnitsField)
+case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsField]])
 
 
 class QueryParser extends RegexParsers {
@@ -73,7 +73,7 @@ class QueryParser extends RegexParsers {
 
   /*
   Specify each domain and value
-     fields: VALUE(DIM(flops)), VALUE(DIM(time), UNITS(seconds)), DOMAIN(DIM(time), UNITS(timestamp))
+     fields: VALUE(DIM(flops)), VALUE(DIM(time), UNITS(seconds)), DOMAIN(DIM(time), UNITS(...))
      fieldPattern: DOMAIN(_________________)
      fieldMembers: DIM(time), UNITS(timestamp)
    */
@@ -86,18 +86,18 @@ class QueryParser extends RegexParsers {
 
   def fieldPattern: Parser[ScrubJayField] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
     case fieldType ~ openParen ~ fieldMembers ~ closeParen => {
-      val unit: ScrubJayUnitsField = fieldMembers.unit.getOrElse(ScrubJayUnitsField.unknown)
       var domain: Boolean = false
       if (fieldType.toLowerCase.equals("domain")) {
         domain = true
       }
-      ScrubJayField(domain = domain, dimension = fieldMembers.dim, units = unit)
+      ScrubJayField(domain = domain, dimension = fieldMembers.dim, units = fieldMembers.units)
     }
   }
   def fieldType: Parser[String] = (domain | value)
-  def fieldMembers: Parser[Member] = dimensionMember ~ opt(comma) ~ opt(unitsMember) ^^ {
+
+  def fieldMembers: Parser[Members] = dimensionMember ~ opt(comma) ~ opt(unitsMember) ^^ {
     case dimensionMember ~ comma ~ unitsMember => {
-      Member(dimensionMember, unitsMember)
+      Members(dimensionMember, unitsMember.getOrElse(ScrubJayUnitsField.any))
     }
 
   }
@@ -107,53 +107,90 @@ class QueryParser extends RegexParsers {
       name
   }
 
-  //Work in progress
-  def unitsMember: Parser[ScrubJayUnitsField] = (units ~ openParen ~
-    nameArg.? ~ comma.? ~
-    elementTypeArg.? ~ comma.? ~
-    aggregatorArg.? ~ comma.? ~
-    interpolatorArg.? ~ comma.? ~
-    subunitsArg.? ~
-    closeParen) ^^ {
-    case units ~ openParen ~
-      nameArg ~ comma1 ~
-      elementTypeArg ~ comma2 ~
-      aggregatorArg ~ comma3 ~
-      interpolatorArg ~ comma4 ~
-      subunitsArg ~
-      closeParen
-      => ScrubJayUnitsField(
-        nameArg.getOrElse(ScrubJayUnitsField.unknown.name),
-        elementTypeArg.getOrElse(ScrubJayUnitsField.unknown.elementType),
-        aggregatorArg.getOrElse(ScrubJayUnitsField.unknown.aggregator),
-        interpolatorArg.getOrElse(ScrubJayUnitsField.unknown.interpolator),
-        subunitsArg.getOrElse(ScrubJayUnitsField.unknown.subUnits)
+  //Example: UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...))
+  def unitsMember: Parser[ScrubJayUnitsField] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
+    case units ~ openParen ~ unitsItems ~ closeParen =>
+      verifyUnits(unitsItems)
+      ScrubJayUnitsField(
+        findUnitsArgString(unitsItems, "name").getOrElse(ScrubJayUnitsField.any.name),
+        findUnitsArgString(unitsItems, "elementType").getOrElse(ScrubJayUnitsField.any.elementType),
+        findUnitsArgString(unitsItems, "aggregator").getOrElse(ScrubJayUnitsField.any.aggregator),
+        findUnitsArgString(unitsItems, "interpolator").getOrElse(ScrubJayUnitsField.any.interpolator),
+        findUnitsArgMap(unitsItems, "subunits").getOrElse(ScrubJayUnitsField.any.subUnits)
       )
   }
 
-  def nameArg: Parser[String] = (unitName ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      name
+  def unitsItems: Parser[Seq[UnitsArg]] = unitsArg ~ rep(comma ~ unitsArg) ^^ {
+    case (name ~ list) => list.foldLeft(Seq(name)) {
+      case (left, ("," ~ right)) => left :+ right
+    }
   }
 
-  def elementTypeArg: Parser[String] = (elementType ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      name
+  def unitsArg: Parser[UnitsArg] = (nameArg | elementTypeArg | aggregatorArg | interpolatorArg | subunitsArg)
+
+  def findUnitsArgString(unitsItems: Seq[UnitsArg], target:String): Option[String] = {
+    for (arg <- unitsItems) {
+      if (arg.typeOfArg.equals(target)) {
+        return arg.nameOfArg
+      }
+    }
+    None
   }
 
-  def aggregatorArg: Parser[String] = (aggregator ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      name
+  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsField]] = {
+    for (arg <- unitsItems) {
+      if (arg.typeOfArg.equals(target)) {
+        return arg.subunitsMap
+      }
+    }
+    None
   }
 
-  def interpolatorArg: Parser[String] = (interpolator ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      name
+  /*
+  UNITS(name(...), elementType(...), aggregator(...), interpolator(...), subunits(...))
+  UNITS can only have up to five arguments and arguments can be optional as long as one is specified
+   */
+  def verifyUnits(unitsItems: Seq[UnitsArg]) = {
+    if (unitsItems.size > 5 || unitsItems.size < 1) {
+      throw new Exception("UNITS field must have between one and five arguments")
+    }
+    val unitsSet = unitsItems.groupBy(_.typeOfArg).map(_._2.head)
+    if (unitsSet.size != unitsItems.size) {
+      throw new Exception("UNITS field cannot have duplicate arguments")
+    }
   }
 
-  def subunitsArg: Parser[Map[String, ScrubJayUnitsField]] = (subunits ~ openParen ~ name ~ colon ~ unitsMember ~ closeParen) ^^ {
+
+
+  //Make overarching unitArg then check for no duplicates
+  //
+
+  def nameArg: Parser[UnitsArg] = (unitName ~ openParen ~ name ~ closeParen) ^^ {
+    case dimension ~ openParen ~ name ~ closeParen =>
+      UnitsArg(typeOfArg = "name", nameOfArg = Some(name), subunitsMap = None)
+  }
+
+  def elementTypeArg: Parser[UnitsArg] = (elementType ~ openParen ~ name ~ closeParen) ^^ {
+    case dimension ~ openParen ~ name ~ closeParen =>
+      UnitsArg(typeOfArg = "elementType", nameOfArg = Some(name), subunitsMap = None)
+
+  }
+
+  def aggregatorArg: Parser[UnitsArg] = (aggregator ~ openParen ~ name ~ closeParen) ^^ {
+    case dimension ~ openParen ~ name ~ closeParen =>
+      UnitsArg(typeOfArg = "aggregator", nameOfArg = Some(name), subunitsMap = None)
+
+  }
+
+  def interpolatorArg: Parser[UnitsArg] = (interpolator ~ openParen ~ name ~ closeParen) ^^ {
+    case dimension ~ openParen ~ name ~ closeParen =>
+      UnitsArg(typeOfArg = "interpolator", nameOfArg = Some(name), subunitsMap = None)
+
+  }
+
+  def subunitsArg: Parser[UnitsArg] = (subunits ~ openParen ~ name ~ colon ~ unitsMember ~ closeParen) ^^ {
     case dimension ~ openParen ~ name ~ colon ~ unitsMember ~ closeParen =>
-      Map(name -> unitsMember)
+      UnitsArg(typeOfArg = "subunits", nameOfArg = None, subunitsMap = Some(Map(name -> unitsMember)))
   }
 
 
