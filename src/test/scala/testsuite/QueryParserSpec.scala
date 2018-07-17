@@ -6,7 +6,7 @@ class QueryParserSpec extends ScrubJaySpec {
     describe("Testing second version of the Parser.") {
       //Default unit use unknown or any?
       it("Test D1: Normal Query. Should pass") {
-        val actual = ScrubJaySchema(Array(
+        val actual = ScrubJaySchema(Set(
           ScrubJayField(domain = true, dimension = "job"),
           ScrubJayField(domain = false, dimension = "time")
         ))
@@ -16,7 +16,7 @@ class QueryParserSpec extends ScrubJaySpec {
 
       //They are equal when I initialize in the opposite order
       it("Test D2: Query with different ordering of Domains and Values. Should Pass") {
-        val actual = ScrubJaySchema(Array(
+        val actual = ScrubJaySchema(Set(
 
           ScrubJayField(domain = false, dimension = "time"),
           ScrubJayField(domain = true, dimension = "job")
@@ -30,7 +30,7 @@ class QueryParserSpec extends ScrubJaySpec {
       */
 
       it("Test D3: Query with non-default units. Should pass") {
-        val actual = ScrubJaySchema(Array(
+        val actual = ScrubJaySchema(Set(
           ScrubJayField(domain = true, dimension = "job"),
           ScrubJayField(domain = false, dimension = "time", units = ScrubJayUnitsField("seconds", "POINT", "*", "*", Map.empty))
         ))
@@ -40,7 +40,7 @@ class QueryParserSpec extends ScrubJaySpec {
 
       //Parentheses are messy.
       it("Test D4: Query with subunits. Should pass") {
-        val actual = ScrubJaySchema(Array(
+        val actual = ScrubJaySchema(Set(
           ScrubJayField(domain = true, dimension = "job"),
           ScrubJayField(domain = false, dimension = "time", units = ScrubJayUnitsField("seconds", "POINT", "*", "*",
             Map("test" -> ScrubJayUnitsField("testName", "testElem", "*", "*", Map.empty)))
@@ -50,7 +50,7 @@ class QueryParserSpec extends ScrubJaySpec {
       }
 
       it("Test D5: Query with multiple domains and values/testing case-insensitivity. Should pass") {
-        val actual = ScrubJaySchema(Array(
+        val actual = ScrubJaySchema(Set(
           ScrubJayField(domain = true, dimension = "job"),
           ScrubJayField(domain = true, dimension = "testDomain"),
           ScrubJayField(domain = false, dimension = "time"),
@@ -62,7 +62,7 @@ class QueryParserSpec extends ScrubJaySpec {
 
       it("Test E1: Missing domain. Should fail") {
         val thrown = intercept[Exception] {
-          val actual = ScrubJaySchema(Array(
+          val actual = ScrubJaySchema(Set(
             ScrubJayField(domain = true, dimension = "job"),
             ScrubJayField(domain = false, dimension = "time")
           ))
@@ -72,7 +72,7 @@ class QueryParserSpec extends ScrubJaySpec {
       }
       it("Test E2: Missing value. Should fail") {
         val thrown = intercept[Exception] {
-          val actual = ScrubJaySchema(Array(
+          val actual = ScrubJaySchema(Set(
             ScrubJayField(domain = true, dimension = "job"),
             ScrubJayField(domain = false, dimension = "time")
           ))
@@ -83,7 +83,7 @@ class QueryParserSpec extends ScrubJaySpec {
       }
       it("Test E3: Dim in wrong order. Should fail") {
         val thrown = intercept[Exception] {
-          val actual = ScrubJaySchema(Array(
+          val actual = ScrubJaySchema(Set(
             ScrubJayField(domain = true, dimension = "job"),
             ScrubJayField(domain = false, dimension = "time")
           ))
@@ -93,7 +93,7 @@ class QueryParserSpec extends ScrubJaySpec {
       }
       it("Test E4: UNITS has duplicate argument types. Should fail") {
         val thrown = intercept[Exception] {
-          val actual = ScrubJaySchema(Array(
+          val actual = ScrubJaySchema(Set(
             ScrubJayField(domain = true, dimension = "job"),
             ScrubJayField(domain = false, dimension = "time")
           ))

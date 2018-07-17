@@ -199,7 +199,7 @@ class QueryParser extends RegexParsers {
 
   def parseQuery: Parser[ScrubJaySchema] = select ~ fields ^^ {
     case select ~ fields => {
-      ScrubJaySchema(fields.toArray)
+      ScrubJaySchema(fields.toSet)
     }
   }
 
@@ -219,7 +219,7 @@ class QueryParser extends RegexParsers {
   }
 
 
-  def verifyQuery(fields: Seq[ScrubJayField]) = {
+  def verifyQuery(fields: Set[ScrubJayField]) = {
     var hasDomain: Boolean = false
     var hasValue: Boolean = false
     for (field <- fields) {
