@@ -83,7 +83,7 @@ object GenerateInputs {
       .withColumn("flops", flopsUDF())
 
     // Create ScrubJaySchema
-    val sjSchema = new ScrubJaySchema(Array(
+    val sjSchema = new ScrubJaySchema(Set(
       SJFieldNode,
       SJFieldFlops
     ))
@@ -98,7 +98,7 @@ object GenerateInputs {
       .withColumn("temperature", temperatureUDF())
 
     // Create ScrubJaySchema
-    val sjSchema = new ScrubJaySchema(Array(
+    val sjSchema = new ScrubJaySchema(Set(
       SJFieldNode,
       SJFieldTemperature
     ))
@@ -115,7 +115,7 @@ object GenerateInputs {
       .cache
 
     // Create ScrubJaySchema
-    val sjSchema = new ScrubJaySchema(Array(
+    val sjSchema = new ScrubJaySchema(Set(
       SJFieldTimestamp,
       SJFieldTemperature
     ))
@@ -145,7 +145,7 @@ object GenerateInputs {
       .cache
 
     // Create ScrubJaySchema
-    val sjSchema = new ScrubJaySchema(Array(
+    val sjSchema = new ScrubJaySchema(Set(
       SJFieldTimestamp,
       SJFieldFlops
     ))

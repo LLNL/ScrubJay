@@ -136,7 +136,7 @@ object DatasetID {
     writeStringToFile(toDotGraphString(dsID), filename)
   }
 
-  sealed case class GraphNode(hash: String, derivation: String, columns: Array[String])
+  sealed case class GraphNode(hash: String, derivation: String, columns: Set[String])
   sealed case class GraphEdge(left: GraphNode, right: GraphNode)
 
   private def toNodeEdgeTuple(dsID: DatasetID, parent: Option[GraphNode] = None): (Seq[GraphNode], Seq[GraphEdge]) = {

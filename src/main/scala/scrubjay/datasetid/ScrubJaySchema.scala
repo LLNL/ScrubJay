@@ -71,7 +71,7 @@ case class ScrubJayField(domain: Boolean,
   }
 }
 
-case class ScrubJaySchema(fields: Array[ScrubJayField]) {
+case class ScrubJaySchema(fields: Set[ScrubJayField]) {
 
   def getField(fieldName: String): ScrubJayField = map(fieldName)
 
@@ -81,19 +81,19 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
   def withGeneratedFieldNames: ScrubJaySchema = ScrubJaySchema(fields.map(_.withGeneratedFieldName))
 
-  def fieldNames: Array[String] = fields.map(_.name)
-  def dimensions: Array[String] = fields.map(_.dimension)
-  def units: Array[ScrubJayUnitsField] = fields.map(_.units)
+  def fieldNames: Set[String] = fields.map(_.name)
+  def dimensions: Set[String] = fields.map(_.dimension)
+  def units: Set[ScrubJayUnitsField] = fields.map(_.units)
 
-  def domainFields: Array[ScrubJayField] = fields.filter(_.domain)
-  def valueFields: Array[ScrubJayField] = fields.filterNot(_.domain)
+  def domainFields: Set[ScrubJayField] = fields.filter(_.domain)
+  def valueFields: Set[ScrubJayField] = fields.filterNot(_.domain)
 
-  def domainDimensions: Array[String] = domainFields.map(_.dimension)
-  def valueDimensions: Array[String] = valueFields.map(_.dimension)
+  def domainDimensions: Set[String] = domainFields.map(_.dimension)
+  def valueDimensions: Set[String] = valueFields.map(_.dimension)
 
-  def containsDimensions(dimensions: Array[String]): Boolean = dimensions.forall(dimensions.contains)
-  def containsDomainDimensions(dimensions: Array[String]): Boolean = dimensions.forall(domainDimensions.contains)
-  def containsValueDimensions(dimensions: Array[String]): Boolean = dimensions.forall(valueDimensions.contains)
+  def containsDimensions(dimensions: Set[String]): Boolean = dimensions.forall(dimensions.contains)
+  def containsDomainDimensions(dimensions: Set[String]): Boolean = dimensions.forall(domainDimensions.contains)
+  def containsValueDimensions(dimensions: Set[String]): Boolean = dimensions.forall(valueDimensions.contains)
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
@@ -112,7 +112,7 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   /**
     * Joinable fields are domain fields with dimension and units in common
     */
-  def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Array[(ScrubJayField, ScrubJayField)] = {
+  def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayField, ScrubJayField)] = {
     domainFields.flatMap(domainField => {
       val otherMatch: Option[ScrubJayField] = other.domainFields.find(otherDomainField =>
         domainField.dimension == otherDomainField.dimension && (!testUnits || domainField.units == otherDomainField.units))
@@ -126,7 +126,7 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
   def joinSchema(other: ScrubJaySchema, testUnits: Boolean = true): Option[ScrubJaySchema] = {
     if (joinableFields(other, testUnits).nonEmpty)
       Some(ScrubJaySchema(
-        domainFields.toSet.union(other.domainFields.toSet).toArray
+        domainFields.union(other.domainFields)
           ++ valueFields
           ++ other.valueFields))
     else
@@ -139,7 +139,7 @@ case class ScrubJaySchema(fields: Array[ScrubJayField]) {
 
 object ScrubJaySchema {
   def unknown(sparkSchema: SparkSchema): ScrubJaySchema = {
-    ScrubJaySchema(sparkSchema.fieldNames.map(name =>
+    ScrubJaySchema(sparkSchema.fieldNames.toSet.map((name: String) =>
       ScrubJayField(domain = false, name, Dimension.unknown.name, ScrubJayUnitsField.unknown)))
   }
 }
