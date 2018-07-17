@@ -1,5 +1,6 @@
 package org.apache.spark.sql.types.scrubjayunits
 
+import scala.math.BigDecimal
 import java.time.{LocalDateTime, ZoneOffset}
 
 import org.apache.spark.sql.types
@@ -82,8 +83,11 @@ object Interpolator {
     case (_, IntegerType) | (_, DecimalType.IntDecimal) =>
       new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toInt))
 
-    case (_, LongType) | (_, DecimalType.LongDecimal) | (_, DecimalType.BigIntDecimal) =>
+    case (_, LongType) | (_, DecimalType.LongDecimal) =>
       new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round))
+
+    case (_, DecimalType.BigIntDecimal) =>
+      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => BigDecimal(d)))
 
     case (_, FloatType) | (_, DecimalType.FloatDecimal) =>
       new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.toFloat))
