@@ -7,8 +7,8 @@ import scrubjay.dataspace.DimensionSpace
 
 case class CassandraDatasetID(keyspace: String,
                               table: String,
-                              sparkSchema: SparkSchema,
-                              scrubJaySchema: ScrubJaySchema)
+                              scrubJaySchema: ScrubJaySchema,
+                              sparkSchema: SparkSchema)
   extends OriginalDatasetID(scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
