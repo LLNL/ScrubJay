@@ -80,7 +80,7 @@ object DatasetID {
 
     val header = "digraph {"
     val nodeSection = nodes.map{case GraphNode(hash, derivation, columns) => {
-      val columnString = columns.mkString(" X ")
+      val columnString = columns.mkString(" X\n")
       val style = derivation match {
         case "NaturalJoin" => "style=filled, fillcolor=\"forestgreen\", label=\"NaturalJoin\\n" + columnString + "\""
         case "InterpolationJoin" => "style=filled, fillcolor=\"lime\", label=\"InterpolationJoin\\n" + columnString + "\""
