@@ -1,10 +1,8 @@
 package org.apache.spark.sql.types.scrubjayunits
 
-import org.apache.spark.sql.types
 import org.apache.spark.sql.types._
 import scrubjay.datasetid.ScrubJayUnitsField
 
-// FIXME: should use type class instead of Any everywhere...
 trait ScrubJayInterpolator extends Serializable {
   def interpolate(points: Seq[(Double, Any)], x: Double): Any
 }
