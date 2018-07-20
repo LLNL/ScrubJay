@@ -1,8 +1,5 @@
 package org.apache.spark.sql.types.scrubjayunits
 
-import scala.math.BigDecimal
-import java.time.{LocalDateTime, ZoneOffset}
-
 import org.apache.spark.sql.types
 import org.apache.spark.sql.types._
 import scrubjay.datasetid.ScrubJayUnitsField
@@ -21,20 +18,10 @@ class ScrubJayNearestInterpolatorAny extends ScrubJayNearestInterpolator {
   }
 }
 
-abstract class Converter[A, B] extends Serializable {
-  def a2b(a: A): B
-  def b2a(b: B): A
-}
-
-class NumberDoubleConverter(toDouble: Double => Any) extends Converter[Any, Double] {
-  def a2b(a: Any): Double = a match {
-    case n: java.lang.Number => n.doubleValue
-  }
-  def b2a(b: Double): Any = toDouble(b)
-}
-
-class ScrubJayLinearInterpolatorNumeric(converter: Converter[Any, Double])
+class ScrubJayLinearInterpolatorNumeric(numericType: NumericType)
   extends ScrubJayLinearInterpolator {
+
+  val converter: ScrubJayConverter[Any, Double] = ScrubJayConverter.get(numericType)
 
   override def interpolate(points: Seq[(Double, Any)], x: Double): Any = {
 
@@ -55,44 +42,15 @@ class ScrubJayLinearInterpolatorNumeric(converter: Converter[Any, Double])
 }
 
 object Interpolator {
-  val SJLocalDateTimeDataType = new types.scrubjayunits.SJLocalDateTimeStringUDT
-  def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = (units, dataType) match {
+  def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = units.interpolator match {
+    case "linear" => dataType match {
+      case numericType: NumericType => new ScrubJayLinearInterpolatorNumeric(numericType)
+      case nonNumericType => throw new RuntimeException("Linear interpolation not supported for non-numeric type " + nonNumericType)
+    }
+    case "nearest" => new ScrubJayNearestInterpolatorAny
 
-    // Nearest interpolator
-    case (ScrubJayUnitsField(_, _, _, "nearest", _), _) => new ScrubJayNearestInterpolatorAny
-
-    // Linear interpolators for base types
-    case (ScrubJayUnitsField(_, _, _, "linear", _), IntegerType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toInt))
-    case (ScrubJayUnitsField(_, _, _, "linear", _), FloatType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.toFloat))
-    case (ScrubJayUnitsField(_, _, _, "linear", _), DoubleType) => new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d))
-
-    // Default interpolators for base types
-    case (_, StringType) => new ScrubJayNearestInterpolatorAny
-
-    case (_, SJLocalDateTimeDataType) => new ScrubJayLinearInterpolatorNumeric(new Converter[Any, Double] {
-      override def a2b(a: Any): Double = a.asInstanceOf[ScrubJayLocalDateTime_String].realValue
-      override def b2a(b: Double): Any = LocalDateTime.ofEpochSecond(b.toInt, ((b % 1)*1e9).toInt, ZoneOffset.UTC)
-    })
-
-    case (_, ByteType) | (_, DecimalType.ByteDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toByte))
-
-    case (_, ShortType) | (_, DecimalType.ShortDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toShort))
-
-    case (_, IntegerType) | (_, DecimalType.IntDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round.toInt))
-
-    case (_, LongType) | (_, DecimalType.LongDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.round))
-
-    case (_, DecimalType.BigIntDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => BigDecimal(d)))
-
-    case (_, FloatType) | (_, DecimalType.FloatDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d.toFloat))
-
-    case (_, DoubleType) | (_, DecimalType.DoubleDecimal) =>
-      new ScrubJayLinearInterpolatorNumeric(new NumberDoubleConverter(d => d))
+    // Default to nearest
+    case _ => new ScrubJayNearestInterpolatorAny
   }
+
 }
