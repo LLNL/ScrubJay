@@ -9,6 +9,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJayField, ScrubJaySchema}
 
 case class ExplodeList(override val dsID: DatasetID, column: String)
   extends Transformation {

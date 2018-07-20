@@ -1,7 +1,7 @@
 package org.apache.spark.sql.types.scrubjayunits
 
 import org.apache.spark.sql.types._
-import scrubjay.datasetid.ScrubJayUnitsField
+import scrubjay.schema.ScrubJayUnitsField
 
 trait ScrubJayInterpolator extends Serializable {
   def interpolate(points: Seq[(Double, Any)], x: Double): Any

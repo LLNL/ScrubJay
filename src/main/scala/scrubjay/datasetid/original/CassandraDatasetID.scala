@@ -1,8 +1,8 @@
 package scrubjay.datasetid.original
 
 import org.apache.spark.sql.DataFrame
-import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 
 case class CassandraDatasetID(keyspace: String,

@@ -4,7 +4,8 @@ import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.dataspace._
 import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin}
-import scrubjay.datasetid.transformation.{ExplodeRange, ExplodeList}
+import scrubjay.datasetid.transformation.{ExplodeList, ExplodeRange}
+import scrubjay.schema.ScrubJayField
 
 object JoinPair {
 

@@ -1,8 +1,9 @@
 package scrubjay.datasetid.combination
 
 import org.apache.spark.sql.DataFrame
-import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
+import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.ScrubJaySchema
 
 case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
   extends Combination {

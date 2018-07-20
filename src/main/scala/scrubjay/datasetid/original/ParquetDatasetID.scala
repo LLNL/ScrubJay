@@ -1,8 +1,8 @@
 package scrubjay.datasetid.original
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import scrubjay.datasetid.{ScrubJaySchema, SparkSchema}
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class ParquetDatasetID(parquetFileName: String,
                             scrubJaySchema: ScrubJaySchema,

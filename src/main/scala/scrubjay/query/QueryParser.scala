@@ -3,7 +3,7 @@ package scrubjay.query
 import scala.util.parsing.combinator._
 import scala.util.matching.Regex
 import scala.language.postfixOps
-import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
+import scrubjay.schema.{ScrubJayField, ScrubJayFieldQuery, ScrubJaySchema, ScrubJaySchemaQuery, ScrubJayUnitsField, ScrubJayUnitsFieldQuery}
 
 import scala.collection.mutable.ArrayBuffer
 /*
@@ -11,8 +11,8 @@ TODO Find out which characters are allowed
  */
 
 
-case class Members(dim: String, units: ScrubJayUnitsField)
-case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsField]])
+case class Members(dim: String, units: ScrubJayUnitsFieldQuery)
+case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsFieldQuery]])
 
 
 class QueryParser extends RegexParsers {
@@ -78,26 +78,26 @@ class QueryParser extends RegexParsers {
      fieldMembers: DIM(time), UNITS(timestamp)
    */
 
-  def fields: Parser[ArrayBuffer[ScrubJayField]] = fieldPattern ~ rep(comma ~ fieldPattern) ^^ {
+  def fields: Parser[ArrayBuffer[ScrubJayFieldQuery]] = fieldPattern ~ rep(comma ~ fieldPattern) ^^ {
     case (field ~ rest) => rest.foldLeft(ArrayBuffer(field)) {
       case (field, ("," ~ rest)) => field :+ rest
     }
   }
 
-  def fieldPattern: Parser[ScrubJayField] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
+  def fieldPattern: Parser[ScrubJayFieldQuery] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
     case fieldType ~ openParen ~ fieldMembers ~ closeParen => {
       var domain: Boolean = false
       if (fieldType.toLowerCase.equals("domain")) {
         domain = true
       }
-      ScrubJayField(domain = domain, dimension = fieldMembers.dim, units = fieldMembers.units)
+      ScrubJayFieldQuery(domain = domain, dimension = fieldMembers.dim, units = fieldMembers.units)
     }
   }
   def fieldType: Parser[String] = (domain | value)
 
   def fieldMembers: Parser[Members] = dimensionMember ~ opt(comma) ~ opt(unitsMember) ^^ {
     case dimensionMember ~ comma ~ unitsMember => {
-      Members(dimensionMember, unitsMember.getOrElse(ScrubJayUnitsField.any))
+      Members(dimensionMember, unitsMember.getOrElse(ScrubJayUnitsFieldQuery()))
     }
 
   }
@@ -108,15 +108,15 @@ class QueryParser extends RegexParsers {
   }
 
   //Example: UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...))
-  def unitsMember: Parser[ScrubJayUnitsField] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
+  def unitsMember: Parser[ScrubJayUnitsFieldQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
     case units ~ openParen ~ unitsItems ~ closeParen =>
       verifyUnits(unitsItems)
-      ScrubJayUnitsField(
-        findUnitsArgString(unitsItems, "name").getOrElse(ScrubJayUnitsField.any.name),
-        findUnitsArgString(unitsItems, "elementType").getOrElse(ScrubJayUnitsField.any.elementType),
-        findUnitsArgString(unitsItems, "aggregator").getOrElse(ScrubJayUnitsField.any.aggregator),
-        findUnitsArgString(unitsItems, "interpolator").getOrElse(ScrubJayUnitsField.any.interpolator),
-        findUnitsArgMap(unitsItems, "subunits").getOrElse(ScrubJayUnitsField.any.subUnits)
+      ScrubJayUnitsFieldQuery(
+        findUnitsArgString(unitsItems, "name").getOrElse(ScrubJayUnitsFieldQuery().name),
+        findUnitsArgString(unitsItems, "elementType").getOrElse(ScrubJayUnitsFieldQuery().elementType),
+        findUnitsArgString(unitsItems, "aggregator").getOrElse(ScrubJayUnitsFieldQuery().aggregator),
+        findUnitsArgString(unitsItems, "interpolator").getOrElse(ScrubJayUnitsFieldQuery().interpolator),
+        findUnitsArgMap(unitsItems, "subunits").getOrElse(ScrubJayUnitsFieldQuery().subUnits)
       )
   }
 
@@ -137,7 +137,7 @@ class QueryParser extends RegexParsers {
     None
   }
 
-  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsField]] = {
+  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsFieldQuery]] = {
     for (arg <- unitsItems) {
       if (arg.typeOfArg.equals(target)) {
         return arg.subunitsMap
@@ -197,13 +197,13 @@ class QueryParser extends RegexParsers {
   //UNITS(name(list), SUBUNITS(listUnits:UNITS(...))
   //DOMAIN(DIM(node), UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...), key:UNITS(...) )
 
-  def parseQuery: Parser[ScrubJaySchema] = select ~ fields ^^ {
+  def parseQuery: Parser[ScrubJaySchemaQuery] = select ~ fields ^^ {
     case select ~ fields => {
-      ScrubJaySchema(fields.toSet)
+      ScrubJaySchemaQuery(fields.toSet)
     }
   }
 
-  def queryToSchema(queryString: String): ScrubJaySchema = {
+  def queryToSchema(queryString: String): ScrubJaySchemaQuery = {
     parse(parseQuery, queryString) match {
       case Success(matched, _) => {
         verifyQuery(matched.fields)
@@ -219,7 +219,7 @@ class QueryParser extends RegexParsers {
   }
 
 
-  def verifyQuery(fields: Set[ScrubJayField]) = {
+  def verifyQuery(fields: Set[ScrubJayFieldQuery]) = {
     var hasDomain: Boolean = false
     var hasValue: Boolean = false
     for (field <- fields) {

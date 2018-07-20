@@ -4,9 +4,10 @@ import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.datasetid.transformation.ExplodeList
 import scrubjay.dataspace.DataSpace
+import scrubjay.schema.{ScrubJaySchema, ScrubJaySchemaQuery}
 
 case class Query(dataSpace: DataSpace,
-                 queryTarget: ScrubJaySchema) {
+                 queryTarget: ScrubJaySchemaQuery) {
 
   // TODO: remove repeat solutions
 
@@ -26,7 +27,7 @@ object Query {
   // Can I derive a datasource from the set of datasources that satisfies my query?
   lazy val dsIDSetSatisfiesQuery: Constraint[DatasetID] = memoize(args => {
     val dataSpace = args(0).as[DataSpace]
-    val queryTarget = args(1).as[ScrubJaySchema]
+    val queryTarget = args(1).as[ScrubJaySchemaQuery]
 
     // Run all possible joins of this entire set
     val allJoins = JoinSet.joinedSet(Seq(dataSpace))
@@ -45,7 +46,7 @@ object Query {
 
     // Return all joins and derivations that satisfy the query
     (allJoins ++ allDerivations).filter(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).satisfiesQuerySchema(queryTarget)
+      dataset.scrubJaySchema(dataSpace.dimensionSpace).matchesQuery(queryTarget)
     })
   })
 

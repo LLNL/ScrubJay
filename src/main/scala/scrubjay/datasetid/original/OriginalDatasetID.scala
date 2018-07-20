@@ -6,6 +6,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayDFLoader
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.ScrubJaySchema
 
 @JsonIgnoreProperties(
   value = Array("valid") // not sure why this gets populated

@@ -14,6 +14,7 @@ import scrubjay.datasetid.combination._
 import scrubjay.datasetid.original._
 import scrubjay.datasetid.transformation._
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 import scrubjay.util.{readFileToString, writeStringToFile}
 
 @JsonIgnoreProperties(

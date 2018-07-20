@@ -5,8 +5,9 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayLocalDateTime_String
 import scrubjay.datasetid.original.LocalDatasetID
-import scrubjay.datasetid.{DatasetID, ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
+import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.{Dimension, DimensionSpace}
+import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 
 import scala.util.Random
 

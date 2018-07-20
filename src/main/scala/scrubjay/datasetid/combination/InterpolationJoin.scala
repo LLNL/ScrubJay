@@ -4,8 +4,9 @@ import scala.language.existentials
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.types.scrubjayunits.{Interpolator, RealValued}
-import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
+import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.ScrubJaySchema
 
 case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID, window: Double)
   extends Combination {

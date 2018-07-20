@@ -1,9 +1,10 @@
 package scrubjay.datasetid.transformation
-import scrubjay.datasetid.{DatasetID, ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.dataspace.DimensionSpace
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lag, udf}
 import org.apache.spark.sql.types.scrubjayunits.{RealValued, ScrubJayArithmetic, ScrubJayConverter, ScrubJayNumberDoubleConverter}
+import scrubjay.datasetid.DatasetID
+import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 
 
 /**

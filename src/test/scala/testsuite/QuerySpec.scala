@@ -1,8 +1,8 @@
 package testsuite
 
-import scrubjay.datasetid.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 import scrubjay.query._
 import scrubjay.dataspace.DataSpace
+import scrubjay.schema.{ScrubJayField, ScrubJayFieldQuery, ScrubJaySchemaQuery, ScrubJayUnitsField, ScrubJayUnitsFieldQuery}
 
 
 class QuerySpec extends ScrubJaySpec {
@@ -11,9 +11,9 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with NO solution") {
 
-    val queryTarget = ScrubJaySchema(Set(
-      ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = false, dimension = "marmosets")
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayFieldQuery(domain = true, dimension = "job"),
+      ScrubJayFieldQuery(domain = false, dimension = "marmosets")
     ))
 
     val query = Query(dataSpace, queryTarget)
@@ -26,9 +26,9 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with single original dataset solution") {
 
-    val queryTarget = ScrubJaySchema(Set(
-      ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = false, dimension = "time")
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayFieldQuery(domain = true, dimension = "job"),
+      ScrubJayFieldQuery(domain = false, dimension = "time")
     ))
 
     val query = Query(dataSpace, queryTarget)
@@ -51,9 +51,9 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with single derived datasource solution") {
 
-    val queryTarget = ScrubJaySchema(Set(
-      ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = true, dimension = "node", units = ScrubJayUnitsField("identifier", "*", "*", "*", Map.empty))
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayFieldQuery(domain = true, dimension = "job"),
+      ScrubJayFieldQuery(domain = true, dimension = "node", units = ScrubJayUnitsFieldQuery("identifier", "*", "*", "*", Map.empty))
     ))
 
     val query = Query(dataSpace, queryTarget)
@@ -75,9 +75,9 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with multiple datasources") {
 
-    val queryTarget = ScrubJaySchema(Set(
-      ScrubJayField(domain = true, dimension = "rack"),
-      ScrubJayField(domain = false, dimension = "flops")
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayFieldQuery(domain = true, dimension = "rack"),
+      ScrubJayFieldQuery(domain = false, dimension = "flops")
     ))
 
     val query = Query(dataSpace, queryTarget)
@@ -99,10 +99,10 @@ class QuerySpec extends ScrubJaySpec {
 
   describe("Query with multiple datasources and single derivations") {
 
-    val queryTarget = ScrubJaySchema(Set(
-      ScrubJayField(domain = true, dimension = "job"),
-      ScrubJayField(domain = true, dimension = "rack"),
-      ScrubJayField(domain = false, dimension = "flops")
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayFieldQuery(domain = true, dimension = "job"),
+      ScrubJayFieldQuery(domain = true, dimension = "rack"),
+      ScrubJayFieldQuery(domain = false, dimension = "flops")
     ))
 
     val query = Query(dataSpace, queryTarget)

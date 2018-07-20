@@ -1,12 +1,12 @@
 package scrubjay.query
 
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
-import scrubjay.datasetid.{DatasetID, ScrubJaySchema}
 import scrubjay.dataspace.{DataSpace, DimensionSpace}
+import scrubjay.schema.{ScrubJaySchema, ScrubJaySchemaQuery}
 
 
 case class QuerySpace(dataSpace: DataSpace,
-                      target: ScrubJaySchema) extends ArgumentSpace {
+                      target: ScrubJaySchemaQuery) extends ArgumentSpace {
 
   override def enumerate: Iterator[Arguments] = {
     // For all combinations of size 1 to N

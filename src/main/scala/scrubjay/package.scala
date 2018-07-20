@@ -20,9 +20,9 @@ package object scrubjay {
   val Query = scrubjay.query.Query
 
   // Schema
-  val ScrubJaySchema = scrubjay.datasetid.ScrubJaySchema
-  val ScrubJayField = scrubjay.datasetid.ScrubJayField
-  val ScrubJayUnitsField = scrubjay.datasetid.ScrubJayUnitsField
+  val ScrubJaySchema = scrubjay.schema.ScrubJaySchema
+  val ScrubJayField = scrubjay.schema.ScrubJayField
+  val ScrubJayUnitsField = scrubjay.schema.ScrubJayUnitsField
 
   // Original datasets
   val LocalDatasetID = scrubjay.datasetid.original.LocalDatasetID

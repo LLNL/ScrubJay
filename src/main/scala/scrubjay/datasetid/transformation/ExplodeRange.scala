@@ -11,6 +11,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJayField, ScrubJaySchema, SparkSchema}
 
 case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
   extends Transformation {

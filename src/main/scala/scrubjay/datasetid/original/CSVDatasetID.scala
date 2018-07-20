@@ -3,6 +3,7 @@ package scrubjay.datasetid.original
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class CSVDatasetID(csvFileName: String,
                         sparkSchema: SparkSchema,
