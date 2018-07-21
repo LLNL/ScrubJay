@@ -1,11 +1,11 @@
 package scrubjay.datasetid.transformation
-import org.apache.spark.sql.{Column, Row, SparkSession}
-import scrubjay.dataspace.DimensionSpace
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.functions.{col, lag, udf}
+import org.apache.spark.sql.functions.{col, lag}
+import org.apache.spark.sql.types.scrubjayunits.ScrubJayConverter
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
-import org.apache.spark.sql.types.scrubjayunits.{ScrubJayArithmetic, ScrubJayConverter}
+import org.apache.spark.sql.{Column, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
+import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
 
 /**
