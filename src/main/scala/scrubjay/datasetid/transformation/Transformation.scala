@@ -13,6 +13,7 @@ import scrubjay.datasetid.DatasetID
   property = "type"
 )
 @JsonSubTypes(Array(
+  new Type(value = classOf[DeriveRate], name = "DeriveRate"),
   new Type(value = classOf[ExplodeList], name = "ExplodeDiscreteRange"),
   new Type(value = classOf[ExplodeRange], name = "ExplodeContinuousRange")
 ))

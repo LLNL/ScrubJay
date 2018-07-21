@@ -27,6 +27,7 @@ object ScrubJayConverter {
 
   def get(dataType: DataType): ScrubJayConverter[Any, Double] = dataType match {
     case numericType: NumericType => get(numericType)
+    case SJLocalDateTimeDataType => new SJLocalDateTimeDoubleConverter
     case nonNumericType: DataType => throw new RuntimeException("Numeric conversion not supported for non-numeric type " + nonNumericType)
   }
 
@@ -35,8 +36,6 @@ object ScrubJayConverter {
     case IntegerType => new ScrubJayNumberDoubleConverter(d => d.round.toInt)
     case FloatType => new ScrubJayNumberDoubleConverter(d => d.toFloat)
     case DoubleType => new ScrubJayNumberDoubleConverter(d => d)
-
-    case SJLocalDateTimeDataType => new SJLocalDateTimeDoubleConverter
 
     case ByteType | DecimalType.ByteDecimal=>
       new ScrubJayNumberDoubleConverter(d => d.round.toByte)

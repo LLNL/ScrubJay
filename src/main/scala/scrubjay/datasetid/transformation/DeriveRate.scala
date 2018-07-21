@@ -1,11 +1,12 @@
 package scrubjay.datasetid.transformation
+import org.apache.spark.sql.{Column, Row, SparkSession}
 import scrubjay.dataspace.DimensionSpace
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lag, udf}
-import org.apache.spark.sql.types.scrubjayunits.{RealValued, ScrubJayArithmetic, ScrubJayConverter, ScrubJayNumberDoubleConverter}
+import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
+import org.apache.spark.sql.types.scrubjayunits.{ScrubJayArithmetic, ScrubJayConverter}
 import scrubjay.datasetid.DatasetID
 import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
-
 
 /**
  * Derive finite difference dY/dX for dimensions X and Y using a window of N rows
@@ -48,50 +49,59 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
     val rateField = ScrubJayField(domain = false, name = getRateFieldName(dimensionSpace), getRateDimensionName(dimensionSpace), rateUnits)
 
-    new ScrubJaySchema(scrubJaySchema(dimensionSpace).fields + rateField)
+    new ScrubJaySchema(dsID.scrubJaySchema(dimensionSpace).fields + rateField)
   }
 
   override def realize(dimensionSpace: DimensionSpace) = {
+
+    val spark = SparkSession.builder().getOrCreate()
+
 
     val df = dsID.realize(dimensionSpace)
 
     val xField: ScrubJayField = xFieldOption(dimensionSpace).get
     val yField: ScrubJayField = yFieldOption(dimensionSpace).get
 
+    val domainColumns: Seq[Column] = scrubJaySchema(dimensionSpace).domainFields
+      .filter(f => f != xField && f != yField)
+      .map(f => col(f.name))
+      .toSeq
+
     val xColumn: String = xField.name
     val yColumn: String = yField.name
-
-    val xIndex = df.schema.fields.indexWhere(field => field.name == xField.name)
-    val yIndex = df.schema.fields.indexWhere(field => field.name == yField.name)
-
-    val dfSorted = df.sort(xField.name)
-
-    val firstRow = dfSorted.first()
-    val firstXValue = firstRow.get(xIndex)
-    val firstYValue = firstRow.get(yIndex)
 
     val xLagColumn = xField.name + "_LAG"
     val yLagColumn = yField.name + "_LAG"
 
-    val xDeltaColumn = xField.name + "_DELTA"
-    val yDeltaColumn = yField.name + "_DELTA"
+    val dfSortedWithLags = df
+      .withColumn(xLagColumn, lag(xColumn, window).over(Window.orderBy(xColumn).partitionBy(domainColumns:_*)))
+      .withColumn(yLagColumn, lag(yColumn, window).over(Window.orderBy(xColumn).partitionBy(domainColumns:_*)))
 
-    val scrubJayArithmeticX = ScrubJayArithmetic.get(df.schema(xColumn).dataType)
-    val scrubJayArithmeticY = ScrubJayArithmetic.get(df.schema(yColumn).dataType)
+    val rddSortedWithLags = dfSortedWithLags.rdd
 
-    val deltaUdfX = udf((a: Any, b: Any) => scrubJayArithmeticX.-(a, b))
-    val deltaUdfY = udf((a: Any, b: Any) => scrubJayArithmeticY.-(a, b))
+    val xDataType = df.schema(xColumn).dataType
+    val yDataType = df.schema(yColumn).dataType
 
-    val scrubJayNumericConverterX = ScrubJayConverter.get(df.schema(xColumn).dataType)
-    val scrubJayNumericConverterY = ScrubJayConverter.get(df.schema(yColumn).dataType)
-    val rateUdf = udf((y: Any, x: Any) => scrubJayNumericConverterY.b2a(scrubJayNumericConverterY.a2b(y) / scrubJayNumericConverterX.a2b(x)))
+    val xConverter = ScrubJayConverter.get(xDataType)
+    val yConverter = ScrubJayConverter.get(yDataType)
 
-    dfSorted
-      .withColumn(xLagColumn, lag(xColumn, window, firstXValue).over(Window.orderBy(xColumn)))
-      .withColumn(yLagColumn, lag(yColumn, window, firstYValue).over(Window.orderBy(xColumn)))
-      .withColumn(xDeltaColumn, deltaUdfX(col(xColumn), col(xLagColumn)))
-      .withColumn(yDeltaColumn, deltaUdfY(col(yColumn), col(yLagColumn)))
-      .withColumn(getRateFieldName(dimensionSpace), rateUdf(col(yDeltaColumn), col(xDeltaColumn)))
-      .drop(xLagColumn, xDeltaColumn, yLagColumn, yDeltaColumn)
+    val rddWithRate = rddSortedWithLags.map(row => {
+      val xValue = row.getAs[Any](xColumn)
+      val yValue = row.getAs[Any](yColumn)
+
+      val xLagValue = if (row.getAs[Any](xLagColumn) != null) row.getAs[Any](xLagColumn) else xValue
+      val yLagValue = if (row.getAs[Any](yLagColumn) != null) row.getAs[Any](yLagColumn) else yValue
+
+      val xDelta = xConverter.a2b(xValue) - xConverter.a2b(xLagValue)
+      val yDelta = yConverter.a2b(yValue) - yConverter.a2b(yLagValue)
+      val rate = yDelta / xDelta
+
+      Row.fromSeq(row.toSeq :+ rate)
+    })
+
+    val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField(getRateFieldName(dimensionSpace), DoubleType))
+
+    spark.createDataFrame(rddWithRate, newSparkSchema)
+      //.drop(xLagColumn, yLagColumn)
   }
 }

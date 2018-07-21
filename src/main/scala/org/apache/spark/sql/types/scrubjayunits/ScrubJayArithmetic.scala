@@ -1,5 +1,6 @@
 package org.apache.spark.sql.types.scrubjayunits
 
+import org.apache.spark.sql.types
 import org.apache.spark.sql.types._
 
 trait ScrubJayArithmetic extends Serializable {
@@ -21,8 +22,10 @@ class ScrubJayArithmeticNumeric(dataType: DataType)
 }
 
 object ScrubJayArithmetic {
+  val SJLocalDateTimeDataType = new types.scrubjayunits.SJLocalDateTimeStringUDT
   def get(dataType: DataType): ScrubJayArithmetic = dataType match {
     case numericType: NumericType => new ScrubJayArithmeticNumeric(numericType)
+    case SJLocalDateTimeDataType => new ScrubJayArithmeticNumeric(SJLocalDateTimeDataType)
     case nonNumericType => throw new RuntimeException("Arithmetic not supported for non-numeric type " + nonNumericType)
   }
 }
