@@ -9,7 +9,7 @@ case class CassandraDatasetID(keyspace: String,
                               table: String,
                               scrubJaySchema: ScrubJaySchema,
                               sparkSchema: SparkSchema)
-  extends OriginalDatasetID(scrubJaySchema) {
+  extends OriginalDatasetID("CassandraTable", scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 

@@ -7,7 +7,7 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 case class CaliperKeyValueDatasetID(ckvFileName: String,
                                     sparkSchema: SparkSchema,
                                     scrubJaySchema: ScrubJaySchema)
-  extends OriginalDatasetID(scrubJaySchema) {
+  extends OriginalDatasetID("Caliper", scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
 

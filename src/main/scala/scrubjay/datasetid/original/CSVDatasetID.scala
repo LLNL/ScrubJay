@@ -9,7 +9,7 @@ case class CSVDatasetID(csvFileName: String,
                         sparkSchema: SparkSchema,
                         scrubJaySchema: ScrubJaySchema,
                         options: Map[String, String] = Map.empty)
-  extends OriginalDatasetID(scrubJaySchema) {
+  extends OriginalDatasetID("CSV", scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
     new java.io.File(csvFileName).exists()

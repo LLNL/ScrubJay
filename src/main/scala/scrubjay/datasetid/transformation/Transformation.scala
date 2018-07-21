@@ -14,10 +14,10 @@ import scrubjay.datasetid.DatasetID
 )
 @JsonSubTypes(Array(
   new Type(value = classOf[DeriveRate], name = "DeriveRate"),
-  new Type(value = classOf[ExplodeList], name = "ExplodeDiscreteRange"),
-  new Type(value = classOf[ExplodeRange], name = "ExplodeContinuousRange")
+  new Type(value = classOf[ExplodeList], name = "ExplodeList"),
+  new Type(value = classOf[ExplodeRange], name = "ExplodeRange")
 ))
-abstract class Transformation extends DatasetID {
+abstract class Transformation(name: String) extends DatasetID(name) {
   val dsID: DatasetID
   override def dependencies: Seq[DatasetID] = Seq(dsID)
 }

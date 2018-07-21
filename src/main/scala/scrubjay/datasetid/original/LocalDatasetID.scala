@@ -7,7 +7,7 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 case class LocalDatasetID(dataframe: DataFrame,
                           scrubJaySchema: ScrubJaySchema,
                          sparkSchema: Option[SparkSchema] = None)
-  extends OriginalDatasetID(scrubJaySchema) {
+  extends OriginalDatasetID("LocalData", scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = true
 

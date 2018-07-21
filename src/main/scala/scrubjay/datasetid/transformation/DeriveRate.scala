@@ -12,7 +12,7 @@ import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
  * Derive finite difference dY/dX for dimensions X and Y using a window of N rows
  */
 case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimension: String, window: Int )
-  extends Transformation {
+  extends Transformation("DeriveRate") {
 
   def xFieldOption(dimensionSpace: DimensionSpace) = {
     dsID.scrubJaySchema(dimensionSpace).fields.find(field => field.dimension == xDimension)
@@ -25,7 +25,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
   def getXField(dimensionSpace: DimensionSpace): ScrubJayField = xFieldOption(dimensionSpace).get
   def getYField(dimensionSpace: DimensionSpace): ScrubJayField = yFieldOption(dimensionSpace).get
 
-  def getRateFieldName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).name + "_PER_" + getXField(dimensionSpace).name
+  def getRateFieldName(dimensionSpace: DimensionSpace) = "value:" + getRateDimensionName(dimensionSpace) + ":rate"
   def getRateUnitsName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).units.name + "_PER_" + getXField(dimensionSpace).units.name
   def getRateDimensionName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).dimension + "_PER_" + getXField(dimensionSpace).dimension
 

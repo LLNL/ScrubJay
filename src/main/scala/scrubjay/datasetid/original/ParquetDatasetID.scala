@@ -7,7 +7,7 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 case class ParquetDatasetID(parquetFileName: String,
                             scrubJaySchema: ScrubJaySchema,
                             sparkSchema: SparkSchema)
-  extends  OriginalDatasetID(scrubJaySchema) {
+  extends  OriginalDatasetID("Parquet", scrubJaySchema) {
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = true
 

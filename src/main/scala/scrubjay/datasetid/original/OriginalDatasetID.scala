@@ -22,7 +22,7 @@ import scrubjay.schema.ScrubJaySchema
   new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
   new Type(value = classOf[CaliperKeyValueDatasetID], name = "CaliperKeyValueDatasetID")
 ))
-abstract class OriginalDatasetID(scrubJaySchema: ScrubJaySchema) extends DatasetID {
+abstract class OriginalDatasetID(name: String, scrubJaySchema: ScrubJaySchema) extends DatasetID(name) {
 
   @JsonIgnore
   lazy val spark: SparkSession = SparkSession.builder().getOrCreate()

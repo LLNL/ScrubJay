@@ -6,7 +6,7 @@ import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.ScrubJaySchema
 
 case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
-  extends Combination {
+  extends Combination("NaturalJoin") {
 
   def joinedSchema(dimensionSpace: DimensionSpace): Option[ScrubJaySchema] = {
     dsID1.scrubJaySchema(dimensionSpace).joinSchema(dsID2.scrubJaySchema(dimensionSpace))

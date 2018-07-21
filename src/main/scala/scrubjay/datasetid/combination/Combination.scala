@@ -16,7 +16,7 @@ import scrubjay.datasetid.DatasetID
   new Type(value = classOf[NaturalJoin], name = "NaturalJoin"),
   new Type(value = classOf[InterpolationJoin], name = "InterpolationJoin")
 ))
-abstract class Combination extends DatasetID {
+abstract class Combination(name: String) extends DatasetID(name) {
   val dsID1: DatasetID
   val dsID2: DatasetID
   override def dependencies: Seq[DatasetID] = Seq(dsID1, dsID2)

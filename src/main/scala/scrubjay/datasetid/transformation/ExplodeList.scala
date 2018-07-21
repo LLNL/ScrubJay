@@ -12,7 +12,7 @@ import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJayField, ScrubJaySchema}
 
 case class ExplodeList(override val dsID: DatasetID, column: String)
-  extends Transformation {
+  extends Transformation("ExplodeList") {
 
   // Modify column units from list to whatever was inside the list
   def newField(dimensionSpace: DimensionSpace): ScrubJayField = {

@@ -14,7 +14,7 @@ import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJayField, ScrubJaySchema, SparkSchema}
 
 case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
-  extends Transformation {
+  extends Transformation("ExplodeRange") {
 
   // Modify column units from range to the units of points within the range
   def newField(dimensionSpace: DimensionSpace): ScrubJayField = {
