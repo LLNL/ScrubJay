@@ -56,7 +56,6 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
     val spark = SparkSession.builder().getOrCreate()
 
-
     val df = dsID.realize(dimensionSpace)
 
     val xField: ScrubJayField = xFieldOption(dimensionSpace).get
@@ -102,6 +101,6 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField(getRateFieldName(dimensionSpace), DoubleType))
 
     spark.createDataFrame(rddWithRate, newSparkSchema)
-      //.drop(xLagColumn, yLagColumn)
+      .drop(xLagColumn, yLagColumn)
   }
 }
