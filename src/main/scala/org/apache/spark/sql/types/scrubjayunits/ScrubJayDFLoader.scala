@@ -2,7 +2,7 @@ package org.apache.spark.sql.types.scrubjayunits
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructField
-import scrubjay.schema.{ScrubJayField, ScrubJaySchema}
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema}
 import scrubjay.schema.RichDataFrame
 
 
@@ -21,7 +21,7 @@ object ScrubJayDFLoader {
   // Get parse function (UDF) for the scrubjaytype specified in metadata, if it exists
   def parseUDFForColumnSchema(df: DataFrame,
                               sparkSchemaField: StructField,
-                              scrubJaySchemaField: ScrubJayField): DataFrame = {
+                              scrubJaySchemaField: ScrubJayColumnSchema): DataFrame = {
 
     if (sparkSchemaField.metadata.contains("scrubJayType")) {
 

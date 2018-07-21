@@ -1,7 +1,7 @@
 package org.apache.spark.sql.types.scrubjayunits
 
 import org.apache.spark.sql.types._
-import scrubjay.schema.ScrubJayUnitsField
+import scrubjay.schema.ScrubJayUnitsSchema
 
 trait ScrubJayInterpolator extends Serializable {
   def interpolate(points: Seq[(Double, Any)], x: Double): Any
@@ -40,7 +40,7 @@ class ScrubJayLinearInterpolatorNumeric(numericType: NumericType)
 }
 
 object Interpolator {
-  def get(units: ScrubJayUnitsField, dataType: DataType): ScrubJayInterpolator = units.interpolator match {
+  def get(units: ScrubJayUnitsSchema, dataType: DataType): ScrubJayInterpolator = units.interpolator match {
     case "linear" => dataType match {
       case numericType: NumericType => new ScrubJayLinearInterpolatorNumeric(numericType)
       case nonNumericType => throw new RuntimeException("Linear interpolation not supported for non-numeric type " + nonNumericType)

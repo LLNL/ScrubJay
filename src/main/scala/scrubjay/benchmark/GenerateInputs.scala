@@ -6,8 +6,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayLocalDateTime_String
 import scrubjay.datasetid.original.LocalDatasetID
 import scrubjay.datasetid.DatasetID
-import scrubjay.dataspace.{Dimension, DimensionSpace}
-import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
+import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.{ScrubJayDimensionSchema, ScrubJayColumnSchema, ScrubJaySchema, ScrubJayUnitsSchema}
 
 import scala.util.Random
 
@@ -19,48 +19,48 @@ object GenerateInputs {
 
   def dimensionSpace: DimensionSpace = {
     DimensionSpace(Array(
-      Dimension("time", ordered=true, continuous=true),
-      Dimension("node", ordered=false, continuous=false),
-      Dimension("flops", ordered = true, continuous = true),
-      Dimension("temperature", ordered=true, continuous=true)
+      ScrubJayDimensionSchema("time", ordered=true, continuous=true),
+      ScrubJayDimensionSchema("node", ordered=false, continuous=false),
+      ScrubJayDimensionSchema("flops", ordered = true, continuous = true),
+      ScrubJayDimensionSchema("temperature", ordered=true, continuous=true)
     ))
   }
 
   val SJFieldNode =
-    ScrubJayField(
+    ScrubJayColumnSchema(
       domain=true,
       name="node",
       dimension="node",
-      units=ScrubJayUnitsField("identifier", "POINT", "nearest", "nearest", Map.empty))
+      units=ScrubJayUnitsSchema("identifier", "POINT", "nearest", "nearest", Map.empty))
 
   val SJFieldNodeList =
-    ScrubJayField(
+    ScrubJayColumnSchema(
       domain=true,
       name="nodelist",
       dimension="node",
-      units=ScrubJayUnitsField("ArrayString", "MULTIPOINT", "nearest", "nearest",
+      units=ScrubJayUnitsSchema("ArrayString", "MULTIPOINT", "nearest", "nearest",
         Map("listUnits" -> SJFieldNode.units)))
 
   val SJFieldTimestamp =
-    ScrubJayField(
+    ScrubJayColumnSchema(
       domain=true,
       name="timestamp",
       dimension="time",
-      units=ScrubJayUnitsField("datetimestamp", "POINT", "average", "linear", Map.empty))
+      units=ScrubJayUnitsSchema("datetimestamp", "POINT", "average", "linear", Map.empty))
 
   val SJFieldTemperature =
-    ScrubJayField(
+    ScrubJayColumnSchema(
       domain=false,
       name="temperature",
       dimension="temperature",
-      units=ScrubJayUnitsField("temperature", "POINT", "average", "linear", Map.empty))
+      units=ScrubJayUnitsSchema("temperature", "POINT", "average", "linear", Map.empty))
 
   val SJFieldFlops =
-    ScrubJayField(
+    ScrubJayColumnSchema(
       domain=false,
       name="flops",
       dimension="flops",
-      units=ScrubJayUnitsField("flops", "POINT", "average", "linear", Map.empty))
+      units=ScrubJayUnitsSchema("flops", "POINT", "average", "linear", Map.empty))
 
 
   val start: ScrubJayLocalDateTime_String = ScrubJayLocalDateTime_String.deserialize("1988-05-14 00:00:00")

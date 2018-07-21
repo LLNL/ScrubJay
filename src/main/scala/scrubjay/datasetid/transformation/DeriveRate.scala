@@ -6,7 +6,7 @@ import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Column, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.DimensionSpace
-import scrubjay.schema.{ScrubJayField, ScrubJaySchema, ScrubJayUnitsField}
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, ScrubJayUnitsSchema}
 
 /**
  * Derive finite difference dY/dX for dimensions X and Y using a window of N rows
@@ -22,8 +22,8 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     dsID.scrubJaySchema(dimensionSpace).fields.find(field => field.dimension == yDimension)
   }
 
-  def getXField(dimensionSpace: DimensionSpace): ScrubJayField = xFieldOption(dimensionSpace).get
-  def getYField(dimensionSpace: DimensionSpace): ScrubJayField = yFieldOption(dimensionSpace).get
+  def getXField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = xFieldOption(dimensionSpace).get
+  def getYField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = yFieldOption(dimensionSpace).get
 
   def getRateFieldName(dimensionSpace: DimensionSpace) = "value:" + getRateDimensionName(dimensionSpace) + ":rate"
   def getRateUnitsName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).units.name + "_PER_" + getXField(dimensionSpace).units.name
@@ -41,13 +41,13 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
   override def scrubJaySchema(dimensionSpace: DimensionSpace) = {
 
-    val xField: ScrubJayField = getXField(dimensionSpace)
-    val yField: ScrubJayField = getYField(dimensionSpace)
+    val xField: ScrubJayColumnSchema = getXField(dimensionSpace)
+    val yField: ScrubJayColumnSchema = getYField(dimensionSpace)
 
     val rateSubUnits = Map("numerator" -> yField.units, "denominator" -> xField.units)
-    val rateUnits = ScrubJayUnitsField(getRateUnitsName(dimensionSpace), "POINT", "average", "linear", rateSubUnits)
+    val rateUnits = ScrubJayUnitsSchema(getRateUnitsName(dimensionSpace), "POINT", "average", "linear", rateSubUnits)
 
-    val rateField = ScrubJayField(domain = false, name = getRateFieldName(dimensionSpace), getRateDimensionName(dimensionSpace), rateUnits)
+    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName(dimensionSpace), getRateDimensionName(dimensionSpace), rateUnits)
 
     new ScrubJaySchema(dsID.scrubJaySchema(dimensionSpace).fields + rateField)
   }
@@ -58,8 +58,8 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
     val df = dsID.realize(dimensionSpace)
 
-    val xField: ScrubJayField = xFieldOption(dimensionSpace).get
-    val yField: ScrubJayField = yFieldOption(dimensionSpace).get
+    val xField: ScrubJayColumnSchema = xFieldOption(dimensionSpace).get
+    val yField: ScrubJayColumnSchema = yFieldOption(dimensionSpace).get
 
     val domainColumns: Seq[Column] = scrubJaySchema(dimensionSpace).domainFields
       .filter(f => f != xField && f != yField)

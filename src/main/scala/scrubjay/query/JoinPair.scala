@@ -5,14 +5,14 @@ import scrubjay.datasetid._
 import scrubjay.dataspace._
 import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin}
 import scrubjay.datasetid.transformation.{ExplodeList, ExplodeRange}
-import scrubjay.schema.ScrubJayField
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema}
 
 object JoinPair {
 
   val interJoinWindow = 60
   val explodePeriod = 30
 
-  def unorderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
+  def unorderedToPoint(ds: DatasetID, f: ScrubJayColumnSchema): DatasetID = {
     if (f.units.elementType == "MULTIPOINT") {
       ExplodeList(ds, f.name)
     } else {
@@ -20,7 +20,7 @@ object JoinPair {
     }
   }
 
-  def orderedToPoint(ds: DatasetID, f: ScrubJayField): DatasetID = {
+  def orderedToPoint(ds: DatasetID, f: ScrubJayColumnSchema): DatasetID = {
     if (f.units.elementType == "RANGE") {
       ExplodeRange(ds, f.name, explodePeriod)
     } else {
@@ -37,11 +37,11 @@ object JoinPair {
     // Explode all possible joinable elements
     val (ds1Exploded, ds2Exploded) = joinableFields.foldLeft((dsID1, dsID2)){
       // Joinable field is unordered
-      case ((ds1, ds2), (f1, f2, Dimension(_, false, false))) => {
+      case ((ds1, ds2), (f1, f2, ScrubJayDimensionSchema(_, false, false, _))) => {
         (unorderedToPoint(ds1, f1), unorderedToPoint(ds2, f2))
       }
       // Joinable field is ordered
-      case ((ds1, ds2), (f1, f2, Dimension(_, true, true))) => {
+      case ((ds1, ds2), (f1, f2, ScrubJayDimensionSchema(_, true, true, _))) => {
         (orderedToPoint(ds1, f1), orderedToPoint(ds2, f2))
       }
     }

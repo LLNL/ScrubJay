@@ -2,9 +2,8 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
-import scrubjay.datasetid.transformation.ExplodeList
 import scrubjay.dataspace.DataSpace
-import scrubjay.schema.{ScrubJaySchema, ScrubJaySchemaQuery}
+import scrubjay.query.schema.ScrubJaySchemaQuery
 
 case class Query(dataSpace: DataSpace,
                  queryTarget: ScrubJaySchemaQuery) {
@@ -13,7 +12,7 @@ case class Query(dataSpace: DataSpace,
 
   def solutions: Iterator[DatasetID] = {
     QuerySpace(dataSpace, queryTarget)
-      .allSolutions(Query.dsIDSetSatisfiesQuery)
+      .allSolutions(Query.joinableDsIDSet)
       .flatMap(_.solutions)
   }
 
@@ -24,8 +23,22 @@ case class Query(dataSpace: DataSpace,
 
 object Query {
 
+  lazy val satisfiesQuery: Constraint[DatasetID] = memoize(args => {
+    val dataSpace = args(0).as[DataSpace]
+    val queryTarget = args(1).as[ScrubJaySchemaQuery]
+
+    // Case 1: no new columns need to be derived, just need to integrate existing ones
+
+    // Case 2: new columns need to be derived, determine their dependencies and first integrate them, then derive
+
+    // Determine what columns need to be integrated before deriving new ones
+
+    ???
+
+  })
+
   // Can I derive a datasource from the set of datasources that satisfies my query?
-  lazy val dsIDSetSatisfiesQuery: Constraint[DatasetID] = memoize(args => {
+  lazy val joinableDsIDSet: Constraint[DatasetID] = memoize(args => {
     val dataSpace = args(0).as[DataSpace]
     val queryTarget = args(1).as[ScrubJaySchemaQuery]
 
@@ -33,19 +46,19 @@ object Query {
     val allJoins = JoinSet.joinedSet(Seq(dataSpace))
 
     // Run all derivations on the joined results
-    val allDerivations = allJoins.flatMap(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.flatMap(column => {
-        val explodeDiscreteRange = ExplodeList(dataset, column)
-        if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
-          Some(explodeDiscreteRange)
-        } else {
-          None
-        }
-      })
-    })
+    // val allDerivations = allJoins.flatMap(dataset => {
+    //   dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.flatMap(column => {
+    //     val explodeDiscreteRange = ExplodeList(dataset, column)
+    //     if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
+    //       Some(explodeDiscreteRange)
+    //     } else {
+    //       None
+    //     }
+    //   })
+    // })
 
     // Return all joins and derivations that satisfy the query
-    (allJoins ++ allDerivations).filter(dataset => {
+    allJoins.filter(dataset => {
       dataset.scrubJaySchema(dataSpace.dimensionSpace).matchesQuery(queryTarget)
     })
   })

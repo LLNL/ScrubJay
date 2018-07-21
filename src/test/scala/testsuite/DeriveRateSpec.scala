@@ -1,17 +1,18 @@
 package testsuite
 
 import scrubjay.datasetid._
-import scrubjay.dataspace.{DataSpace, Dimension, DimensionSpace}
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 import scrubjay.datasetid.transformation.DeriveRate
+import scrubjay.schema.ScrubJayDimensionSchema
 
 
 class DeriveRateSpec extends ScrubJaySpec {
 
   lazy val dimensionSpace: DimensionSpace =
     DimensionSpace(Array(
-      Dimension("node", ordered = false, continuous = false),
-      Dimension("flops", ordered = true, continuous = true),
-      Dimension("time", ordered = true, continuous = true))
+      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
+      ScrubJayDimensionSchema("flops", ordered = true, continuous = true),
+      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
     )
 
   lazy val nodeFlops: DatasetID = DatasetID.fromJsonFile(nodeFlopsDatasetIDFilename)

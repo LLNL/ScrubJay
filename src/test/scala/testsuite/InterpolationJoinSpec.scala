@@ -2,16 +2,17 @@ package testsuite
 
 import scrubjay.datasetid.combination.InterpolationJoin
 import scrubjay.datasetid.DatasetID
-import scrubjay.dataspace.{Dimension, DimensionSpace}
+import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.ScrubJayDimensionSchema
 
 class InterpolationJoinSpec extends ScrubJaySpec {
 
   lazy val dimensionSpace: DimensionSpace =
     DimensionSpace(Array(
-      Dimension("job", ordered = false, continuous = false),
-      Dimension("node", ordered = false, continuous = false),
-      Dimension("flops", ordered = true, continuous = true),
-      Dimension("time", ordered = true, continuous = true))
+      ScrubJayDimensionSchema("job", ordered = false, continuous = false),
+      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
+      ScrubJayDimensionSchema("flops", ordered = true, continuous = true),
+      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
     )
 
   describe("InterpolationJoin") {

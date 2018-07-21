@@ -1,11 +1,18 @@
 package scrubjay.schema
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import scrubjay.dataspace.Dimension
+import scrubjay.query.schema.ScrubJaySchemaQuery
 
-case class ScrubJaySchema(fields: Set[ScrubJayField]) {
+object ScrubJaySchema {
+  def unknown(sparkSchema: SparkSchema): ScrubJaySchema = {
+    ScrubJaySchema(sparkSchema.fieldNames.toSet.map((name: String) =>
+      ScrubJayColumnSchema(domain = false, name)))
+  }
+}
 
-  def getField(fieldName: String): ScrubJayField = map(fieldName)
+case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
+
+  def getField(fieldName: String): ScrubJayColumnSchema = map(fieldName)
 
   override def toString: String = {
     "ScrubJaySchema\n|--" + fields.mkString("\n|--")
@@ -15,10 +22,10 @@ case class ScrubJaySchema(fields: Set[ScrubJayField]) {
 
   def fieldNames: Set[String] = fields.map(_.name)
   def dimensions: Set[String] = fields.map(_.dimension)
-  def units: Set[ScrubJayUnitsField] = fields.map(_.units)
+  def units: Set[ScrubJayUnitsSchema] = fields.map(_.units)
 
-  def domainFields: Set[ScrubJayField] = fields.filter(_.domain)
-  def valueFields: Set[ScrubJayField] = fields.filterNot(_.domain)
+  def domainFields: Set[ScrubJayColumnSchema] = fields.filter(_.domain)
+  def valueFields: Set[ScrubJayColumnSchema] = fields.filterNot(_.domain)
 
   def domainDimensions: Set[String] = domainFields.map(_.dimension)
   def valueDimensions: Set[String] = valueFields.map(_.dimension)
@@ -44,11 +51,11 @@ case class ScrubJaySchema(fields: Set[ScrubJayField]) {
   /**
     * Joinable fields are domain fields with dimension and units in common
     */
-  def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayField, ScrubJayField)] = {
+  def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayColumnSchema, ScrubJayColumnSchema)] = {
     domainFields.flatMap(domainField => {
-      val otherMatch: Option[ScrubJayField] = other.domainFields.find(otherDomainField =>
+      val otherMatch: Option[ScrubJayColumnSchema] = other.domainFields.find(otherDomainField =>
         domainField.dimension == otherDomainField.dimension && (!testUnits || domainField.units == otherDomainField.units))
-      otherMatch.fold(None: Option[(ScrubJayField, ScrubJayField)])(f => Some(domainField, f))
+      otherMatch.fold(None: Option[(ScrubJayColumnSchema, ScrubJayColumnSchema)])(f => Some(domainField, f))
     })
   }
 
@@ -66,15 +73,6 @@ case class ScrubJaySchema(fields: Set[ScrubJayField]) {
   }
 
   @JsonIgnore
-  val map: Map[String, ScrubJayField] = fields.map(field => (field.name, field)).toMap
+  val map: Map[String, ScrubJayColumnSchema] = fields.map(field => (field.name, field)).toMap
 }
 
-case class ScrubJaySchemaQuery(fields: Set[ScrubJayFieldQuery]) {
-}
-
-object ScrubJaySchema {
-  def unknown(sparkSchema: SparkSchema): ScrubJaySchema = {
-    ScrubJaySchema(sparkSchema.fieldNames.toSet.map((name: String) =>
-      ScrubJayField(domain = false, name, Dimension.unknown.name, ScrubJayUnitsField.unknown)))
-  }
-}

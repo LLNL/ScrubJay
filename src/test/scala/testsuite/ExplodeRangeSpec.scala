@@ -1,8 +1,9 @@
 package testsuite
 
 import scrubjay.datasetid._
-import scrubjay.dataspace.{DataSpace, Dimension, DimensionSpace}
+import scrubjay.dataspace.{DataSpace, DimensionSpace}
 import scrubjay.datasetid.transformation.ExplodeRange
+import scrubjay.schema.ScrubJayDimensionSchema
 
 
 class ExplodeRangeSpec extends ScrubJaySpec {
@@ -11,9 +12,9 @@ class ExplodeRangeSpec extends ScrubJaySpec {
 
   lazy val dataSpace: DataSpace = DataSpace(
     dimensionSpace = DimensionSpace(Array(
-      Dimension("job", ordered = false, continuous = false),
-      Dimension("node", ordered = false, continuous = false),
-      Dimension("time", ordered = true, continuous = true))
+      ScrubJayDimensionSchema("job", ordered = false, continuous = false),
+      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
+      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
     ),
     datasets = Array(
       jobQueue

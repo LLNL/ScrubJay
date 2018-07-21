@@ -1,15 +1,16 @@
 package testsuite
 
 import scrubjay.datasetid._
-import scrubjay.dataspace.{Dimension, DimensionSpace}
+import scrubjay.dataspace.DimensionSpace
+import scrubjay.schema.ScrubJayDimensionSchema
 
 class CSVDatasetIDSpec extends ScrubJaySpec {
 
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
   val dimensionSpace = DimensionSpace(Array(
-    Dimension("job", ordered = false, continuous = false),
-    Dimension("node", ordered = false, continuous = false),
-    Dimension("time", ordered = true, continuous = true))
+    ScrubJayDimensionSchema("job", ordered = false, continuous = false),
+    ScrubJayDimensionSchema("node", ordered = false, continuous = false),
+    ScrubJayDimensionSchema("time", ordered = true, continuous = true))
   )
 
   describe("CSV sourced job queue data") {

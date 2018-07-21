@@ -2,7 +2,7 @@ package scrubjay.query
 
 import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
 import scrubjay.dataspace.{DataSpace, DimensionSpace}
-import scrubjay.schema.{ScrubJaySchema, ScrubJaySchemaQuery}
+import scrubjay.query.schema.ScrubJaySchemaQuery
 
 
 case class QuerySpace(dataSpace: DataSpace,

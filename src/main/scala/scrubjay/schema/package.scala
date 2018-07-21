@@ -6,9 +6,9 @@ package object schema {
   type SparkSchema = org.apache.spark.sql.types.StructType
 
   val UNKNOWN_STRING = "UNKNOWN_STRING"
-  val WILDCARD_STRING = "*"
-  def wildMatch(s1: String, s2: String): Boolean = {
-    s1 == WILDCARD_STRING || s2 == WILDCARD_STRING || s1 == s2
+
+  def wildMatch[T](s1: T, s2: Option[T]): Boolean = {
+    s2.isEmpty || s1 == s2.get
   }
 
   implicit class RichDataFrame(df: DataFrame) {

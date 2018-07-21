@@ -11,13 +11,13 @@ import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
-import scrubjay.schema.{ScrubJayField, ScrubJaySchema, SparkSchema}
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, SparkSchema}
 
 case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
   extends Transformation("ExplodeRange") {
 
   // Modify column units from range to the units of points within the range
-  def newField(dimensionSpace: DimensionSpace): ScrubJayField = {
+  def newField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = {
     val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
     val newUnits = columnField.units.subUnits("rangeUnits")
     columnField.copy(units = newUnits).withGeneratedFieldName
@@ -26,7 +26,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
-        case ScrubJayField(domain, `column`, dimension, units) => newField(dimensionSpace)
+        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField(dimensionSpace)
         case other => other
       }
     )

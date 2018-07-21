@@ -9,13 +9,13 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
-import scrubjay.schema.{ScrubJayField, ScrubJaySchema}
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema}
 
 case class ExplodeList(override val dsID: DatasetID, column: String)
   extends Transformation("ExplodeList") {
 
   // Modify column units from list to whatever was inside the list
-  def newField(dimensionSpace: DimensionSpace): ScrubJayField = {
+  def newField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = {
     val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
     val newUnits = columnField.units.subUnits("listUnits")
     columnField.copy(units = newUnits).withGeneratedFieldName
@@ -24,7 +24,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema(dimensionSpace).fields.map{
-        case ScrubJayField(domain, `column`, dimension, units) => newField(dimensionSpace)
+        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField(dimensionSpace)
         case other => other
       }
     )

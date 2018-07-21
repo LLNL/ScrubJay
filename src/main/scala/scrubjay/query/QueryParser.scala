@@ -1,18 +1,18 @@
 package scrubjay.query
 
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+
 import scala.util.parsing.combinator._
 import scala.util.matching.Regex
 import scala.language.postfixOps
-import scrubjay.schema.{ScrubJayField, ScrubJayFieldQuery, ScrubJaySchema, ScrubJaySchemaQuery, ScrubJayUnitsField, ScrubJayUnitsFieldQuery}
-
 import scala.collection.mutable.ArrayBuffer
 /*
 TODO Find out which characters are allowed
  */
 
 
-case class Members(dim: String, units: ScrubJayUnitsFieldQuery)
-case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsFieldQuery]])
+case class Members(dim: String, units: Option[ScrubJayUnitsQuery])
+case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsQuery]])
 
 
 class QueryParser extends RegexParsers {
@@ -78,26 +78,26 @@ class QueryParser extends RegexParsers {
      fieldMembers: DIM(time), UNITS(timestamp)
    */
 
-  def fields: Parser[ArrayBuffer[ScrubJayFieldQuery]] = fieldPattern ~ rep(comma ~ fieldPattern) ^^ {
+  def fields: Parser[ArrayBuffer[ScrubJayColumnSchemaQuery]] = fieldPattern ~ rep(comma ~ fieldPattern) ^^ {
     case (field ~ rest) => rest.foldLeft(ArrayBuffer(field)) {
       case (field, ("," ~ rest)) => field :+ rest
     }
   }
 
-  def fieldPattern: Parser[ScrubJayFieldQuery] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
+  def fieldPattern: Parser[ScrubJayColumnSchemaQuery] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
     case fieldType ~ openParen ~ fieldMembers ~ closeParen => {
       var domain: Boolean = false
       if (fieldType.toLowerCase.equals("domain")) {
         domain = true
       }
-      ScrubJayFieldQuery(domain = domain, dimension = fieldMembers.dim, units = fieldMembers.units)
+      ScrubJayColumnSchemaQuery(domain = Some(domain), name = None, dimension = Some(fieldMembers.dim), units = fieldMembers.units)
     }
   }
   def fieldType: Parser[String] = (domain | value)
 
   def fieldMembers: Parser[Members] = dimensionMember ~ opt(comma) ~ opt(unitsMember) ^^ {
     case dimensionMember ~ comma ~ unitsMember => {
-      Members(dimensionMember, unitsMember.getOrElse(ScrubJayUnitsFieldQuery()))
+      Members(dimensionMember, unitsMember)
     }
 
   }
@@ -108,15 +108,15 @@ class QueryParser extends RegexParsers {
   }
 
   //Example: UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...))
-  def unitsMember: Parser[ScrubJayUnitsFieldQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
+  def unitsMember: Parser[ScrubJayUnitsQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
     case units ~ openParen ~ unitsItems ~ closeParen =>
       verifyUnits(unitsItems)
-      ScrubJayUnitsFieldQuery(
-        findUnitsArgString(unitsItems, "name").getOrElse(ScrubJayUnitsFieldQuery().name),
-        findUnitsArgString(unitsItems, "elementType").getOrElse(ScrubJayUnitsFieldQuery().elementType),
-        findUnitsArgString(unitsItems, "aggregator").getOrElse(ScrubJayUnitsFieldQuery().aggregator),
-        findUnitsArgString(unitsItems, "interpolator").getOrElse(ScrubJayUnitsFieldQuery().interpolator),
-        findUnitsArgMap(unitsItems, "subunits").getOrElse(ScrubJayUnitsFieldQuery().subUnits)
+      ScrubJayUnitsQuery(
+        findUnitsArgString(unitsItems, "name"),
+        findUnitsArgString(unitsItems, "elementType"),
+        findUnitsArgString(unitsItems, "aggregator"),
+        findUnitsArgString(unitsItems, "interpolator"),
+        findUnitsArgMap(unitsItems, "subunits")
       )
   }
 
@@ -137,7 +137,7 @@ class QueryParser extends RegexParsers {
     None
   }
 
-  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsFieldQuery]] = {
+  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsQuery]] = {
     for (arg <- unitsItems) {
       if (arg.typeOfArg.equals(target)) {
         return arg.subunitsMap
@@ -219,11 +219,11 @@ class QueryParser extends RegexParsers {
   }
 
 
-  def verifyQuery(fields: Set[ScrubJayFieldQuery]) = {
+  def verifyQuery(fields: Set[ScrubJayColumnSchemaQuery]) = {
     var hasDomain: Boolean = false
     var hasValue: Boolean = false
     for (field <- fields) {
-      if (field.domain) {
+      if (field.domain.isDefined && field.domain.get) {
         hasDomain = true
       } else {
         hasValue = true

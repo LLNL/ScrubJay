@@ -2,6 +2,7 @@ package scrubjay.dataspace
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import scrubjay.datasetid.DatasetID
+import scrubjay.schema.ScrubJayDimensionSchema
 import scrubjay.util.writeStringToFile
 
 import scala.io.Source
@@ -11,11 +12,11 @@ case class DataSpace(dimensionSpace: DimensionSpace, datasets: Array[DatasetID])
   def writeToJsonFile(filename: String): Unit = DataSpace.writeToJsonFile(this, filename)
 
   @JsonIgnore
-  private val dimensionMap: Map[String, Dimension] = dimensionSpace.dimensions.map{
-    case d @ Dimension(name, ordered, continuous) => (name, d)
+  private val dimensionMap: Map[String, ScrubJayDimensionSchema] = dimensionSpace.dimensions.map{
+    case d @ ScrubJayDimensionSchema(name, _, _, _) => (name, d)
   }.toMap
 
-  def dimension(name: String): Dimension = dimensionMap(name)
+  def dimension(name: String): ScrubJayDimensionSchema = dimensionMap(name)
 }
 
 object DataSpace {

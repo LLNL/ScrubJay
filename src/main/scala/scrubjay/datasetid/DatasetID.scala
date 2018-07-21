@@ -38,9 +38,9 @@ abstract class DatasetID(val name: String) extends Serializable {
     else
       None
   }
-  def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean
-  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema
-  def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame
+  def isValid(dimensionSpace: DimensionSpace = DimensionSpace()): Boolean
+  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace()): ScrubJaySchema
+  def realize(dimensionSpace: DimensionSpace = DimensionSpace()): DataFrame
 
   def debugPrint(dimensionSpace: DimensionSpace): Unit = {
     val df = realize(dimensionSpace)

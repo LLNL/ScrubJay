@@ -14,15 +14,14 @@ package object scrubjay {
   // Dataspace
   val DataSpace = scrubjay.dataspace.DataSpace
   val DimensionSpace = scrubjay.dataspace.DimensionSpace
-  val Dimension = scrubjay.dataspace.Dimension
 
   // Query
   val Query = scrubjay.query.Query
 
   // Schema
   val ScrubJaySchema = scrubjay.schema.ScrubJaySchema
-  val ScrubJayField = scrubjay.schema.ScrubJayField
-  val ScrubJayUnitsField = scrubjay.schema.ScrubJayUnitsField
+  val ScrubJayField = scrubjay.schema.ScrubJayColumnSchema
+  val ScrubJayUnitsField = scrubjay.schema.ScrubJayUnitsSchema
 
   // Original datasets
   val LocalDatasetID = scrubjay.datasetid.original.LocalDatasetID
