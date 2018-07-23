@@ -24,12 +24,12 @@ in the created dataspace.
 
 .. code-block:: scala
 
-   val queryTarget = ScrubJaySchema(Array(
+   val querySchema = ScrubJaySchema(Array(
      ScrubJayField(domain = true, dimension = "rack"),
      ScrubJayField(domain = false, dimension = "flops")
    ))
 
-   val query = Query(dataSpace, queryTarget)
+   val query = Query(dataSpace, querySchema)
 
 todo: Queries may be generated using the :ref:`sjql`.
 

@@ -1,6 +1,6 @@
 package scrubjay.query
 
-import gov.llnl.ConstraintSolver.{ArgumentSpace, Arguments}
+import scrubjay.query.constraintsolver.ConstraintSolver._
 import scrubjay.dataspace.{DataSpace, DimensionSpace}
 import scrubjay.query.schema.ScrubJaySchemaQuery
 

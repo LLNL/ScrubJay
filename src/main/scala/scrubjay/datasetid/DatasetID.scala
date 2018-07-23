@@ -142,7 +142,7 @@ object DatasetID {
 
     val derivation = dsID
 
-    val columns = dsID.scrubJaySchema(DimensionSpace.unknown).fieldNames
+    val columns = dsID.scrubJaySchema(DimensionSpace.unknown).columnNames
 
     val node = GraphNode(hash, derivation, columns)
 

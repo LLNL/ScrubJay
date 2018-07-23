@@ -35,12 +35,12 @@ Then, we create a query target, which is just the schema of the dataset that we 
 in the created dataspace.
 
 ```scala
-   val queryTarget = ScrubJaySchema(Array(
+   val querySchema = ScrubJaySchema(Array(
      ScrubJayField(domain = true, dimension = "rack"),
      ScrubJayField(domain = false, dimension = "flops")
    ))
 
-   val query = Query(dataSpace, queryTarget)
+   val query = Query(dataSpace, querySchema)
 ```
 
 todo: Queries may be generated using the ScrubJay Query Language.

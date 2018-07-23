@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay.query._
 import scrubjay.dataspace.DataSpace
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
 
 
 class QuerySpec extends ScrubJaySpec {
@@ -12,14 +12,19 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with NO solution") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("job")),
-      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some("marmosets"))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
+      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("marmosets"))))
     ))
 
     val query = Query(dataSpace, queryTarget)
 
-    lazy val solutions = query.solutions.toList
     it("should find no correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
+      val solutions = query.solutions.toList
+
       assert(solutions.isEmpty)
     }
   }
@@ -27,18 +32,18 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with single original dataset solution") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("job")),
-      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some("time"))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
+      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("time"))))
     ))
 
     val query = Query(dataSpace, queryTarget)
-
-    lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
+
+      val solutions = query.solutions.toList
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
@@ -52,18 +57,19 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with single derived datasource solution") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("job")),
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("node"), units = Some(ScrubJayUnitsQuery(Some("identifier"))))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("node"))), units = Some(ScrubJayUnitsQuery(Some("identifier"))))
     ))
 
     val query = Query(dataSpace, queryTarget)
 
-    lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
+
+      val solutions = query.solutions.toList
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
@@ -76,18 +82,19 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with multiple datasources") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("rack")),
-      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some("flops"))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("rack")))),
+      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("flops"))))
     ))
 
     val query = Query(dataSpace, queryTarget)
 
-    lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
+
+      val solutions = query.solutions.toList
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
@@ -100,19 +107,19 @@ class QuerySpec extends ScrubJaySpec {
   describe("Query with multiple datasources and single derivations") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("job")),
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some("rack")),
-      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some("flops"))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("rack")))),
+      ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("flops"))))
     ))
 
     val query = Query(dataSpace, queryTarget)
-
-    lazy val solutions = query.solutions.toList
 
     it("should find the correct solution") {
 
       println("Query:")
       println(queryTarget)
+
+      val solutions = query.solutions.toList
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)

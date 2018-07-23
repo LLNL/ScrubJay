@@ -1,21 +1,22 @@
 package scrubjay.query
 
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
 
 import scala.util.parsing.combinator._
 import scala.util.matching.Regex
 import scala.language.postfixOps
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.ClassTag
 /*
 TODO Find out which characters are allowed
  */
 
 
-case class Members(dim: String, units: Option[ScrubJayUnitsQuery])
-case class UnitsArg(typeOfArg:String, nameOfArg: Option[String], subunitsMap: Option[Map[String, ScrubJayUnitsQuery]])
+case class Members(dim: Option[ScrubJayDimensionSchemaQuery], units: Option[ScrubJayUnitsQuery])
+case class UnitsArg(name: String, subUnitsName: Option[String] = None, subunitsMap: Option[Map[String, ScrubJayUnitsQuery]] = None)
+case class DimensionArg(name: Option[String] = None, subDimensions: Option[Seq[ScrubJayDimensionSchemaQuery]] = None)
 
-
-class QueryParser extends RegexParsers {
+object QueryParser extends RegexParsers {
   /*
   Keywords
     Define specific words that must be matched in the query.
@@ -25,6 +26,7 @@ class QueryParser extends RegexParsers {
   def value: Parser[String] = buildCaseInsensitiveRegex("value")
   def units: Parser[String] = buildCaseInsensitiveRegex("units")
   def dimension: Parser[String] = buildCaseInsensitiveRegex("dim")
+  def subDimensions: Parser[String] = buildCaseInsensitiveRegex("subdims")
 
   def unitName: Parser[String] = buildCaseInsensitiveRegex("name")
   def elementType: Parser[String] = buildCaseInsensitiveRegex("elementType")
@@ -44,16 +46,21 @@ class QueryParser extends RegexParsers {
   /*
   Retrieving each col/val name
     name         : Each col/val can be optionally quoted. Preference is given to quoted name
-    nonQuotedName: Set of characters allowed in a non-quoted name.
-    quotedName   : Defines the structure of a quoted name.
+    nonQuotedString: Set of characters allowed in a non-quoted name.
+    quotedString   : Defines the structure of a quoted name.
     noQuotes     : Rule to define a set of characters allowed in a quoted name (everything except quotes for now)
   */
-  def name: Parser[String] = (quotedName | nonQuotedName)
-  def nonQuotedName: Parser[String] = """[a-zA-Z0-9_*.]+""".r ^^ {_.toString}
-  def quotedName: Parser[String] = quote ~ noQuotes ~ quote ^^ {
+
+  def optionallyQuotedString: Parser[String] = (quotedString | nonQuotedString)
+  def nonQuotedString: Parser[String] = """[a-zA-Z0-9_*.]+""".r ^^ {_.toString}
+  def quotedString: Parser[String] = quote ~ noQuotes ~ quote ^^ {
     case openQuote ~ noQuotes ~ closeQuote => noQuotes.toString
   }
   def noQuotes: Parser[String] = """[^\"]*""".r ^^ {_.toString}
+
+  def name: Parser[String] = buildCaseInsensitiveRegex("name") ~ openParen ~ optionallyQuotedString ~ closeParen ^^ {
+    case _ ~ _ ~ name ~ _ => name
+  }
 
   /*
   List processing
@@ -73,39 +80,73 @@ class QueryParser extends RegexParsers {
 
   /*
   Specify each domain and value
-     fields: VALUE(DIM(flops)), VALUE(DIM(time), UNITS(seconds)), DOMAIN(DIM(time), UNITS(...))
-     fieldPattern: DOMAIN(_________________)
-     fieldMembers: DIM(time), UNITS(timestamp)
+     columns: VALUE(DIM(flops)), VALUE(DIM(time), UNITS(seconds)), DOMAIN(DIM(time), UNITS(...))
+     columnField: DOMAIN(_________________)
+     columnMembers: DIM(time), UNITS(timestamp)
    */
 
-  def fields: Parser[ArrayBuffer[ScrubJayColumnSchemaQuery]] = fieldPattern ~ rep(comma ~ fieldPattern) ^^ {
+  def columns: Parser[ArrayBuffer[ScrubJayColumnSchemaQuery]] = columnField ~ rep(comma ~ columnField) ^^ {
     case (field ~ rest) => rest.foldLeft(ArrayBuffer(field)) {
       case (field, ("," ~ rest)) => field :+ rest
     }
   }
 
-  def fieldPattern: Parser[ScrubJayColumnSchemaQuery] = (fieldType ~ openParen ~ fieldMembers ~ closeParen) ^^ {
+  def columnField: Parser[ScrubJayColumnSchemaQuery] = (columnType ~ openParen ~ columnMembers ~ closeParen) ^^ {
     case fieldType ~ openParen ~ fieldMembers ~ closeParen => {
       var domain: Boolean = false
       if (fieldType.toLowerCase.equals("domain")) {
         domain = true
       }
-      ScrubJayColumnSchemaQuery(domain = Some(domain), name = None, dimension = Some(fieldMembers.dim), units = fieldMembers.units)
+      ScrubJayColumnSchemaQuery(domain = Some(domain), name = None, dimension = fieldMembers.dim, units = fieldMembers.units)
     }
   }
-  def fieldType: Parser[String] = (domain | value)
+  def columnType: Parser[String] = (domain | value)
 
-  def fieldMembers: Parser[Members] = dimensionMember ~ opt(comma) ~ opt(unitsMember) ^^ {
+  def columnMembers: Parser[Members] = dimensionField ~ opt(comma) ~ opt(unitsMember) ^^ {
     case dimensionMember ~ comma ~ unitsMember => {
-      Members(dimensionMember, unitsMember)
+      Members(Some(dimensionMember), unitsMember)
     }
-
   }
 
-  def dimensionMember: Parser[String] = (dimension ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      name
+  def dimensionField: Parser[ScrubJayDimensionSchemaQuery] = (dimension ~ openParen ~  dimensionArgList ~ closeParen) ^^ {
+    case dimension ~ openParen ~ members ~ closeParen => {
+
+      val dimensionName = members.flatMap(_.name)
+      val dimensionSubDimensions = members.flatMap(_.subDimensions)
+
+      // Can only define each argument once
+      if (dimensionName.length > 1) {
+        throw new Exception("More than one name or defined for dimension!")
+      } else if (dimensionSubDimensions.length > 1) {
+        throw new Exception("More than one subunits list defined for dimension!")
+      }
+
+      val name: Option[String] = dimensionName.headOption
+      val subDimensions: Option[Seq[ScrubJayDimensionSchemaQuery]] = dimensionSubDimensions.headOption
+
+      ScrubJayDimensionSchemaQuery(name = name, subDimensions = subDimensions)
+    }
   }
+
+
+  def dimensionSubDimensionListArg: Parser[DimensionArg] = subDimensions ~ openParen ~ dimensionField ~ rep(comma ~ dimensionField) ~ closeParen ^^ {
+    // remove parens and identifiers, extract list of dimensions
+    case _ ~ _ ~ member ~ rest ~ _ => DimensionArg(subDimensions = Some(member +: rest.map{
+      case _ ~ otherMember => otherMember
+    }))
+  }
+
+  def dimensionArgList: Parser[Seq[DimensionArg]] = dimensionMember ~ rep(comma ~ dimensionMember) ^^ {
+    case member ~ rest => member +: rest.map{
+      case comma ~ otherMember => otherMember
+    }
+  }
+
+  def dimensionNameArg: Parser[DimensionArg] = name ^^ {
+    case name => DimensionArg(name = Some(name))
+  }
+
+  def dimensionMember: Parser[DimensionArg] = (dimensionNameArg | dimensionSubDimensionListArg)
 
   //Example: UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...))
   def unitsMember: Parser[ScrubJayUnitsQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
@@ -130,8 +171,8 @@ class QueryParser extends RegexParsers {
 
   def findUnitsArgString(unitsItems: Seq[UnitsArg], target:String): Option[String] = {
     for (arg <- unitsItems) {
-      if (arg.typeOfArg.equals(target)) {
-        return arg.nameOfArg
+      if (arg.name.equals(target)) {
+        return arg.subUnitsName
       }
     }
     None
@@ -139,7 +180,7 @@ class QueryParser extends RegexParsers {
 
   def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsQuery]] = {
     for (arg <- unitsItems) {
-      if (arg.typeOfArg.equals(target)) {
+      if (arg.name.equals(target)) {
         return arg.subunitsMap
       }
     }
@@ -154,7 +195,7 @@ class QueryParser extends RegexParsers {
     if (unitsItems.size > 5 || unitsItems.size < 1) {
       throw new Exception("UNITS field must have between one and five arguments")
     }
-    val unitsSet = unitsItems.groupBy(_.typeOfArg).map(_._2.head)
+    val unitsSet = unitsItems.groupBy(_.name).map(_._2.head)
     if (unitsSet.size != unitsItems.size) {
       throw new Exception("UNITS field cannot have duplicate arguments")
     }
@@ -165,39 +206,39 @@ class QueryParser extends RegexParsers {
   //Make overarching unitArg then check for no duplicates
   //
 
-  def nameArg: Parser[UnitsArg] = (unitName ~ openParen ~ name ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ closeParen =>
-      UnitsArg(typeOfArg = "name", nameOfArg = Some(name), subunitsMap = None)
+  def nameArg: Parser[UnitsArg] = name ^^ {
+    case name =>
+      UnitsArg(name = "name", subUnitsName = Some(name), subunitsMap = None)
   }
 
-  def elementTypeArg: Parser[UnitsArg] = (elementType ~ openParen ~ name ~ closeParen) ^^ {
+  def elementTypeArg: Parser[UnitsArg] = (elementType ~ openParen ~ optionallyQuotedString ~ closeParen) ^^ {
     case dimension ~ openParen ~ name ~ closeParen =>
-      UnitsArg(typeOfArg = "elementType", nameOfArg = Some(name), subunitsMap = None)
+      UnitsArg(name = "elementType", subUnitsName = Some(name), subunitsMap = None)
 
   }
 
   def aggregatorArg: Parser[UnitsArg] = (aggregator ~ openParen ~ name ~ closeParen) ^^ {
     case dimension ~ openParen ~ name ~ closeParen =>
-      UnitsArg(typeOfArg = "aggregator", nameOfArg = Some(name), subunitsMap = None)
+      UnitsArg(name = "aggregator", subUnitsName = Some(name), subunitsMap = None)
 
   }
 
   def interpolatorArg: Parser[UnitsArg] = (interpolator ~ openParen ~ name ~ closeParen) ^^ {
     case dimension ~ openParen ~ name ~ closeParen =>
-      UnitsArg(typeOfArg = "interpolator", nameOfArg = Some(name), subunitsMap = None)
+      UnitsArg(name = "interpolator", subUnitsName = Some(name), subunitsMap = None)
 
   }
 
-  def subunitsArg: Parser[UnitsArg] = (subunits ~ openParen ~ name ~ colon ~ unitsMember ~ closeParen) ^^ {
-    case dimension ~ openParen ~ name ~ colon ~ unitsMember ~ closeParen =>
-      UnitsArg(typeOfArg = "subunits", nameOfArg = None, subunitsMap = Some(Map(name -> unitsMember)))
+  def subunitsArg: Parser[UnitsArg] = (subunits ~ openParen ~ optionallyQuotedString ~ colon ~ unitsMember ~ closeParen) ^^ {
+    case dimension ~ openParen ~ optionallyQuotedString ~ colon ~ unitsMember ~ closeParen =>
+      UnitsArg(name = "subunits", subUnitsName = None, subunitsMap = Some(Map(optionallyQuotedString -> unitsMember)))
   }
 
 
   //UNITS(name(list), SUBUNITS(listUnits:UNITS(...))
   //DOMAIN(DIM(node), UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...), key:UNITS(...) )
 
-  def parseQuery: Parser[ScrubJaySchemaQuery] = select ~ fields ^^ {
+  def parseQuery: Parser[ScrubJaySchemaQuery] = select ~ columns ^^ {
     case select ~ fields => {
       ScrubJaySchemaQuery(fields.toSet)
     }
@@ -206,7 +247,7 @@ class QueryParser extends RegexParsers {
   def queryToSchema(queryString: String): ScrubJaySchemaQuery = {
     parse(parseQuery, queryString) match {
       case Success(matched, _) => {
-        verifyQuery(matched.fields)
+        verifyQuery(matched.columns)
         matched
       }
       case Failure(msg, _) => throw new Exception("Invalid Query.")

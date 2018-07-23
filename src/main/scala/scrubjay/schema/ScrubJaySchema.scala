@@ -18,21 +18,21 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
     "ScrubJaySchema\n|--" + fields.mkString("\n|--")
   }
 
-  def withGeneratedFieldNames: ScrubJaySchema = ScrubJaySchema(fields.map(_.withGeneratedFieldName))
+  def withGeneratedColumnNames: ScrubJaySchema = ScrubJaySchema(fields.map(_.withGeneratedColumnName))
 
-  def fieldNames: Set[String] = fields.map(_.name)
-  def dimensions: Set[String] = fields.map(_.dimension)
+  def columnNames: Set[String] = fields.map(_.name)
+  def dimensions: Set[ScrubJayDimensionSchema] = fields.map(_.dimension)
   def units: Set[ScrubJayUnitsSchema] = fields.map(_.units)
 
   def domainFields: Set[ScrubJayColumnSchema] = fields.filter(_.domain)
   def valueFields: Set[ScrubJayColumnSchema] = fields.filterNot(_.domain)
 
-  def domainDimensions: Set[String] = domainFields.map(_.dimension)
-  def valueDimensions: Set[String] = valueFields.map(_.dimension)
+  def domainDimensions: Set[ScrubJayDimensionSchema] = domainFields.map(_.dimension)
+  def valueDimensions: Set[ScrubJayDimensionSchema] = valueFields.map(_.dimension)
 
   def containsDimensions(dimensions: Set[String]): Boolean = dimensions.forall(dimensions.contains)
-  def containsDomainDimensions(dimensions: Set[String]): Boolean = dimensions.forall(domainDimensions.contains)
-  def containsValueDimensions(dimensions: Set[String]): Boolean = dimensions.forall(valueDimensions.contains)
+  def containsDomainDimensions(dimensions: Set[ScrubJayDimensionSchema]): Boolean = dimensions.forall(domainDimensions.contains)
+  def containsValueDimensions(dimensions: Set[ScrubJayDimensionSchema]): Boolean = dimensions.forall(valueDimensions.contains)
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
@@ -45,11 +45,11 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
     * This schema satisfies a target schema if every field in the target has a match here
     */
   def matchesQuery(query: ScrubJaySchemaQuery): Boolean = {
-    query.fields.forall(targetField => fields.exists(_.matchesQuery(targetField)))
+    query.columns.forall(targetField => fields.exists(_.matchesQuery(targetField)))
   }
 
   /**
-    * Joinable fields are domain fields with dimension and units in common
+    * Joinable columns are domain columns with dimension and units in common
     */
   def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayColumnSchema, ScrubJayColumnSchema)] = {
     domainFields.flatMap(domainField => {

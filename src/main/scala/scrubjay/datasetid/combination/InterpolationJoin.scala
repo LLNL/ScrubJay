@@ -18,15 +18,15 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
   override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = {
     joinedSchema(dimensionSpace)
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
-      .withGeneratedFieldNames
+      .withGeneratedColumnNames
   }
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = {
     joinedSchema(dimensionSpace).isDefined &&
     dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
       // Exactly one join field must be ordered
-      // TODO: multiple ordered join fields
-      .count(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered) == 1
+      // TODO: multiple ordered join columns
+      .count(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered) == 1
   }
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {
@@ -38,13 +38,13 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     val joinFields = dsID1.scrubJaySchema(dimensionSpace)
       .joinableFields(dsID2.scrubJaySchema(dimensionSpace))
 
-    // Get ordered and unordered join fields for each dataset
+    // Get ordered and unordered join columns for each dataset
     val (unorderedJoinFields1, unorderedJoinFields2) = {
-      joinFields.filterNot(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered)
+      joinFields.filterNot(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered)
         .unzip
     }
     val (orderedJoinFields1, orderedJoinFields2) = {
-      joinFields.filter(field => dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered)
+      joinFields.filter(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered)
         .unzip
     }
 
@@ -52,8 +52,8 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     val unorderedJoinFieldNames1 = unorderedJoinFields1.map(_.name)
     val unorderedJoinFieldNames2 = unorderedJoinFields2.map(_.name)
 
-    val orderedJoinFieldName1 = orderedJoinFields1.map(_.name).head // TODO: multiple ordered join fields
-    val orderedJoinFieldName2 = orderedJoinFields2.map(_.name).head // TODO: multiple ordered join fields
+    val orderedJoinFieldName1 = orderedJoinFields1.map(_.name).head // TODO: multiple ordered join columns
+    val orderedJoinFieldName2 = orderedJoinFields2.map(_.name).head // TODO: multiple ordered join columns
 
     val orderedJoinFieldIndex1 = df1.schema.fieldIndex(orderedJoinFieldName1)
     val orderedJoinFieldIndex2 = df2.schema.fieldIndex(orderedJoinFieldName2)
@@ -91,7 +91,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     })
 
     // Create 1 to N mapping from each row in df1 to rows in df2
-    // ..also remove existing unordered join fields from df2
+    // ..also remove existing unordered join columns from df2
     val df2UnorderedIndices = unorderedJoinFieldNames2.map(name => df2.schema.fieldIndex(name))
     val df2IndexIsUnordered = (0 to df2.schema.fields.length).map(df2UnorderedIndices.contains)
     val df2FilterNotUnorderedIndex = (row: Row) =>
@@ -116,9 +116,9 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
 
     // DEBUG
     // .map{case (row, rowSet) => Row.fromSeq(row.toSeq :+ rowSet.toArray.mkString(","))}
-    // spark.createDataFrame(oneToNMapping, StructType(df1.schema.fields :+ StructField("rowSet", StringType)))
+    // spark.createDataFrame(oneToNMapping, StructType(df1.schema.columns :+ StructField("rowSet", StringType)))
 
-    // Determine new fields and indices of df2
+    // Determine new columns and indices of df2
     val df2NewFieldInfo = df2.schema.fields.zipWithIndex.zip(df2IndexIsUnordered).flatMap{case ((c, i), false) => Some((c, i)); case _ => None}
     val df2NewOrderedIndex = df2NewFieldInfo.indexWhere(_._2 == orderedJoinFieldIndex2)
     val df2NewSparkFields = df2NewFieldInfo.map(_._1).patch(df2NewOrderedIndex, Nil, 1)

@@ -3,7 +3,7 @@ package scrubjay.query
 import scrubjay.datasetid._
 import scrubjay.dataspace.DataSpace
 
-import gov.llnl.ConstraintSolver._
+import scrubjay.query.constraintsolver.ConstraintSolver._
 
 object JoinSet {
 

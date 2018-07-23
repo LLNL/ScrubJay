@@ -30,14 +30,14 @@ object GenerateInputs {
     ScrubJayColumnSchema(
       domain=true,
       name="node",
-      dimension="node",
+      dimension=ScrubJayDimensionSchema("node"),
       units=ScrubJayUnitsSchema("identifier", "POINT", "nearest", "nearest", Map.empty))
 
   val SJFieldNodeList =
     ScrubJayColumnSchema(
       domain=true,
       name="nodelist",
-      dimension="node",
+      dimension=ScrubJayDimensionSchema("node"),
       units=ScrubJayUnitsSchema("ArrayString", "MULTIPOINT", "nearest", "nearest",
         Map("listUnits" -> SJFieldNode.units)))
 
@@ -45,21 +45,21 @@ object GenerateInputs {
     ScrubJayColumnSchema(
       domain=true,
       name="timestamp",
-      dimension="time",
+      dimension=ScrubJayDimensionSchema("time"),
       units=ScrubJayUnitsSchema("datetimestamp", "POINT", "average", "linear", Map.empty))
 
   val SJFieldTemperature =
     ScrubJayColumnSchema(
       domain=false,
       name="temperature",
-      dimension="temperature",
+      dimension=ScrubJayDimensionSchema("temperature"),
       units=ScrubJayUnitsSchema("temperature", "POINT", "average", "linear", Map.empty))
 
   val SJFieldFlops =
     ScrubJayColumnSchema(
       domain=false,
       name="flops",
-      dimension="flops",
+      dimension=ScrubJayDimensionSchema("flops"),
       units=ScrubJayUnitsSchema("flops", "POINT", "average", "linear", Map.empty))
 
 

@@ -18,7 +18,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
   def newField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = {
     val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
     val newUnits = columnField.units.subUnits("listUnits")
-    columnField.copy(units = newUnits).withGeneratedFieldName
+    columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
   override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {

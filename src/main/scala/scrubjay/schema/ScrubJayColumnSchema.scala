@@ -4,7 +4,7 @@ import scrubjay.query.schema.ScrubJayColumnSchemaQuery
 
 case class ScrubJayColumnSchema(domain: Boolean,
                                 name: String = UNKNOWN_STRING,
-                                dimension: String = UNKNOWN_STRING,
+                                dimension: ScrubJayDimensionSchema = ScrubJayDimensionSchema(),
                                 units: ScrubJayUnitsSchema = ScrubJayUnitsSchema()) {
 
   override def toString: String = {
@@ -27,13 +27,13 @@ case class ScrubJayColumnSchema(domain: Boolean,
     domainType + ":" + dimension + ":" + units.name
   }
 
-  def withGeneratedFieldName: ScrubJayColumnSchema = {
+  def withGeneratedColumnName: ScrubJayColumnSchema = {
     copy(name = generateFieldName)
   }
 
   def matchesQuery(query: ScrubJayColumnSchemaQuery): Boolean = {
     val domainMatches = wildMatch(domain, query.domain)
-    val dimensionMatches = wildMatch(dimension, query.dimension)
+    val dimensionMatches = query.dimension.isEmpty || dimension.matchesQuery(query.dimension.get)
     val unitsMatches = query.units.isEmpty || units.matchesQuery(query.units.get)
     domainMatches && dimensionMatches && unitsMatches
   }

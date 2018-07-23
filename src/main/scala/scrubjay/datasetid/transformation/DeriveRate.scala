@@ -6,7 +6,7 @@ import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Column, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.DimensionSpace
-import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, ScrubJayUnitsSchema}
+import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJaySchema, ScrubJayUnitsSchema}
 
 /**
  * Derive finite difference dY/dX for dimensions X and Y using a window of N rows
@@ -47,7 +47,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     val rateSubUnits = Map("numerator" -> yField.units, "denominator" -> xField.units)
     val rateUnits = ScrubJayUnitsSchema(getRateUnitsName(dimensionSpace), "POINT", "average", "linear", rateSubUnits)
 
-    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName(dimensionSpace), getRateDimensionName(dimensionSpace), rateUnits)
+    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName(dimensionSpace), ScrubJayDimensionSchema(getRateDimensionName(dimensionSpace)), rateUnits)
 
     new ScrubJaySchema(dsID.scrubJaySchema(dimensionSpace).fields + rateField)
   }

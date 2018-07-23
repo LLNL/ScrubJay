@@ -34,6 +34,6 @@ abstract class OriginalDatasetID(name: String, scrubJaySchema: ScrubJaySchema) e
   }
 
   override def dependencies: Seq[DatasetID] = Seq.empty
-  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = scrubJaySchema.withGeneratedFieldNames
+  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = scrubJaySchema.withGeneratedColumnNames
 }
 

@@ -1,6 +1,6 @@
 package scrubjay.query
 
-import gov.llnl.ConstraintSolver._
+import scrubjay.query.constraintsolver.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.dataspace._
 import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin}
@@ -32,7 +32,7 @@ object JoinPair {
     // Check if domain dimensions match (regardless of units)
     val joinableFields = dsID1.scrubJaySchema(dimensionSpace)
       .joinableFields(dsID2.scrubJaySchema(dimensionSpace), testUnits = false)
-      .map{case (f1, f2) => (f1, f2, dimensionSpace.findDimension(f1.dimension).get)}
+      .map{case (f1, f2) => (f1, f2, dimensionSpace.findDimension(f1.dimension.name).get)}
 
     // Explode all possible joinable elements
     val (ds1Exploded, ds2Exploded) = joinableFields.foldLeft((dsID1, dsID2)){

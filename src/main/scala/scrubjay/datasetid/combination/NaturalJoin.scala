@@ -15,14 +15,14 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
   override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = {
     joinedSchema(dimensionSpace)
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
-      .withGeneratedFieldNames
+      .withGeneratedColumnNames
   }
 
   override def isValid(dimensionSpace: DimensionSpace): Boolean = {
     joinedSchema(dimensionSpace).isDefined &&
       dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
-        // All joinable fields must be unordered, else must use interpolation join
-        .forall(field => !dimensionSpace.findDimensionOrDefault(field._1.dimension).ordered)
+        // All joinable columns must be unordered, else must use interpolation join
+        .forall(field => !dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered)
   }
 
   override def realize(dimensionSpace: DimensionSpace): DataFrame = {

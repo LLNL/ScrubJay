@@ -1,8 +1,8 @@
 package scrubjay.query
 
-import gov.llnl.ConstraintSolver._
 import scrubjay.datasetid._
 import scrubjay.dataspace.DataSpace
+import scrubjay.query.constraintsolver.ConstraintSolver._
 import scrubjay.query.schema.ScrubJaySchemaQuery
 
 case class Query(dataSpace: DataSpace,
@@ -47,7 +47,7 @@ object Query {
 
     // Run all derivations on the joined results
     // val allDerivations = allJoins.flatMap(dataset => {
-    //   dataset.scrubJaySchema(dataSpace.dimensionSpace).fieldNames.flatMap(column => {
+    //   dataset.scrubJaySchema(dataSpace.dimensionSpace).columnNames.flatMap(column => {
     //     val explodeDiscreteRange = ExplodeList(dataset, column)
     //     if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
     //       Some(explodeDiscreteRange)
