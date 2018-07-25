@@ -23,7 +23,7 @@ class InterpolationJoinBench(repeats: Long = 10,
       (
         r,
         numRows,
-        returnTime(interJoined.realize(GenerateInputs.dimensionSpace).collect())
+        returnTime(interJoined.realize.collect())
       )
     }
 

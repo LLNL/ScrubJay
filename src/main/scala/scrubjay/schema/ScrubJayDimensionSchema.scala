@@ -10,7 +10,7 @@ case class ScrubJayDimensionSchema(name: String = UNKNOWN_STRING,
     val nameMatches = wildMatch(name, query.name)
     val orderedMatches = wildMatch(ordered, query.ordered)
     val continuousMatches = wildMatch(continuous, query.continuous)
-    val subDimensionsMatch = subDimensions.isEmpty || subDimensions.forall(subDimension =>
+    val subDimensionsMatch = query.subDimensions.isEmpty || subDimensions.forall(subDimension =>
       query.subDimensions.get.exists(q => subDimension.matchesQuery(q)))
     nameMatches && orderedMatches && continuousMatches && subDimensionsMatch
   }

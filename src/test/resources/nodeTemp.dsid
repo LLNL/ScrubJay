@@ -29,12 +29,16 @@
       "metadata" : { }
     } ]
   },
-  "scrubJaySchema": {
+  "originalScrubJaySchema": {
     "fields": [
       {
         "name" : "node",
         "domain" : true,
-        "dimension" : "node",
+        "dimension" : {
+          "name": "node",
+          "ordered": false,
+          "continuous": false
+        },
         "units" : {
           "name" : "identifier",
           "elementType" : "POINT"
@@ -43,7 +47,11 @@
       {
         "name" : "time",
         "domain" : true,
-        "dimension" : "time",
+        "dimension" : {
+          "name": "time",
+          "ordered": true,
+          "continuous": true
+        },
         "units" : {
           "name" : "datetimestamp",
           "elementType" : "POINT"
@@ -52,7 +60,11 @@
       {
         "name" : "temp",
         "domain" : false,
-        "dimension" : "temperature",
+        "dimension" : {
+            "name" : "temperature",
+            "ordered" : true,
+            "continuous" : true,
+        }
         "units" : {
           "name" : "degrees celsius",
           "elementType" : "POINT",

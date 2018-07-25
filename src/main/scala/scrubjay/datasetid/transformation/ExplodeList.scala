@@ -15,42 +15,42 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
   extends Transformation("ExplodeList") {
 
   // Modify column units from list to whatever was inside the list
-  def newField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = {
-    val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
+  def newField: ScrubJayColumnSchema = {
+    val columnField = dsID.scrubJaySchema.getField(column)
     val newUnits = columnField.units.subUnits("listUnits")
     columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {
+  override def scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
-      dsID.scrubJaySchema(dimensionSpace).fields.map{
-        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField(dimensionSpace)
+      dsID.scrubJaySchema.fields.map{
+        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
         case other => other
       }
     )
   }
 
-  def validScrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
-    val columnUnits = dsID.scrubJaySchema(dimensionSpace).getField(column).units
+  def validScrubJaySchema: Boolean = {
+    val columnUnits = dsID.scrubJaySchema.getField(column).units
     columnUnits.name == "list"
   }
 
-  def validSparkSchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
-    dsID.realize(dimensionSpace).schema(column).dataType match {
+  def validSparkSchema: Boolean = {
+    dsID.realize.schema(column).dataType match {
       case ArrayType(_, _) => true
       case MapType(_, _, _) => true
       case _ => false
     }
   }
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
-    validScrubJaySchema(dimensionSpace) && validSparkSchema(dimensionSpace)
+  override def isValid: Boolean = {
+    validScrubJaySchema && validSparkSchema
   }
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
-    val df = dsID.realize(dimensionSpace)
+  override def realize: DataFrame = {
+    val df = dsID.realize
     df.withColumn(column, ExplodeList.dfExpression(df(column)))
-      .withColumnRenamed(column, newField(dimensionSpace).name)
+      .withColumnRenamed(column, newField.name)
   }
 }
 

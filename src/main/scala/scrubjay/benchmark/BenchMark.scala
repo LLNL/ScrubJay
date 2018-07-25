@@ -17,7 +17,7 @@ trait BenchMark[T] {
 
     val warmup = {
       lazy val interjoined = InterpolationJoin(timeTemp, timeFlops, 6)
-      val t = returnTime(interjoined.realize(GenerateInputs.dimensionSpace).collect())
+      val t = returnTime(interjoined.realize.collect())
       println(t)
     }
 

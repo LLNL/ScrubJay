@@ -22,7 +22,7 @@ class NaturalJoinBench(repeats: Long = 10,
       (
         r,
         numRows,
-        returnTime(naturalJoined.realize(GenerateInputs.dimensionSpace).collect())
+        returnTime(naturalJoined.realize.collect())
       )
     }
 

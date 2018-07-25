@@ -5,13 +5,13 @@ import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class LocalDatasetID(dataframe: DataFrame,
-                          scrubJaySchema: ScrubJaySchema,
+                          originalScrubJaySchema: ScrubJaySchema,
                          sparkSchema: Option[SparkSchema] = None)
-  extends OriginalDatasetID("LocalData", scrubJaySchema) {
+  extends OriginalDatasetID("LocalData", originalScrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace): Boolean = true
+  override def isValid: Boolean = true
 
-  override def load: DataFrame = {
+  override def originalDF: DataFrame = {
     if (sparkSchema.isDefined) {
       spark.createDataFrame(dataframe.rdd, sparkSchema.get)
     } else {

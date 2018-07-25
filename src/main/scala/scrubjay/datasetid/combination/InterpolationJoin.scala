@@ -5,46 +5,45 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.types.scrubjayunits.{Interpolator, RealValued}
 import scrubjay.datasetid.DatasetID
-import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.ScrubJaySchema
 
 case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID, window: Double)
   extends Combination("InterpolationJoin") {
 
-  def joinedSchema(dimensionSpace: DimensionSpace): Option[ScrubJaySchema] = {
-    dsID1.scrubJaySchema(dimensionSpace).joinSchema(dsID2.scrubJaySchema(dimensionSpace))
+  def joinedSchema: Option[ScrubJaySchema] = {
+    dsID1.scrubJaySchema.joinSchema(dsID2.scrubJaySchema)
   }
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = {
-    joinedSchema(dimensionSpace)
+  override def scrubJaySchema: ScrubJaySchema = {
+    joinedSchema
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
       .withGeneratedColumnNames
   }
 
-  override def isValid(dimensionSpace: DimensionSpace): Boolean = {
-    joinedSchema(dimensionSpace).isDefined &&
-    dsID1.scrubJaySchema(dimensionSpace).joinableFields(dsID2.scrubJaySchema(dimensionSpace))
+  override def isValid: Boolean = {
+    joinedSchema.isDefined &&
+    dsID1.scrubJaySchema.joinableFields(dsID2.scrubJaySchema)
       // Exactly one join field must be ordered
       // TODO: multiple ordered join columns
-      .count(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered) == 1
+      .count(field => scrubJaySchema.findDimensionOrDefault(field._1.dimension.name).ordered) == 1
   }
 
-  override def realize(dimensionSpace: DimensionSpace): DataFrame = {
+  override def realize: DataFrame = {
 
     val spark = SparkSession.builder().getOrCreate()
 
-    val df1 = dsID1.realize(dimensionSpace)
-    val df2 = dsID2.realize(dimensionSpace)
-    val joinFields = dsID1.scrubJaySchema(dimensionSpace)
-      .joinableFields(dsID2.scrubJaySchema(dimensionSpace))
+    val df1 = dsID1.realize
+    val df2 = dsID2.realize
+    val joinFields = dsID1.scrubJaySchema
+      .joinableFields(dsID2.scrubJaySchema)
 
     // Get ordered and unordered join columns for each dataset
     val (unorderedJoinFields1, unorderedJoinFields2) = {
-      joinFields.filterNot(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered)
+      joinFields.filterNot(field => scrubJaySchema.findDimensionOrDefault(field._1.dimension.name).ordered)
         .unzip
     }
     val (orderedJoinFields1, orderedJoinFields2) = {
-      joinFields.filter(field => dimensionSpace.findDimensionOrDefault(field._1.dimension.name).ordered)
+      joinFields.filter(field => scrubJaySchema.findDimensionOrDefault(field._1.dimension.name).ordered)
         .unzip
     }
 
@@ -122,7 +121,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     val df2NewFieldInfo = df2.schema.fields.zipWithIndex.zip(df2IndexIsUnordered).flatMap{case ((c, i), false) => Some((c, i)); case _ => None}
     val df2NewOrderedIndex = df2NewFieldInfo.indexWhere(_._2 == orderedJoinFieldIndex2)
     val df2NewSparkFields = df2NewFieldInfo.map(_._1).patch(df2NewOrderedIndex, Nil, 1)
-    val df2NewSJFields = df2NewSparkFields.map(f => dsID2.scrubJaySchema(dimensionSpace).getField(f.name))
+    val df2NewSJFields = df2NewSparkFields.map(f => dsID2.scrubJaySchema.getField(f.name))
 
     // Determine interpolators for all values in df2
     val df2Interpolators = df2NewSJFields.zip(df2NewSparkFields)

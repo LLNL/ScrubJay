@@ -34,6 +34,14 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
   def containsDomainDimensions(dimensions: Set[ScrubJayDimensionSchema]): Boolean = dimensions.forall(domainDimensions.contains)
   def containsValueDimensions(dimensions: Set[ScrubJayDimensionSchema]): Boolean = dimensions.forall(valueDimensions.contains)
 
+  @JsonIgnore
+  private val dimensionMap: Map[String, ScrubJayDimensionSchema] = dimensions.map{
+    case d @ ScrubJayDimensionSchema(name, _, _, _) => (name, d)
+  }.toMap
+
+  def findDimension(name: String): Option[ScrubJayDimensionSchema] = dimensionMap.get(name)
+  def findDimensionOrDefault(name: String): ScrubJayDimensionSchema = dimensionMap.getOrElse(name, ScrubJayDimensionSchema())
+
   override def equals(obj: scala.Any): Boolean = {
     obj match {
       case s: ScrubJaySchema => map == s.map
@@ -52,11 +60,13 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
     * Joinable columns are domain columns with dimension and units in common
     */
   def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayColumnSchema, ScrubJayColumnSchema)] = {
-    domainFields.flatMap(domainField => {
-      val otherMatch: Option[ScrubJayColumnSchema] = other.domainFields.find(otherDomainField =>
-        domainField.dimension == otherDomainField.dimension && (!testUnits || domainField.units == otherDomainField.units))
-      otherMatch.fold(None: Option[(ScrubJayColumnSchema, ScrubJayColumnSchema)])(f => Some(domainField, f))
-    })
+    val domainPairs = domainFields.flatMap(domainField =>
+      other.domainFields.map(otherDomainField => (domainField, otherDomainField)))
+
+    domainPairs.filter(domainPair =>
+      domainPair._1.dimension == domainPair._2.dimension
+      && (!testUnits || domainPair._1.units == domainPair._2.units)
+    )
   }
 
   /**

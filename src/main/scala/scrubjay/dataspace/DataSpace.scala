@@ -7,16 +7,20 @@ import scrubjay.util.writeStringToFile
 
 import scala.io.Source
 
-case class DataSpace(dimensionSpace: DimensionSpace, datasets: Array[DatasetID]) {
+case class DataSpace(datasets: Array[DatasetID]) {
   def toJsonString: String = DataSpace.toJsonString(this)
   def writeToJsonFile(filename: String): Unit = DataSpace.writeToJsonFile(this, filename)
 
   @JsonIgnore
-  private val dimensionMap: Map[String, ScrubJayDimensionSchema] = dimensionSpace.dimensions.map{
+  val dimensions: Set[ScrubJayDimensionSchema] = datasets.flatMap(_.scrubJaySchema.fields.map(_.dimension)).toSet
+
+  @JsonIgnore
+  private val dimensionMap: Map[String, ScrubJayDimensionSchema] = dimensions.map{
     case d @ ScrubJayDimensionSchema(name, _, _, _) => (name, d)
   }.toMap
 
-  def dimension(name: String): ScrubJayDimensionSchema = dimensionMap(name)
+  def findDimension(name: String): Option[ScrubJayDimensionSchema] = dimensionMap.get(name)
+  def findDimensionOrDefault(name: String): ScrubJayDimensionSchema = dimensionMap.getOrElse(name, ScrubJayDimensionSchema())
 }
 
 object DataSpace {
@@ -40,6 +44,6 @@ object DataSpace {
   }
 
   def generateSkeletonFor(datasets: Array[DatasetID]): DataSpace = {
-    DataSpace(DimensionSpace.unknown, datasets)
+    DataSpace(datasets)
   }
 }

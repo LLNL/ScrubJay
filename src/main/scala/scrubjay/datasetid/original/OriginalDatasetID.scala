@@ -22,18 +22,18 @@ import scrubjay.schema.ScrubJaySchema
   new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
   new Type(value = classOf[CaliperKeyValueDatasetID], name = "CaliperKeyValueDatasetID")
 ))
-abstract class OriginalDatasetID(name: String, scrubJaySchema: ScrubJaySchema) extends DatasetID(name) {
+abstract class OriginalDatasetID(name: String, originalScrubJaySchema: ScrubJaySchema) extends DatasetID(name) {
 
   @JsonIgnore
   lazy val spark: SparkSession = SparkSession.builder().getOrCreate()
 
-  def load: DataFrame
+  def originalDF: DataFrame
 
-  override def realize(dimensionSpace: DimensionSpace = DimensionSpace.unknown): DataFrame = {
-    ScrubJayDFLoader.load(load, scrubJaySchema)
+  override def realize: DataFrame = {
+    ScrubJayDFLoader.load(originalDF, originalScrubJaySchema)
   }
 
   override def dependencies: Seq[DatasetID] = Seq.empty
-  override def scrubJaySchema(dimensionSpace: DimensionSpace): ScrubJaySchema = scrubJaySchema.withGeneratedColumnNames
+  override def scrubJaySchema: ScrubJaySchema = originalScrubJaySchema.withGeneratedColumnNames
 }
 

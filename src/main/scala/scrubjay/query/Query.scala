@@ -47,9 +47,9 @@ object Query {
 
     // Run all derivations on the joined results
     // val allDerivations = allJoins.flatMap(dataset => {
-    //   dataset.scrubJaySchema(dataSpace.dimensionSpace).columnNames.flatMap(column => {
+    //   dataset.scrubJaySchema(dataSpace.dimensions).columnNames.flatMap(column => {
     //     val explodeDiscreteRange = ExplodeList(dataset, column)
-    //     if (explodeDiscreteRange.isValid(dataSpace.dimensionSpace)) {
+    //     if (explodeDiscreteRange.isValid(dataSpace.dimensions)) {
     //       Some(explodeDiscreteRange)
     //     } else {
     //       None
@@ -59,7 +59,7 @@ object Query {
 
     // Return all joins and derivations that satisfy the query
     allJoins.filter(dataset => {
-      dataset.scrubJaySchema(dataSpace.dimensionSpace).matchesQuery(queryTarget)
+      dataset.scrubJaySchema.matchesQuery(queryTarget)
     })
   })
 

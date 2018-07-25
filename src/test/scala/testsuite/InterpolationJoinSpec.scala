@@ -7,14 +7,6 @@ import scrubjay.schema.ScrubJayDimensionSchema
 
 class InterpolationJoinSpec extends ScrubJaySpec {
 
-  lazy val dimensionSpace: DimensionSpace =
-    DimensionSpace(Array(
-      ScrubJayDimensionSchema("job", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("flops", ordered = true, continuous = true),
-      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
-    )
-
   describe("InterpolationJoin") {
     lazy val nodeFlops: DatasetID = DatasetID.fromJsonFile(nodeFlopsDatasetIDFilename)
     lazy val nodeTemp: DatasetID = DatasetID.fromJsonFile(nodeTempDatasetIDFilename)
@@ -23,10 +15,10 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       lazy val interjoined = InterpolationJoin(nodeFlops, nodeTemp, 60)
 
       it("should be defined") {
-        assert(interjoined.isValid(dimensionSpace))
+        assert(interjoined.isValid)
       }
       it("should look correct"){
-        interjoined.debugPrint(dimensionSpace)
+        interjoined.debugPrint
       }
       it("should serialize/deserialize correctly") {
         assert(DatasetID.fromJsonString(DatasetID.toJsonString(interjoined)) == interjoined)
@@ -37,10 +29,10 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       lazy val interjoined = InterpolationJoin(nodeTemp, nodeFlops, 60)
 
       it("should be defined") {
-        assert(interjoined.isValid(dimensionSpace))
+        assert(interjoined.isValid)
       }
       it("should look correct") {
-        interjoined.debugPrint(dimensionSpace)
+        interjoined.debugPrint
       }
       it("should serialize/deserialize correctly") {
         assert(DatasetID.fromJsonString(DatasetID.toJsonString(interjoined)) == interjoined)

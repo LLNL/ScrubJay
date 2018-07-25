@@ -47,7 +47,7 @@ class QuerySpec extends ScrubJaySpec {
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
-        solution._1.debugPrint(dataSpace.dimensionSpace)
+        solution._1.debugPrint
       })
       assert(solutions.nonEmpty)
     }
@@ -73,7 +73,7 @@ class QuerySpec extends ScrubJaySpec {
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
-        solution._1.debugPrint(dataSpace.dimensionSpace)
+        solution._1.debugPrint
       })
       assert(solutions.nonEmpty)
     }
@@ -98,7 +98,7 @@ class QuerySpec extends ScrubJaySpec {
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
-        solution._1.debugPrint(dataSpace.dimensionSpace)
+        solution._1.debugPrint
       })
       assert(solutions.nonEmpty)
     }
@@ -123,7 +123,7 @@ class QuerySpec extends ScrubJaySpec {
 
       solutions.zipWithIndex.foreach(solution => {
         println("Solution: " + solution._2)
-        solution._1.debugPrint(dataSpace.dimensionSpace)
+        solution._1.debugPrint
       })
       assert(solutions.nonEmpty)
     }

@@ -7,15 +7,15 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class CSVDatasetID(csvFileName: String,
                         sparkSchema: SparkSchema,
-                        scrubJaySchema: ScrubJaySchema,
+                        originalScrubJaySchema: ScrubJaySchema,
                         options: Map[String, String] = Map.empty)
-  extends OriginalDatasetID("CSV", scrubJaySchema) {
+  extends OriginalDatasetID("CSV", originalScrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
+  override def isValid: Boolean = {
     new java.io.File(csvFileName).exists()
   }
 
-  override def load: DataFrame = {
+  override def originalDF: DataFrame = {
     spark.read
       .format("com.databricks.spark.csv")
       .schema(sparkSchema)
@@ -29,7 +29,7 @@ object CSVDatasetID {
   def saveDataToCSV(dsID: DatasetID,
                     fileName: String,
                     options: Map[String, String]): Unit = {
-    dsID.realize()
+    dsID.realize
       .write
       .options(options)
       .csv(fileName)
@@ -49,8 +49,8 @@ object CSVDatasetID {
 
     val sparkSchema = rawDF.schema
 
-    val scrubJaySchema = ScrubJaySchema.unknown(sparkSchema)
+    val originalScrubJaySchema = ScrubJaySchema.unknown(sparkSchema)
 
-    CSVDatasetID(filename, sparkSchema, scrubJaySchema, csvOptions)
+    CSVDatasetID(filename, sparkSchema, originalScrubJaySchema, csvOptions)
   }
 }

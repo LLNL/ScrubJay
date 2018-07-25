@@ -16,7 +16,7 @@ class DataSpaceSpec extends ScrubJaySpec {
     }
 
     it("should create the correct datasets") {
-      jobData.datasets.foreach(_.debugPrint(jobData.dimensionSpace))
+      jobData.datasets.foreach(_.debugPrint)
     }
   }
 }

@@ -58,7 +58,7 @@ to create the query.
 For example, to derive the first solution:
 
 ```scala
-   val realizedDataFrame = solutions.head.realize(dataSpace.dimensionSpace)
+   val realizedDataFrame = solutions.head.realize(dataSpace.dimensions)
 ```
 
 We can also see how the solution was derived in a DAG, using `toAsciiGraphString`:

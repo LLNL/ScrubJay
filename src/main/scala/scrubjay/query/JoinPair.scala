@@ -2,7 +2,6 @@ package scrubjay.query
 
 import scrubjay.query.constraintsolver.ConstraintSolver._
 import scrubjay.datasetid._
-import scrubjay.dataspace._
 import scrubjay.datasetid.combination.{InterpolationJoin, NaturalJoin}
 import scrubjay.datasetid.transformation.{ExplodeList, ExplodeRange}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema}
@@ -28,13 +27,13 @@ object JoinPair {
     }
   }
 
-  def allJoinedPairs(dsID1: DatasetID, dsID2: DatasetID, dimensionSpace: DimensionSpace): Seq[DatasetID] = {
+  def allJoinedPairs(dsID1: DatasetID, dsID2: DatasetID, dimensions: Set[ScrubJayDimensionSchema]): Seq[DatasetID] = {
     // Check if domain dimensions match (regardless of units)
-    val joinableFields = dsID1.scrubJaySchema(dimensionSpace)
-      .joinableFields(dsID2.scrubJaySchema(dimensionSpace), testUnits = false)
-      .map{case (f1, f2) => (f1, f2, dimensionSpace.findDimension(f1.dimension.name).get)}
+    val joinableFields = dsID1.scrubJaySchema
+      .joinableFields(dsID2.scrubJaySchema, testUnits = false)
+      .map{case (f1, f2) => (f1, f2, dimensions.find(_ == f1.dimension).get)}
 
-    // Explode all possible joinable elements
+    // Explode all possible joinable elements if explodable
     val (ds1Exploded, ds2Exploded) = joinableFields.foldLeft((dsID1, dsID2)){
       // Joinable field is unordered
       case ((ds1, ds2), (f1, f2, ScrubJayDimensionSchema(_, false, false, _))) => {
@@ -63,9 +62,9 @@ object JoinPair {
 
   // Figure out what kind of join to do, then do it
   lazy val joinedPair: Constraint[DatasetID] = memoize(args => {
-    val dimensionSpace = args(0).as[DimensionSpace]
+    val dimensions = args(0).as[Set[ScrubJayDimensionSchema]]
     val dsID1 = args(1).as[DatasetID]
     val dsID2 = args(2).as[DatasetID]
-    allJoinedPairs(dsID1, dsID2, dimensionSpace).flatMap(_.asOption(dimensionSpace))
+    allJoinedPairs(dsID1, dsID2, dimensions).flatMap(_.asOption)
   })
 }

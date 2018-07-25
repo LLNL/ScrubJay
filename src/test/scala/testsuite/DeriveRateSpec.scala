@@ -21,13 +21,13 @@ class DeriveRateSpec extends ScrubJaySpec {
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      assert(jobQueueExplodeNodeList.isValid(dimensionSpace))
+      assert(jobQueueExplodeNodeList.isValid)
     }
     it("should lookCorrect") {
       println("Before:")
-      nodeFlops.debugPrint(dimensionSpace)
+      nodeFlops.debugPrint
       println("After:")
-      jobQueueExplodeNodeList.debugPrint(dimensionSpace)
+      jobQueueExplodeNodeList.debugPrint
     }
     it("should serialize/deserialize correctly") {
       val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)

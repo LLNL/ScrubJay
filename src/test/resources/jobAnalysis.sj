@@ -1,32 +1,4 @@
 {
-  "dimensionSpace" : {
-    "dimensions": [
-      {
-        "name": "time",
-        "ordered": true,
-        "continuous": true
-      },
-      {
-        "name": "job",
-        "ordered": false,
-        "continuous": false
-      },
-      {
-        "name": "rack",
-        "ordered": false,
-        "continuous": false
-      },
-      {
-        "name": "flops",
-        "ordered": true,
-        "continuous": true
-      },
-      {
-        "name": "node",
-        "ordered": false,
-        "continuous": false
-      }
-    ] },
   "datasets": [
     {
       "type" : "CSVDatasetID",
@@ -73,12 +45,16 @@
           }
         } ]
       },
-      "scrubJaySchema": {
+      "originalScrubJaySchema": {
         "fields": [
           {
             "name" : "jobid",
             "domain" : true,
-            "dimension" : "job",
+            "dimension" : {
+              "name": "job",
+              "ordered": false,
+              "continuous": false
+            },
             "units" : {
               "name" : "identifier",
               "elementType" : "POINT"
@@ -86,7 +62,11 @@
           },
           {
             "name" : "nodelist",
-            "dimension" : "node",
+            "dimension" : {
+              "name": "node",
+              "ordered": false,
+              "continuous": false
+            },
             "domain" : true,
             "units" : {
               "name": "list",
@@ -101,7 +81,11 @@
           },
           {
             "name" : "elapsed",
-            "dimension" : "time",
+            "dimension" : {
+              "name": "time",
+              "ordered": true,
+              "continuous": true
+            },
             "domain" : false,
             "units" : {
               "name" : "seconds",
@@ -110,7 +94,11 @@
           },
           {
             "name" : "timespan",
-            "dimension" : "time",
+            "dimension" : {
+              "name": "time",
+              "ordered": true,
+              "continuous": true
+            },
             "domain" : true,
             "units" : {
               "name" : "range",
@@ -150,12 +138,16 @@
           }
         ]
       },
-      "scrubJaySchema": {
+      "originalScrubJaySchema": {
         "fields": [
           {
             "name" : "node",
             "domain" : true,
-            "dimension" : "node",
+            "dimension" : {
+              "name": "node",
+              "ordered": false,
+              "continuous": false
+            },
             "units" : {
               "name" : "identifier",
               "elementType" : "POINT"
@@ -164,7 +156,11 @@
           {
             "name" : "rack",
             "domain" : true,
-            "dimension" : "rack",
+            "dimension" : {
+              "name": "rack",
+              "ordered": false,
+              "continuous": false
+            },
             "units" : {
               "name" : "identifier",
               "elementType" : "POINT"
@@ -208,12 +204,16 @@
           }
         ]
       },
-      "scrubJaySchema": {
+      "originalScrubJaySchema": {
         "fields": [
           {
             "name" : "node",
             "domain" : true,
-            "dimension" : "node",
+            "dimension" : {
+              "name": "node",
+              "ordered": false,
+              "continuous": false
+            },
             "units" : {
               "name" : "identifier",
               "elementType" : "POINT"
@@ -222,7 +222,11 @@
           {
             "name" : "time",
             "domain" : true,
-            "dimension" : "time",
+            "dimension" : {
+              "name": "time",
+              "ordered": true,
+              "continuous": true
+            },
             "units" : {
               "name" : "datetimestamp",
               "elementType" : "POINT"
@@ -231,7 +235,11 @@
           {
             "name" : "flops",
             "domain" : false,
-            "dimension" : "flops",
+            "dimension" : {
+              "name": "flops",
+              "ordered": true,
+              "continuous": true
+            },
             "units" : {
               "name" : "count",
               "elementType" : "POINT"

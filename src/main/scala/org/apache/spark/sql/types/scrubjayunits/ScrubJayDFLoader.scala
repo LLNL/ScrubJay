@@ -8,14 +8,14 @@ import scrubjay.schema.RichDataFrame
 
 object ScrubJayDFLoader {
 
-  def load(DF: DataFrame, scrubJaySchema: ScrubJaySchema): DataFrame = {
+  def load(DF: DataFrame, originalScrubJaySchema: ScrubJaySchema): DataFrame = {
 
     // For each column, if we can convert to a high-level scrubjaytype, convert it
     DF.schema.fields.foldLeft(DF)((newDF, sparkSchemaField) => {
-      parseUDFForColumnSchema(newDF, sparkSchemaField, scrubJaySchema.getField(sparkSchemaField.name))
+      parseUDFForColumnSchema(newDF, sparkSchemaField, originalScrubJaySchema.getField(sparkSchemaField.name))
     })
       // And update the spark schema to have scrubjay-formatted names "domain:dimension:units"
-      .updateSparkSchemaNames(scrubJaySchema)
+      .updateSparkSchemaNames(originalScrubJaySchema)
   }
 
   // Get parse function (UDF) for the scrubjaytype specified in metadata, if it exists

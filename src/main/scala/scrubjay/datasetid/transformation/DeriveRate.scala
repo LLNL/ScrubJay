@@ -3,7 +3,7 @@ import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lag}
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayConverter
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
-import org.apache.spark.sql.{Column, Row, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
 import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJaySchema, ScrubJayUnitsSchema}
@@ -14,54 +14,54 @@ import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJayS
 case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimension: String, window: Int )
   extends Transformation("DeriveRate") {
 
-  def xFieldOption(dimensionSpace: DimensionSpace) = {
-    dsID.scrubJaySchema(dimensionSpace).fields.find(field => field.dimension == xDimension)
+  def xFieldOption = {
+    dsID.scrubJaySchema.fields.find(field => field.dimension.name == xDimension)
   }
 
-  def yFieldOption(dimensionSpace: DimensionSpace) = {
-    dsID.scrubJaySchema(dimensionSpace).fields.find(field => field.dimension == yDimension)
+  def yFieldOption = {
+    dsID.scrubJaySchema.fields.find(field => field.dimension.name == yDimension)
   }
 
-  def getXField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = xFieldOption(dimensionSpace).get
-  def getYField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = yFieldOption(dimensionSpace).get
+  def getXField: ScrubJayColumnSchema = xFieldOption.get
+  def getYField: ScrubJayColumnSchema = yFieldOption.get
 
-  def getRateFieldName(dimensionSpace: DimensionSpace) = "value:" + getRateDimensionName(dimensionSpace) + ":rate"
-  def getRateUnitsName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).units.name + "_PER_" + getXField(dimensionSpace).units.name
-  def getRateDimensionName(dimensionSpace: DimensionSpace) = getYField(dimensionSpace).dimension + "_PER_" + getXField(dimensionSpace).dimension
+  def getRateFieldName = "value:" + getRateDimensionName + ":rate"
+  def getRateUnitsName = getYField.units.name + "_PER_" + getXField.units.name
+  def getRateDimensionName = getYField.dimension + "_PER_" + getXField.dimension
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
-    val xDimensionExists = dimensionSpace.dimensions.exists(_.name == xDimension)
-    val yDimensionExists = dimensionSpace.dimensions.exists(_.name == yDimension)
+  override def isValid: Boolean = {
+    val xDimensionExists = scrubJaySchema.dimensions.exists(_.name == xDimension)
+    val yDimensionExists = scrubJaySchema.dimensions.exists(_.name == yDimension)
 
     if (xDimensionExists && yDimensionExists)
-      xFieldOption(dimensionSpace).isDefined && yFieldOption(dimensionSpace).isDefined
+      xFieldOption.isDefined && yFieldOption.isDefined
     else
       false
   }
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace) = {
+  override def scrubJaySchema: ScrubJaySchema = {
 
-    val xField: ScrubJayColumnSchema = getXField(dimensionSpace)
-    val yField: ScrubJayColumnSchema = getYField(dimensionSpace)
+    val xField: ScrubJayColumnSchema = getXField
+    val yField: ScrubJayColumnSchema = getYField
 
     val rateSubUnits = Map("numerator" -> yField.units, "denominator" -> xField.units)
-    val rateUnits = ScrubJayUnitsSchema(getRateUnitsName(dimensionSpace), "POINT", "average", "linear", rateSubUnits)
+    val rateUnits = ScrubJayUnitsSchema(getRateUnitsName, "POINT", "average", "linear", rateSubUnits)
 
-    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName(dimensionSpace), ScrubJayDimensionSchema(getRateDimensionName(dimensionSpace)), rateUnits)
+    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName, ScrubJayDimensionSchema(getRateDimensionName), rateUnits)
 
-    new ScrubJaySchema(dsID.scrubJaySchema(dimensionSpace).fields + rateField)
+    new ScrubJaySchema(dsID.scrubJaySchema.fields + rateField)
   }
 
-  override def realize(dimensionSpace: DimensionSpace) = {
+  override def realize: DataFrame = {
 
     val spark = SparkSession.builder().getOrCreate()
 
-    val df = dsID.realize(dimensionSpace)
+    val df = dsID.realize
 
-    val xField: ScrubJayColumnSchema = xFieldOption(dimensionSpace).get
-    val yField: ScrubJayColumnSchema = yFieldOption(dimensionSpace).get
+    val xField: ScrubJayColumnSchema = xFieldOption.get
+    val yField: ScrubJayColumnSchema = yFieldOption.get
 
-    val domainColumns: Seq[Column] = scrubJaySchema(dimensionSpace).domainFields
+    val domainColumns: Seq[Column] = scrubJaySchema.domainFields
       .filter(f => f != xField && f != yField)
       .map(f => col(f.name))
       .toSeq
@@ -98,7 +98,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
       Row.fromSeq(row.toSeq :+ rate)
     })
 
-    val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField(getRateFieldName(dimensionSpace), DoubleType))
+    val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField(getRateFieldName, DoubleType))
 
     spark.createDataFrame(rddWithRate, newSparkSchema)
       .drop(xLagColumn, yLagColumn)

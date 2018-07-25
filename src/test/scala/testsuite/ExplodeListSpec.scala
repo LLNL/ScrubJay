@@ -11,11 +11,6 @@ class ExplodeListSpec extends ScrubJaySpec {
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
 
   lazy val dataSpace: DataSpace = DataSpace(
-    dimensionSpace = DimensionSpace(Array(
-      ScrubJayDimensionSchema("job", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
-    ),
     datasets = Array(
       jobQueue
     )
@@ -25,13 +20,13 @@ class ExplodeListSpec extends ScrubJaySpec {
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      assert(jobQueueExplodeNodeList.isValid(dataSpace.dimensionSpace))
+      assert(jobQueueExplodeNodeList.isValid)
     }
     it("should lookCorrect") {
       println("Before:")
-      jobQueue.debugPrint(dataSpace.dimensionSpace)
+      jobQueue.debugPrint
       println("After:")
-      jobQueueExplodeNodeList.debugPrint(dataSpace.dimensionSpace)
+      jobQueueExplodeNodeList.debugPrint
     }
     it("should serialize/deserialize correctly") {
       val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)

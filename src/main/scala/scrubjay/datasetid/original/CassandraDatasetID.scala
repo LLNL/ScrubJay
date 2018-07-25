@@ -7,13 +7,13 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class CassandraDatasetID(keyspace: String,
                               table: String,
-                              scrubJaySchema: ScrubJaySchema,
+                              originalScrubJaySchema: ScrubJaySchema,
                               sparkSchema: SparkSchema)
-  extends OriginalDatasetID("CassandraTable", scrubJaySchema) {
+  extends OriginalDatasetID("CassandraTable", originalScrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
+  override def isValid: Boolean = true
 
-  override def load: DataFrame = {
+  override def originalDF: DataFrame = {
     spark.read
       .schema(sparkSchema)
       .format("org.apache.spark.sql.cassandra")

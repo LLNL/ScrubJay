@@ -11,11 +11,6 @@ class ExplodeRangeSpec extends ScrubJaySpec {
   lazy val jobQueue: DatasetID = DatasetID.fromJsonFile(jobQueueDatasetIDFilename)
 
   lazy val dataSpace: DataSpace = DataSpace(
-    dimensionSpace = DimensionSpace(Array(
-      ScrubJayDimensionSchema("job", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
-    ),
     datasets = Array(
       jobQueue
     )
@@ -25,13 +20,13 @@ class ExplodeRangeSpec extends ScrubJaySpec {
 
   describe("Derive exploded time range") {
     it("should be defined") {
-      assert(jobQueueExplodeTimeRange.isValid(dataSpace.dimensionSpace))
+      assert(jobQueueExplodeTimeRange.isValid)
     }
     it("should look correct") {
       println("Before:")
-      jobQueue.debugPrint(dataSpace.dimensionSpace)
+      jobQueue.debugPrint
       println("After:")
-      jobQueueExplodeTimeRange.debugPrint(dataSpace.dimensionSpace)
+      jobQueueExplodeTimeRange.debugPrint
     }
     it("should serialize/deserialize correctly") {
       val json: String = DatasetID.toJsonString(jobQueueExplodeTimeRange)

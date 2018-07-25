@@ -6,10 +6,10 @@ import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class CaliperKeyValueDatasetID(ckvFileName: String,
                                     sparkSchema: SparkSchema,
-                                    scrubJaySchema: ScrubJaySchema)
-  extends OriginalDatasetID("Caliper", scrubJaySchema) {
+                                    originalScrubJaySchema: ScrubJaySchema)
+  extends OriginalDatasetID("Caliper", originalScrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = true
+  override def isValid: Boolean = true
 
-  override def load: DataFrame = ???
+  override def originalDF: DataFrame = ???
 }

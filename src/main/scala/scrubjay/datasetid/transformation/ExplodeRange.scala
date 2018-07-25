@@ -17,25 +17,25 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
   extends Transformation("ExplodeRange") {
 
   // Modify column units from range to the units of points within the range
-  def newField(dimensionSpace: DimensionSpace): ScrubJayColumnSchema = {
-    val columnField = dsID.scrubJaySchema(dimensionSpace).getField(column)
+  def newField: ScrubJayColumnSchema = {
+    val columnField = dsID.scrubJaySchema.getField(column)
     val newUnits = columnField.units.subUnits("rangeUnits")
     columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace.unknown): ScrubJaySchema = {
+  override def scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
-      dsID.scrubJaySchema(dimensionSpace).fields.map{
-        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField(dimensionSpace)
+      dsID.scrubJaySchema.fields.map{
+        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
         case other => other
       }
     )
   }
 
-  override def isValid(dimensionSpace: DimensionSpace = DimensionSpace.unknown): Boolean = {
-    val columnUnits = dsID.scrubJaySchema(dimensionSpace).getField(column).units
-    val dimensionName = dsID.scrubJaySchema(dimensionSpace).getField(column).dimension
-    val dimensionToExplode = dimensionSpace.dimensions.find(_.name == dimensionName)
+  override def isValid: Boolean = {
+    val columnUnits = dsID.scrubJaySchema.getField(column).units
+    val dimensionName = dsID.scrubJaySchema.getField(column).dimension
+    val dimensionToExplode = scrubJaySchema.dimensions.find(_.name == dimensionName)
 
     if (dimensionToExplode.isDefined)
       dimensionToExplode.get.continuous && columnUnits.name == "range"
@@ -43,10 +43,10 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
       false
   }
 
-  override def realize(dimensionSpace: DimensionSpace): DataFrame = {
-    val DF = dsID.realize(dimensionSpace: DimensionSpace)
+  override def realize: DataFrame = {
+    val DF = dsID.realize
     DF.withColumn(column, ExplodeRange.dfExpression(DF(column), interval))
-      .withColumnRenamed(column, newField(dimensionSpace).name)
+      .withColumnRenamed(column, newField.name)
   }
 }
 

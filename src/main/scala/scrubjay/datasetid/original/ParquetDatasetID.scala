@@ -5,13 +5,13 @@ import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class ParquetDatasetID(parquetFileName: String,
-                            scrubJaySchema: ScrubJaySchema,
+                            originalScrubJaySchema: ScrubJaySchema,
                             sparkSchema: SparkSchema)
-  extends  OriginalDatasetID("Parquet", scrubJaySchema) {
+  extends  OriginalDatasetID("Parquet", originalScrubJaySchema) {
 
-  override def isValid(dimensionSpace: DimensionSpace): Boolean = true
+  override def isValid: Boolean = true
 
-  override def load: DataFrame = {
+  override def originalDF: DataFrame = {
     spark.read.schema(sparkSchema).parquet(parquetFileName)
   }
 }

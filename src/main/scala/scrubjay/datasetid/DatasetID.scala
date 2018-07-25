@@ -32,22 +32,22 @@ import scrubjay.util.{readFileToString, writeStringToFile}
 ))
 abstract class DatasetID(val name: String) extends Serializable {
 
-  def asOption(dimensionSpace: DimensionSpace): Option[DatasetID] = {
-    if (isValid(dimensionSpace))
+  def asOption: Option[DatasetID] = {
+    if (isValid)
       Some(this)
     else
       None
   }
-  def isValid(dimensionSpace: DimensionSpace = DimensionSpace()): Boolean
-  def scrubJaySchema(dimensionSpace: DimensionSpace = DimensionSpace()): ScrubJaySchema
-  def realize(dimensionSpace: DimensionSpace = DimensionSpace()): DataFrame
+  def isValid: Boolean
+  def scrubJaySchema: ScrubJaySchema
+  def realize: DataFrame
 
-  def debugPrint(dimensionSpace: DimensionSpace): Unit = {
-    val df = realize(dimensionSpace)
+  def debugPrint: Unit = {
+    val df = realize
     println(Console.YELLOW + "Spark Schema:")
     df.printSchema()
     println(Console.BLUE + "ScrubJay Schema:")
-    println(scrubJaySchema(dimensionSpace))
+    println(scrubJaySchema)
     println(Console.GREEN + "Derivation Graph:")
     println(DatasetID.toAsciiGraphString(this))
     println(Console.RESET + "DataFrame:")
@@ -142,7 +142,7 @@ object DatasetID {
 
     val derivation = dsID
 
-    val columns = dsID.scrubJaySchema(DimensionSpace.unknown).columnNames
+    val columns = dsID.scrubJaySchema.columnNames
 
     val node = GraphNode(hash, derivation, columns)
 

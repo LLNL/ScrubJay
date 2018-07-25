@@ -43,12 +43,16 @@
       }
     } ]
   },
-  "scrubJaySchema": {
+  "originalScrubJaySchema": {
     "fields": [
       {
         "name" : "jobid",
         "domain" : true,
-        "dimension" : "job",
+        "dimension" : {
+          "name": "job",
+          "ordered": false,
+          "continuous": false
+        },
         "units" : {
           "name" : "identifier",
           "elementType" : "POINT"
@@ -71,7 +75,11 @@
       },
       {
         "name" : "elapsed",
-        "dimension" : "time",
+        "dimension" : {
+          "name": "time",
+          "ordered": true,
+          "continuous": true
+        },
         "domain" : false,
         "units" : {
           "name" : "seconds",
@@ -80,7 +88,11 @@
       },
       {
         "name" : "timespan",
-        "dimension" : "time",
+        "dimension" : {
+          "name": "time",
+          "ordered": true,
+          "continuous": true
+        },
         "domain" : true,
         "units" : {
           "name" : "range",
