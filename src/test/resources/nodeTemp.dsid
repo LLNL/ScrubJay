@@ -63,8 +63,8 @@
         "dimension" : {
             "name" : "temperature",
             "ordered" : true,
-            "continuous" : true,
-        }
+            "continuous" : true
+        },
         "units" : {
           "name" : "degrees celsius",
           "elementType" : "POINT",

@@ -24,7 +24,7 @@ case class ScrubJayColumnSchema(domain: Boolean,
 
   def generateFieldName: String = {
     val domainType = if (domain) "domain" else "value"
-    domainType + ":" + dimension + ":" + units.name
+    domainType + ":" + dimension.name + ":" + units.name
   }
 
   def withGeneratedColumnName: ScrubJayColumnSchema = {

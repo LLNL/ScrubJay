@@ -1,7 +1,7 @@
 package scrubjay.datasetid
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -13,13 +13,9 @@ import org.apache.spark.sql.types.DataType
 import scrubjay.datasetid.combination._
 import scrubjay.datasetid.original._
 import scrubjay.datasetid.transformation._
-import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 import scrubjay.util.{readFileToString, writeStringToFile}
 
-@JsonIgnoreProperties(
-  value = Array("valid", "name") // not sure why this gets populated
-)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
@@ -38,6 +34,8 @@ abstract class DatasetID(val name: String) extends Serializable {
     else
       None
   }
+
+  @JsonIgnore
   def isValid: Boolean
   def scrubJaySchema: ScrubJaySchema
   def realize: DataFrame

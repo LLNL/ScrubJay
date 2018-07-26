@@ -1,11 +1,11 @@
 package scrubjay.datasetid.transformation
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lag}
 import org.apache.spark.sql.types.scrubjayunits.ScrubJayConverter
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
-import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJaySchema, ScrubJayUnitsSchema}
 
 /**
@@ -22,11 +22,16 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     dsID.scrubJaySchema.fields.find(field => field.dimension.name == yDimension)
   }
 
+  @JsonIgnore
   def getXField: ScrubJayColumnSchema = xFieldOption.get
+  @JsonIgnore
   def getYField: ScrubJayColumnSchema = yFieldOption.get
 
+  @JsonIgnore
   def getRateFieldName = "value:" + getRateDimensionName + ":rate"
+  @JsonIgnore
   def getRateUnitsName = getYField.units.name + "_PER_" + getXField.units.name
+  @JsonIgnore
   def getRateDimensionName = getYField.dimension + "_PER_" + getXField.dimension
 
   override def isValid: Boolean = {

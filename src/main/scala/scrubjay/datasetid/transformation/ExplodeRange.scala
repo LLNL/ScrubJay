@@ -34,13 +34,9 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
 
   override def isValid: Boolean = {
     val columnUnits = dsID.scrubJaySchema.getField(column).units
-    val dimensionName = dsID.scrubJaySchema.getField(column).dimension
-    val dimensionToExplode = scrubJaySchema.dimensions.find(_.name == dimensionName)
+    val dimensionToExplode = dsID.scrubJaySchema.getField(column).dimension
 
-    if (dimensionToExplode.isDefined)
-      dimensionToExplode.get.continuous && columnUnits.name == "range"
-    else
-      false
+    dimensionToExplode.continuous && columnUnits.name == "range"
   }
 
   override def realize: DataFrame = {

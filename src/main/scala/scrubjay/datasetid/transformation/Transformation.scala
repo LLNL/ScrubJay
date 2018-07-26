@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, Jso
 import scrubjay.datasetid.DatasetID
 
 @JsonIgnoreProperties(
-  value = Array("valid") // not sure why this gets populated
+  //value = Array("valid") // not sure why this gets populated
 )
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,

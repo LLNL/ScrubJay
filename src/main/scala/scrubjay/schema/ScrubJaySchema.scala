@@ -12,6 +12,7 @@ object ScrubJaySchema {
 
 case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
 
+  // Possible TODO: make getField return an Option
   def getField(fieldName: String): ScrubJayColumnSchema = map(fieldName)
 
   override def toString: String = {
