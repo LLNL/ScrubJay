@@ -11,17 +11,6 @@ case class ScrubJayColumnSchema(domain: Boolean,
     s"ScrubJayColumnSchema(domain=$domain, name=$name, dimension=$dimension, units=$units)"
   }
 
-  def compareElements(other: ScrubJayColumnSchema,
-                      compareDomain: Boolean = true,
-                      compareName: Boolean = false,
-                      compareDimension: Boolean = true,
-                      compareUnits: Boolean = true): Boolean = {
-    (!compareDomain      || domain    == other.domain)    &&
-      (!compareName      || name      == other.name)      &&
-      (!compareDimension || dimension == other.dimension) &&
-      (!compareUnits     || units     == other.units)
-  }
-
   def generateFieldName: String = {
     val domainType = if (domain) "domain" else "value"
     domainType + ":" + dimension.name + ":" + units.name
