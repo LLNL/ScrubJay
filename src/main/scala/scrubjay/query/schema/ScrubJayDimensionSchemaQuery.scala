@@ -12,12 +12,12 @@ case class ScrubJayDimensionSchemaQuery(name: Option[String] = None,
 
     // Expand all subdimensions recursively
     val recursiveCase: Seq[Seq[Set[ScrubJayDimensionSchemaQuery]]] =
-      subDimensionsSeq.map(_.expand.toSeq)
+      subDimensionsSeq.map(s => s.expand.toSeq)
 
     // Cross product of expansions of subunits (ways to do first * ways to do second * ...)
     val combinations: Iterator[Set[ScrubJayDimensionSchemaQuery]] =
       Combinatorics.cartesian(recursiveCase).map(c => c.reduce((a, b) => a union b))
 
-    combinations
+    Iterator(Set(this)) ++ combinations
   }
 }
