@@ -20,7 +20,7 @@ class ExplodeListSpec extends ScrubJaySpec {
 
   describe("Derive exploded node list") {
     it("should be defined") {
-      assert(jobQueueExplodeNodeList.isValid)
+      assert(jobQueueExplodeNodeList.valid)
     }
     it("should lookCorrect") {
       println("Before:")

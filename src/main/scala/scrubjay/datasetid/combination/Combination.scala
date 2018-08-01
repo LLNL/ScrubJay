@@ -1,7 +1,7 @@
 package scrubjay.datasetid.combination
 
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import scrubjay.datasetid.DatasetID
 
 @JsonIgnoreProperties(
@@ -19,5 +19,4 @@ import scrubjay.datasetid.DatasetID
 abstract class Combination(name: String) extends DatasetID(name) {
   val dsID1: DatasetID
   val dsID2: DatasetID
-  override def dependencies: Seq[DatasetID] = Seq(dsID1, dsID2)
 }

@@ -1,5 +1,7 @@
 package scrubjay.datasetid.combination
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 import scala.language.existentials
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
@@ -10,17 +12,18 @@ import scrubjay.schema.ScrubJaySchema
 case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: DatasetID, window: Double)
   extends Combination("InterpolationJoin") {
 
-  def joinedSchema: Option[ScrubJaySchema] = {
+  @JsonIgnore
+  val joinedSchema: Option[ScrubJaySchema] = {
     dsID1.scrubJaySchema.joinSchema(dsID2.scrubJaySchema)
   }
 
-  override def scrubJaySchema: ScrubJaySchema = {
+  override val scrubJaySchema: ScrubJaySchema = {
     joinedSchema
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
       .withGeneratedColumnNames
   }
 
-  override def isValid: Boolean = {
+  override val valid: Boolean = {
     joinedSchema.isDefined &&
     dsID1.scrubJaySchema.joinableFields(dsID2.scrubJaySchema)
       // Exactly one join field must be ordered

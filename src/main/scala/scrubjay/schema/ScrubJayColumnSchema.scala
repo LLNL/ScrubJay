@@ -1,5 +1,6 @@
 package scrubjay.schema
 
+import scrubjay.datasetid.transformation.Transformation
 import scrubjay.query.schema.ScrubJayColumnSchemaQuery
 
 case class ScrubJayColumnSchema(domain: Boolean,
@@ -25,6 +26,17 @@ case class ScrubJayColumnSchema(domain: Boolean,
     val dimensionMatches = query.dimension.isEmpty || dimension.matchesQuery(query.dimension.get)
     val unitsMatches = query.units.isEmpty || units.matchesQuery(query.units.get)
     domainMatches && dimensionMatches && unitsMatches
+  }
+
+  def derivationPathToQuery(query: ScrubJayColumnSchemaQuery): Iterator[Seq[Transformation]] = {
+
+    // if matchesQuery, add empty Seq as first result
+    val noDerivationMatches: Iterator[Seq[Transformation]] = if (matchesQuery(query)) Iterator(Seq.empty) else Iterator.empty
+
+    // get derivationPathToQuery for dimension
+
+
+    ???
   }
 }
 

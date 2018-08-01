@@ -21,7 +21,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override def scrubJaySchema: ScrubJaySchema = {
+  override val scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.fields.map{
         case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
@@ -43,7 +43,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     }
   }
 
-  override def isValid: Boolean = {
+  override val valid: Boolean = {
     validScrubJaySchema && validSparkSchema
   }
 

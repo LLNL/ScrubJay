@@ -20,7 +20,7 @@ class ExplodeRangeSpec extends ScrubJaySpec {
 
   describe("Derive exploded time range") {
     it("should be defined") {
-      assert(jobQueueExplodeTimeRange.isValid)
+      assert(jobQueueExplodeTimeRange.valid)
     }
     it("should look correct") {
       println("Before:")

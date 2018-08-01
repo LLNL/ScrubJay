@@ -23,7 +23,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
     columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override def scrubJaySchema: ScrubJaySchema = {
+  override val scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.fields.map{
         case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
@@ -32,7 +32,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
     )
   }
 
-  override def isValid: Boolean = {
+  override val valid: Boolean = {
     val columnUnits = dsID.scrubJaySchema.getField(column).units
     val dimensionToExplode = dsID.scrubJaySchema.getField(column).dimension
 

@@ -8,9 +8,6 @@ import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.ScrubJaySchema
 
-@JsonIgnoreProperties(
-  value = Array("valid") // not sure why this gets populated
-)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
@@ -33,7 +30,6 @@ abstract class OriginalDatasetID(name: String, originalScrubJaySchema: ScrubJayS
     ScrubJayDFLoader.load(originalDF, originalScrubJaySchema)
   }
 
-  override def dependencies: Seq[DatasetID] = Seq.empty
-  override def scrubJaySchema: ScrubJaySchema = originalScrubJaySchema.withGeneratedColumnNames
+  override val scrubJaySchema: ScrubJaySchema = originalScrubJaySchema.withGeneratedColumnNames
 }
 

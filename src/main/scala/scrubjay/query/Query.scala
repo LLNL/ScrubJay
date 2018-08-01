@@ -29,7 +29,7 @@ object Query {
 
     // Case 1: no new columns need to be derived, just need to integrate existing ones
 
-    // Case 2: new columns need to be derived, determine their dependencies and first integrate them, then derive
+    // Case 2: new columns need to be derived, determine their inputDatasetIDs and first integrate them, then derive
 
     // Determine what columns need to be integrated before deriving new ones
 

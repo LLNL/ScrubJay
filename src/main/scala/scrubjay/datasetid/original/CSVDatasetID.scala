@@ -11,7 +11,7 @@ case class CSVDatasetID(csvFileName: String,
                         options: Map[String, String] = Map.empty)
   extends OriginalDatasetID("CSV", originalScrubJaySchema) {
 
-  override def isValid: Boolean = {
+  override val valid: Boolean = {
     new java.io.File(csvFileName).exists()
   }
 

@@ -2,7 +2,6 @@ package scrubjay.datasetid.combination
 
 import org.apache.spark.sql.DataFrame
 import scrubjay.datasetid.DatasetID
-import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.ScrubJaySchema
 
 case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: DatasetID)
@@ -12,13 +11,13 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
     dsID1.scrubJaySchema.joinSchema(dsID2.scrubJaySchema)
   }
 
-  override def scrubJaySchema: ScrubJaySchema = {
+  override val scrubJaySchema: ScrubJaySchema = {
     joinedSchema
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
       .withGeneratedColumnNames
   }
 
-  override def isValid: Boolean = {
+  override val valid: Boolean = {
     joinedSchema.isDefined &&
       dsID1.scrubJaySchema.joinableFields(dsID2.scrubJaySchema)
         // All joinable columns must be unordered, else must use interpolation join

@@ -34,17 +34,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
   @JsonIgnore
   def getRateDimensionName = getYField.dimension + "_PER_" + getXField.dimension
 
-  override def isValid: Boolean = {
-    val xDimensionExists = scrubJaySchema.dimensions.exists(_.name == xDimension)
-    val yDimensionExists = scrubJaySchema.dimensions.exists(_.name == yDimension)
-
-    if (xDimensionExists && yDimensionExists)
-      xFieldOption.isDefined && yFieldOption.isDefined
-    else
-      false
-  }
-
-  override def scrubJaySchema: ScrubJaySchema = {
+  override val scrubJaySchema: ScrubJaySchema = {
 
     val xField: ScrubJayColumnSchema = getXField
     val yField: ScrubJayColumnSchema = getYField
@@ -55,6 +45,16 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName, ScrubJayDimensionSchema(getRateDimensionName), rateUnits)
 
     new ScrubJaySchema(dsID.scrubJaySchema.fields + rateField)
+  }
+
+  override val valid: Boolean = {
+    val xDimensionExists = scrubJaySchema.dimensions.exists(_.name == xDimension)
+    val yDimensionExists = scrubJaySchema.dimensions.exists(_.name == yDimension)
+
+    if (xDimensionExists && yDimensionExists)
+      xFieldOption.isDefined && yFieldOption.isDefined
+    else
+      false
   }
 
   override def realize: DataFrame = {

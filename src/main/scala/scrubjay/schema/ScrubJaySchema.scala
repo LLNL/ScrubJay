@@ -1,6 +1,8 @@
 package scrubjay.schema
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import scrubjay.datasetid.DatasetID
+import scrubjay.datasetid.transformation.Transformation
 import scrubjay.query.schema.ScrubJaySchemaQuery
 
 object ScrubJaySchema {
@@ -55,6 +57,16 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
     */
   def matchesQuery(query: ScrubJaySchemaQuery): Boolean = {
     query.columns.forall(targetField => fields.exists(_.matchesQuery(targetField)))
+  }
+
+  def derivationPathToQuery(query: ScrubJaySchemaQuery): Iterator[Seq[Transformation]] = {
+
+    // if matchesQuery, add empty Seq as first result
+    val noDerivationMatches: Iterator[Seq[Transformation]] = if (matchesQuery(query)) Iterator(Seq.empty) else Iterator.empty
+
+    // get derivationPathToQuery for each column
+
+    ???
   }
 
   /**

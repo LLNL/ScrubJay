@@ -11,7 +11,7 @@ case class CassandraDatasetID(keyspace: String,
                               sparkSchema: SparkSchema)
   extends OriginalDatasetID("CassandraTable", originalScrubJaySchema) {
 
-  override def isValid: Boolean = true
+  override val valid: Boolean = true
 
   override def originalDF: DataFrame = {
     spark.read

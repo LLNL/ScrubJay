@@ -16,6 +16,12 @@ import scrubjay.datasetid.transformation._
 import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 import scrubjay.util.{readFileToString, writeStringToFile}
 
+@JsonIgnoreProperties(
+  Array(
+    "valid",
+    "scrubJaySchema"
+  )
+)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
@@ -29,15 +35,14 @@ import scrubjay.util.{readFileToString, writeStringToFile}
 abstract class DatasetID(val name: String) extends Serializable {
 
   def asOption: Option[DatasetID] = {
-    if (isValid)
+    if (valid)
       Some(this)
     else
       None
   }
 
-  @JsonIgnore
-  def isValid: Boolean
-  def scrubJaySchema: ScrubJaySchema
+  val valid: Boolean
+  val scrubJaySchema: ScrubJaySchema
   def realize: DataFrame
 
   def debugPrint: Unit = {
@@ -51,8 +56,6 @@ abstract class DatasetID(val name: String) extends Serializable {
     println(Console.RESET + "DataFrame:")
     df.show(false)
   }
-
-  def dependencies: Seq[DatasetID]
 }
 
 object DatasetID {
@@ -151,7 +154,13 @@ object DatasetID {
         Seq()
     }
 
-    val (childNodes, childEdges) = dsID.dependencies
+    val datasetDependencies: Seq[DatasetID] = dsID match {
+      case o: OriginalDatasetID => Seq.empty
+      case t: Transformation => Seq(t.dsID)
+      case c: Combination => Seq(c.dsID1, c.dsID2)
+    }
+
+    val (childNodes, childEdges) = datasetDependencies
       .map(toNodeEdgeTuple(_, Some(node)))
       .fold((Seq.empty, Seq.empty))((a, b) => (a._1 ++ b._1, a._2 ++ b._2))
 

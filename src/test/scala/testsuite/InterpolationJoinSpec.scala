@@ -15,7 +15,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       lazy val interjoined = InterpolationJoin(nodeFlops, nodeTemp, 60)
 
       it("should be defined") {
-        assert(interjoined.isValid)
+        assert(interjoined.valid)
       }
       it("should look correct"){
         interjoined.debugPrint
@@ -29,7 +29,7 @@ class InterpolationJoinSpec extends ScrubJaySpec {
       lazy val interjoined = InterpolationJoin(nodeTemp, nodeFlops, 60)
 
       it("should be defined") {
-        assert(interjoined.isValid)
+        assert(interjoined.valid)
       }
       it("should look correct") {
         interjoined.debugPrint
