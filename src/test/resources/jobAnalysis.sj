@@ -46,7 +46,7 @@
         } ]
       },
       "originalScrubJaySchema": {
-        "fields": [
+        "columns": [
           {
             "name" : "jobid",
             "domain" : true,
@@ -139,7 +139,7 @@
         ]
       },
       "originalScrubJaySchema": {
-        "fields": [
+        "columns": [
           {
             "name" : "node",
             "domain" : true,
@@ -205,7 +205,7 @@
         ]
       },
       "originalScrubJaySchema": {
-        "fields": [
+        "columns": [
           {
             "name" : "node",
             "domain" : true,

@@ -30,7 +30,7 @@
     } ]
   },
   "originalScrubJaySchema": {
-    "fields": [
+    "columns": [
       {
         "name" : "node",
         "domain" : true,

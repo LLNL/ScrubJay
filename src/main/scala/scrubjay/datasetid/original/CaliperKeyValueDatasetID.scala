@@ -9,7 +9,7 @@ case class CaliperKeyValueDatasetID(ckvFileName: String,
                                     originalScrubJaySchema: ScrubJaySchema)
   extends OriginalDatasetID("Caliper", originalScrubJaySchema) {
 
-  override val valid: Boolean = true
+  override def validFn: Boolean = true
 
   override def originalDF: DataFrame = ???
 }

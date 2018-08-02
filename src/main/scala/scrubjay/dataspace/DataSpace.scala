@@ -12,7 +12,7 @@ case class DataSpace(datasets: Array[DatasetID]) {
   def writeToJsonFile(filename: String): Unit = DataSpace.writeToJsonFile(this, filename)
 
   @JsonIgnore
-  val dimensions: Set[ScrubJayDimensionSchema] = datasets.flatMap(_.scrubJaySchema.fields.map(_.dimension)).toSet
+  val dimensions: Set[ScrubJayDimensionSchema] = datasets.flatMap(_.scrubJaySchema.columns.map(_.dimension)).toSet
 
   @JsonIgnore
   private val dimensionMap: Map[String, ScrubJayDimensionSchema] = dimensions.map{

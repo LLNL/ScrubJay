@@ -12,23 +12,23 @@ object ScrubJaySchema {
   }
 }
 
-case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
+case class ScrubJaySchema(columns: Set[ScrubJayColumnSchema]) {
 
-  // Possible TODO: make getField return an Option
-  def getField(fieldName: String): ScrubJayColumnSchema = map(fieldName)
+  // Possible TODO: make getColumn return an Option
+  def getColumn(fieldName: String): ScrubJayColumnSchema = map(fieldName)
 
   override def toString: String = {
-    "ScrubJaySchema\n|--" + fields.mkString("\n|--")
+    "ScrubJaySchema\n|--" + columns.mkString("\n|--")
   }
 
-  def withGeneratedColumnNames: ScrubJaySchema = ScrubJaySchema(fields.map(_.withGeneratedColumnName))
+  def withGeneratedColumnNames: ScrubJaySchema = ScrubJaySchema(columns.map(_.withGeneratedColumnName))
 
-  def columnNames: Set[String] = fields.map(_.name)
-  def dimensions: Set[ScrubJayDimensionSchema] = fields.map(_.dimension)
-  def units: Set[ScrubJayUnitsSchema] = fields.map(_.units)
+  def columnNames: Set[String] = columns.map(_.name)
+  def dimensions: Set[ScrubJayDimensionSchema] = columns.map(_.dimension)
+  def units: Set[ScrubJayUnitsSchema] = columns.map(_.units)
 
-  def domainFields: Set[ScrubJayColumnSchema] = fields.filter(_.domain)
-  def valueFields: Set[ScrubJayColumnSchema] = fields.filterNot(_.domain)
+  def domainFields: Set[ScrubJayColumnSchema] = columns.filter(_.domain)
+  def valueFields: Set[ScrubJayColumnSchema] = columns.filterNot(_.domain)
 
   def domainDimensions: Set[ScrubJayDimensionSchema] = domainFields.map(_.dimension)
   def valueDimensions: Set[ScrubJayDimensionSchema] = valueFields.map(_.dimension)
@@ -56,7 +56,7 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
     * This schema satisfies a target schema if every field in the target has a match here
     */
   def matchesQuery(query: ScrubJaySchemaQuery): Boolean = {
-    query.columns.forall(targetField => fields.exists(_.matchesQuery(targetField)))
+    query.columns.forall(targetField => columns.exists(_.matchesQuery(targetField)))
   }
 
   def derivationPathToQuery(query: ScrubJaySchemaQuery): Iterator[Seq[Transformation]] = {
@@ -96,6 +96,6 @@ case class ScrubJaySchema(fields: Set[ScrubJayColumnSchema]) {
   }
 
   @JsonIgnore
-  val map: Map[String, ScrubJayColumnSchema] = fields.map(field => (field.name, field)).toMap
+  val map: Map[String, ScrubJayColumnSchema] = columns.map(field => (field.name, field)).toMap
 }
 

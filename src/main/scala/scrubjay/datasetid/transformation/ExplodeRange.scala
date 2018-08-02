@@ -1,5 +1,6 @@
 package scrubjay.datasetid.transformation
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
@@ -10,7 +11,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
-import scrubjay.dataspace.DimensionSpace
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJayUnitsQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, SparkSchema}
 
 case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
@@ -18,25 +19,27 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
 
   // Modify column units from range to the units of points within the range
   def newField: ScrubJayColumnSchema = {
-    val columnField = dsID.scrubJaySchema.getField(column)
+    val columnField = dsID.scrubJaySchema.getColumn(column)
     val newUnits = columnField.units.subUnits("rangeUnits")
     columnField.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override val scrubJaySchema: ScrubJaySchema = {
+  @JsonIgnore
+  lazy val explodeColumnQuery = ScrubJayColumnSchemaQuery(
+    name=Some(column),
+    dimension=Some(ScrubJayDimensionSchemaQuery(continuous=Some(true))),
+    units=Some(ScrubJayUnitsQuery(name=Some("range")))
+  )
+
+  lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
+
+  lazy override val scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
-      dsID.scrubJaySchema.fields.map{
-        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
+      dsID.scrubJaySchema.columns.map {
+        case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField
         case other => other
       }
     )
-  }
-
-  override val valid: Boolean = {
-    val columnUnits = dsID.scrubJaySchema.getField(column).units
-    val dimensionToExplode = dsID.scrubJaySchema.getField(column).dimension
-
-    dimensionToExplode.continuous && columnUnits.name == "range"
   }
 
   override def realize: DataFrame = {

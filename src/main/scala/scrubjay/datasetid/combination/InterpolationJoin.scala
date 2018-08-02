@@ -23,7 +23,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
       .withGeneratedColumnNames
   }
 
-  override val valid: Boolean = {
+  override def validFn: Boolean = {
     joinedSchema.isDefined &&
     dsID1.scrubJaySchema.joinableFields(dsID2.scrubJaySchema)
       // Exactly one join field must be ordered
@@ -124,7 +124,7 @@ case class InterpolationJoin(override val dsID1: DatasetID, override val dsID2: 
     val df2NewFieldInfo = df2.schema.fields.zipWithIndex.zip(df2IndexIsUnordered).flatMap{case ((c, i), false) => Some((c, i)); case _ => None}
     val df2NewOrderedIndex = df2NewFieldInfo.indexWhere(_._2 == orderedJoinFieldIndex2)
     val df2NewSparkFields = df2NewFieldInfo.map(_._1).patch(df2NewOrderedIndex, Nil, 1)
-    val df2NewSJFields = df2NewSparkFields.map(f => dsID2.scrubJaySchema.getField(f.name))
+    val df2NewSJFields = df2NewSparkFields.map(f => dsID2.scrubJaySchema.getColumn(f.name))
 
     // Determine interpolators for all values in df2
     val df2Interpolators = df2NewSJFields.zip(df2NewSparkFields)

@@ -2,7 +2,6 @@ package scrubjay.datasetid.original
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import scrubjay.datasetid._
-import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.{ScrubJaySchema, SparkSchema}
 
 case class CSVDatasetID(csvFileName: String,
@@ -11,7 +10,7 @@ case class CSVDatasetID(csvFileName: String,
                         options: Map[String, String] = Map.empty)
   extends OriginalDatasetID("CSV", originalScrubJaySchema) {
 
-  override val valid: Boolean = {
+  override def validFn: Boolean = {
     new java.io.File(csvFileName).exists()
   }
 

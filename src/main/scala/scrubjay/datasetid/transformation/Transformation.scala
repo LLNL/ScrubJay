@@ -3,7 +3,7 @@ package scrubjay.datasetid.transformation
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonSubTypes, JsonTypeInfo}
 import scrubjay.datasetid.DatasetID
-import scrubjay.query.schema.ScrubJayColumnSchemaQuery
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJaySchemaQuery}
 
 @JsonIgnoreProperties(
   Array(
@@ -22,6 +22,7 @@ import scrubjay.query.schema.ScrubJayColumnSchemaQuery
 ))
 abstract class Transformation(name: String) extends DatasetID(name) {
   val dsID: DatasetID
+  val columnDependencies: Set[ScrubJayColumnSchemaQuery]
 
-  //val columnDependencies: Set[ScrubJayColumnSchemaQuery]
+  override def validFn: Boolean = dsID.scrubJaySchema.matchesQuery(ScrubJaySchemaQuery(columnDependencies))
 }

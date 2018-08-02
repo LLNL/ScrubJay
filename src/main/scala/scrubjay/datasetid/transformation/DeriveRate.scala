@@ -6,6 +6,7 @@ import org.apache.spark.sql.types.scrubjayunits.ScrubJayConverter
 import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 import scrubjay.datasetid.DatasetID
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJaySchema, ScrubJayUnitsSchema}
 
 /**
@@ -15,11 +16,11 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
   extends Transformation("DeriveRate") {
 
   def xFieldOption = {
-    dsID.scrubJaySchema.fields.find(field => field.dimension.name == xDimension)
+    dsID.scrubJaySchema.columns.find(field => field.dimension.name == xDimension)
   }
 
   def yFieldOption = {
-    dsID.scrubJaySchema.fields.find(field => field.dimension.name == yDimension)
+    dsID.scrubJaySchema.columns.find(field => field.dimension.name == yDimension)
   }
 
   @JsonIgnore
@@ -34,7 +35,12 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
   @JsonIgnore
   def getRateDimensionName = getYField.dimension + "_PER_" + getXField.dimension
 
-  override val scrubJaySchema: ScrubJaySchema = {
+  lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(
+    ScrubJayColumnSchemaQuery(dimension=Some(ScrubJayDimensionSchemaQuery(name=Some(xDimension)))),
+    ScrubJayColumnSchemaQuery(dimension=Some(ScrubJayDimensionSchemaQuery(name=Some(yDimension))))
+  )
+
+  lazy override val scrubJaySchema: ScrubJaySchema = {
 
     val xField: ScrubJayColumnSchema = getXField
     val yField: ScrubJayColumnSchema = getYField
@@ -44,17 +50,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
     val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName, ScrubJayDimensionSchema(getRateDimensionName), rateUnits)
 
-    new ScrubJaySchema(dsID.scrubJaySchema.fields + rateField)
-  }
-
-  override val valid: Boolean = {
-    val xDimensionExists = scrubJaySchema.dimensions.exists(_.name == xDimension)
-    val yDimensionExists = scrubJaySchema.dimensions.exists(_.name == yDimension)
-
-    if (xDimensionExists && yDimensionExists)
-      xFieldOption.isDefined && yFieldOption.isDefined
-    else
-      false
+    new ScrubJaySchema(dsID.scrubJaySchema.columns + rateField)
   }
 
   override def realize: DataFrame = {

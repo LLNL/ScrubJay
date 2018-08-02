@@ -1,5 +1,6 @@
 package scrubjay.datasetid.transformation
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
@@ -8,7 +9,7 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
-import scrubjay.dataspace.DimensionSpace
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayUnitsQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema}
 
 case class ExplodeList(override val dsID: DatasetID, column: String)
@@ -16,23 +17,23 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
 
   // Modify column units from list to whatever was inside the list
   def newField: ScrubJayColumnSchema = {
-    val columnField = dsID.scrubJaySchema.getField(column)
-    val newUnits = columnField.units.subUnits("listUnits")
-    columnField.copy(units = newUnits).withGeneratedColumnName
+    val scrubJayColumn = dsID.scrubJaySchema.getColumn(column)
+    val newUnits = scrubJayColumn.units.subUnits("listUnits")
+    scrubJayColumn.copy(units = newUnits).withGeneratedColumnName
   }
 
-  override val scrubJaySchema: ScrubJaySchema = {
+  @JsonIgnore
+  lazy val explodeColumnQuery = ScrubJayColumnSchemaQuery(name=Some(column), units=Some(ScrubJayUnitsQuery(name=Some("list"))))
+
+  lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
+
+  lazy override val scrubJaySchema: ScrubJaySchema = {
     ScrubJaySchema(
-      dsID.scrubJaySchema.fields.map{
-        case ScrubJayColumnSchema(domain, `column`, dimension, units) => newField
+      dsID.scrubJaySchema.columns.map {
+        case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField
         case other => other
       }
     )
-  }
-
-  def validScrubJaySchema: Boolean = {
-    val columnUnits = dsID.scrubJaySchema.getField(column).units
-    columnUnits.name == "list"
   }
 
   def validSparkSchema: Boolean = {
@@ -43,8 +44,8 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     }
   }
 
-  override val valid: Boolean = {
-    validScrubJaySchema && validSparkSchema
+  lazy override val valid: Boolean = {
+    super.validFn && validSparkSchema
   }
 
   override def realize: DataFrame = {

@@ -9,7 +9,7 @@ case class ParquetDatasetID(parquetFileName: String,
                             sparkSchema: SparkSchema)
   extends  OriginalDatasetID("Parquet", originalScrubJaySchema) {
 
-  override val valid: Boolean = true
+  override def validFn: Boolean = true
 
   override def originalDF: DataFrame = {
     spark.read.schema(sparkSchema).parquet(parquetFileName)

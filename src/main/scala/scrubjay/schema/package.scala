@@ -14,7 +14,7 @@ package object schema {
   implicit class RichDataFrame(df: DataFrame) {
     def updateSparkSchemaNames(scrubJaySchema: ScrubJaySchema): DataFrame = {
       val newSchemaNames = df.schema.map(field => {
-        scrubJaySchema.getField(field.name).generateFieldName
+        scrubJaySchema.getColumn(field.name).generateFieldName
       })
       df.toDF(newSchemaNames:_*)
     }

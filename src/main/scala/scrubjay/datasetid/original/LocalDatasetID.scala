@@ -9,7 +9,7 @@ case class LocalDatasetID(dataframe: DataFrame,
                          sparkSchema: Option[SparkSchema] = None)
   extends OriginalDatasetID("LocalData", originalScrubJaySchema) {
 
-  override val valid: Boolean = true
+  override def validFn: Boolean = true
 
   override def originalDF: DataFrame = {
     if (sparkSchema.isDefined) {

@@ -17,7 +17,7 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
       .withGeneratedColumnNames
   }
 
-  override val valid: Boolean = {
+  override def validFn: Boolean = {
     joinedSchema.isDefined &&
       dsID1.scrubJaySchema.joinableFields(dsID2.scrubJaySchema)
         // All joinable columns must be unordered, else must use interpolation join

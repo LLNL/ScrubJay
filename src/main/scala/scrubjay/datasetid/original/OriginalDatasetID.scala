@@ -8,6 +8,12 @@ import scrubjay.datasetid._
 import scrubjay.dataspace.DimensionSpace
 import scrubjay.schema.ScrubJaySchema
 
+@JsonIgnoreProperties(
+  Array(
+    "scrubJaySchema",
+    "spark"
+  )
+)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
@@ -21,7 +27,6 @@ import scrubjay.schema.ScrubJaySchema
 ))
 abstract class OriginalDatasetID(name: String, originalScrubJaySchema: ScrubJaySchema) extends DatasetID(name) {
 
-  @JsonIgnore
   lazy val spark: SparkSession = SparkSession.builder().getOrCreate()
 
   def originalDF: DataFrame
