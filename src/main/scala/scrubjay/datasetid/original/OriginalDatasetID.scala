@@ -35,6 +35,6 @@ abstract class OriginalDatasetID(name: String, originalScrubJaySchema: ScrubJayS
     ScrubJayDFLoader.load(originalDF, originalScrubJaySchema)
   }
 
-  override val scrubJaySchema: ScrubJaySchema = originalScrubJaySchema.withGeneratedColumnNames
+  override def scrubJaySchemaFn: ScrubJaySchema = originalScrubJaySchema.withGeneratedColumnNames
 }
 

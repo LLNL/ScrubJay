@@ -40,7 +40,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     ScrubJayColumnSchemaQuery(dimension=Some(ScrubJayDimensionSchemaQuery(name=Some(yDimension))))
   )
 
-  lazy override val scrubJaySchema: ScrubJaySchema = {
+  override def scrubJaySchemaFn: ScrubJaySchema = {
 
     val xField: ScrubJayColumnSchema = getXField
     val yField: ScrubJayColumnSchema = getYField

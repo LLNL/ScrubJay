@@ -11,7 +11,7 @@ case class NaturalJoin(override val dsID1: DatasetID, override val dsID2: Datase
     dsID1.scrubJaySchema.joinSchema(dsID2.scrubJaySchema)
   }
 
-  override val scrubJaySchema: ScrubJaySchema = {
+  override def scrubJaySchemaFn: ScrubJaySchema = {
     joinedSchema
       .getOrElse(throw new RuntimeException("Invalid schema requested!"))
       .withGeneratedColumnNames

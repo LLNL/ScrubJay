@@ -33,7 +33,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
 
   lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
 
-  lazy override val scrubJaySchema: ScrubJaySchema = {
+  override def scrubJaySchemaFn: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.columns.map {
         case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField

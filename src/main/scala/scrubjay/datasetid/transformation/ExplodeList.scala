@@ -27,7 +27,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
 
   lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
 
-  lazy override val scrubJaySchema: ScrubJaySchema = {
+  override def scrubJaySchemaFn: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.columns.map {
         case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField
@@ -44,7 +44,7 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
     }
   }
 
-  lazy override val valid: Boolean = {
+  override def validFn: Boolean = {
     super.validFn && validSparkSchema
   }
 

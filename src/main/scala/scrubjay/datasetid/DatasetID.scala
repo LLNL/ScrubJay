@@ -44,7 +44,9 @@ abstract class DatasetID(val name: String) extends Serializable {
   protected def validFn: Boolean
   lazy val valid: Boolean = validFn
 
-  val scrubJaySchema: ScrubJaySchema
+  protected def scrubJaySchemaFn: ScrubJaySchema
+  lazy val scrubJaySchema: ScrubJaySchema = scrubJaySchemaFn
+
   def realize: DataFrame
 
   def debugPrint: Unit = {
