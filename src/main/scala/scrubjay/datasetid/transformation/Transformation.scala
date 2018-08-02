@@ -7,6 +7,8 @@ import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJaySchemaQuery}
 
 @JsonIgnoreProperties(
   Array(
+    "valid",
+    "scrubJaySchema",
     "columnDependencies"
   )
 )
