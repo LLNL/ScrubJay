@@ -8,32 +8,25 @@ import scrubjay.schema.ScrubJayDimensionSchema
 
 class DeriveRateSpec extends ScrubJaySpec {
 
-  lazy val dimensionSpace: DimensionSpace =
-    DimensionSpace(Array(
-      ScrubJayDimensionSchema("node", ordered = false, continuous = false),
-      ScrubJayDimensionSchema("flops", ordered = true, continuous = true),
-      ScrubJayDimensionSchema("time", ordered = true, continuous = true))
-    )
-
   lazy val nodeFlops: DatasetID = DatasetID.fromJsonFile(nodeFlopsDatasetIDFilename)
 
-  lazy val jobQueueExplodeNodeList: DatasetID = DeriveRate(nodeFlops, "flops", "time", 2)
+  lazy val deriveFlops: DatasetID = DeriveRate(nodeFlops, "flops", "time", 2)
 
-  describe("Derive exploded node list") {
+  describe("Derive rate") {
     it("should be defined") {
-      assert(jobQueueExplodeNodeList.valid)
+      assert(deriveFlops.valid)
     }
     it("should lookCorrect") {
       println("Before:")
       nodeFlops.debugPrint
       println("After:")
-      jobQueueExplodeNodeList.debugPrint
+      deriveFlops.debugPrint
     }
     it("should serialize/deserialize correctly") {
-      val json: String = DatasetID.toJsonString(jobQueueExplodeNodeList)
+      val json: String = DatasetID.toJsonString(deriveFlops)
       println("JSON:")
       println(json)
-      assert(DatasetID.fromJsonString(json) == jobQueueExplodeNodeList)
+      assert(DatasetID.fromJsonString(json) == deriveFlops)
     }
   }
 }
