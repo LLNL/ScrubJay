@@ -15,7 +15,7 @@ case class ScrubJayDimensionSchemaQuery(name: Option[String] = None,
       if (name.isDefined && subDimensions.isDefined && subDimensions.get.nonEmpty) {
         val subDimensionsSeq = subDimensions.getOrElse(Seq[ScrubJayDimensionSchemaQuery]())
 
-        val singleDerivation: DatasetID => DatasetID = name.get match {
+        val singleTransformation: DatasetID => DatasetID = name.get match {
           case "rate" =>
             (dsID: DatasetID) =>
               DeriveRate(dsID, subDimensionsSeq(0).name.get, subDimensionsSeq(1).name.get, 10)
@@ -29,7 +29,7 @@ case class ScrubJayDimensionSchemaQuery(name: Option[String] = None,
         val combinations: Iterator[DatasetID => DatasetID] =
           Combinatorics.cartesian(recursiveCase).map(c =>
             c.reduce((a: DatasetID => DatasetID, b: DatasetID => DatasetID) =>
-              (dsID: DatasetID) => singleDerivation.apply(a.apply(b.apply(dsID)))))
+              (dsID: DatasetID) => singleTransformation.apply(a.apply(b.apply(dsID)))))
 
         combinations
       } else {

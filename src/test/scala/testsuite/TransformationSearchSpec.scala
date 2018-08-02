@@ -101,14 +101,14 @@ class TransformationSearchSpec extends ScrubJaySpec {
         ScrubJayDimensionSchemaQuery(
           name=Some("rate"),
           subDimensions=Some(Seq(
-            ScrubJayDimensionSchemaQuery(name=Some("x")),
-            ScrubJayDimensionSchemaQuery(name=Some("y"))
+            ScrubJayDimensionSchemaQuery(name=Some("y")),
+            ScrubJayDimensionSchemaQuery(name=Some("x"))
           ))),
         ScrubJayDimensionSchemaQuery(
           name=Some("rate"),
           subDimensions=Some(Seq(
-            ScrubJayDimensionSchemaQuery(name=Some("z")),
-            ScrubJayDimensionSchemaQuery(name=Some("w"))
+            ScrubJayDimensionSchemaQuery(name=Some("w")),
+            ScrubJayDimensionSchemaQuery(name=Some("z"))
           )))
       )))
 
@@ -137,16 +137,14 @@ class TransformationSearchSpec extends ScrubJaySpec {
     }
 
     it("should include double DeriveRate transformation one way") {
-      val transformation = transformations(2).apply(nodeFlops)
-
-      println(DatasetID.toJsonString(transformation))
-
       val correctTransformation = transformations(2).apply(nodeFlops) match {
         case r1: DeriveRate => r1.dsID match {
-          case r2: DeriveRate => r2.dsID match {
-            case _: CSVDatasetID => true
-            case _ => false
-          }
+          case r2: DeriveRate
+            if r2.xDimension == "z" && r2.yDimension == "w" =>
+            r2.dsID match {
+              case _: CSVDatasetID => true
+              case _ => false
+            }
         }
         case _ => false
       }
@@ -154,16 +152,14 @@ class TransformationSearchSpec extends ScrubJaySpec {
     }
 
     it("should include double DeriveRate transformation another way") {
-      val transformation = transformations(3).apply(nodeFlops)
-
-      println(DatasetID.toJsonString(transformation))
-
       val correctTransformation = transformations(3).apply(nodeFlops) match {
         case r1: DeriveRate => r1.dsID match {
-          case r2: DeriveRate => r2.dsID match {
-            case _: CSVDatasetID => true
-            case _ => false
-          }
+          case r2: DeriveRate
+            if r2.xDimension == "x" && r2.yDimension == "y"  =>
+            r2.dsID match {
+              case _: CSVDatasetID => true
+              case _ => false
+            }
         }
         case _ => false
       }
@@ -171,18 +167,18 @@ class TransformationSearchSpec extends ScrubJaySpec {
     }
 
     it("should include double double DeriveRate transformation (animal style)") {
-      val transformation = transformations(4).apply(nodeFlops)
-
-      println(DatasetID.toJsonString(transformation))
-
       val correctTransformation = transformations(4).apply(nodeFlops) match {
         case r1: DeriveRate => r1.dsID match {
-          case r2: DeriveRate => r2.dsID match {
-            case r3: DeriveRate => r3.dsID match {
-              case _: CSVDatasetID => true
-              case _ => false
+          case r2: DeriveRate
+            if r2.xDimension == "x" && r2.yDimension == "y"  =>
+            r2.dsID match {
+              case r3: DeriveRate
+                if r3.xDimension == "z" && r3.yDimension == "w" =>
+                r3.dsID match {
+                  case _: CSVDatasetID => true
+                  case _ => false
+                }
             }
-          }
         }
         case _ => false
       }
