@@ -17,7 +17,7 @@ class TransformationSearchSpec extends ScrubJaySpec {
         ScrubJayDimensionSchemaQuery(name=Some("flops")),
         ScrubJayDimensionSchemaQuery(name=Some("time")))))
 
-    val transformations = rateQuery.transformations.toSeq
+    val transformations = rateQuery.transformationPaths.toSeq
 
     it("should have 2 solutions") {
       assert(transformations.length == 2)
@@ -55,7 +55,7 @@ class TransformationSearchSpec extends ScrubJaySpec {
           ))),
         ScrubJayDimensionSchemaQuery(name=Some("z")))))
 
-    val transformations = rateQuery.transformations.toSeq
+    val transformations = rateQuery.transformationPaths.toSeq
 
     it("should have 3 solutions") {
       assert(transformations.length == 3)
@@ -112,7 +112,7 @@ class TransformationSearchSpec extends ScrubJaySpec {
           )))
       )))
 
-    val transformations = rateQuery.transformations.toSeq
+    val transformations = rateQuery.transformationPaths.toSeq
 
     it("should have 5 solutions") {
       assert(transformations.length == 5)

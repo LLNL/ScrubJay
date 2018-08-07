@@ -53,23 +53,6 @@ case class ScrubJaySchema(columns: Set[ScrubJayColumnSchema]) {
   }
 
   /**
-    * This schema satisfies a target schema if every field in the target has a match here
-    */
-  def matchesQuery(query: ScrubJaySchemaQuery): Boolean = {
-    query.columns.forall(targetField => columns.exists(_.matchesQuery(targetField)))
-  }
-
-  def derivationPathToQuery(query: ScrubJaySchemaQuery): Iterator[Seq[Transformation]] = {
-
-    // if matchesQuery, add empty Seq as first result
-    val noDerivationMatches: Iterator[Seq[Transformation]] = if (matchesQuery(query)) Iterator(Seq.empty) else Iterator.empty
-
-    // get derivationPathToQuery for each column
-
-    ???
-  }
-
-  /**
     * Joinable columns are domain columns with dimension and units in common
     */
   def joinableFields(other: ScrubJaySchema, testUnits: Boolean = true): Set[(ScrubJayColumnSchema, ScrubJayColumnSchema)] = {

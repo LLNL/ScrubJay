@@ -9,7 +9,7 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Column, DataFrame}
 import scrubjay.datasetid._
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayUnitsSchemaQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema}
 
 case class ExplodeList(override val dsID: DatasetID, column: String)
@@ -23,14 +23,14 @@ case class ExplodeList(override val dsID: DatasetID, column: String)
   }
 
   @JsonIgnore
-  lazy val explodeColumnQuery = ScrubJayColumnSchemaQuery(name=Some(column), units=Some(ScrubJayUnitsQuery(name=Some("list"))))
+  lazy val explodeColumnQuery = ScrubJayColumnSchemaQuery(name=Some(column), units=Some(ScrubJayUnitsSchemaQuery(name=Some("list"))))
 
   lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
 
   override def scrubJaySchemaFn: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.columns.map {
-        case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField
+        case explodeColumn if explodeColumnQuery.matches(explodeColumn) => newField
         case other => other
       }
     )

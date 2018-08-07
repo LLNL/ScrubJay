@@ -2,7 +2,7 @@ package testsuite
 
 import scrubjay.query._
 import scrubjay.dataspace.DataSpace
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsSchemaQuery}
 
 
 class QuerySpec extends ScrubJaySpec {
@@ -58,7 +58,7 @@ class QuerySpec extends ScrubJaySpec {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
       ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
-      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("node"))), units = Some(ScrubJayUnitsQuery(Some("identifier"))))
+      ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("node"))), units = Some(ScrubJayUnitsSchemaQuery(Some("identifier"))))
     ))
 
     val query = Query(dataSpace, queryTarget)

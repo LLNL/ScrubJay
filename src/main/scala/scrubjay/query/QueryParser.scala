@@ -1,6 +1,6 @@
 package scrubjay.query
 
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsSchemaQuery}
 
 import scala.util.parsing.combinator._
 import scala.util.matching.Regex
@@ -12,8 +12,8 @@ TODO Find out which characters are allowed
  */
 
 
-case class Members(dim: Option[ScrubJayDimensionSchemaQuery], units: Option[ScrubJayUnitsQuery])
-case class UnitsArg(name: String, subUnitsName: Option[String] = None, subunitsMap: Option[Map[String, ScrubJayUnitsQuery]] = None)
+case class Members(dim: Option[ScrubJayDimensionSchemaQuery], units: Option[ScrubJayUnitsSchemaQuery])
+case class UnitsArg(name: String, subUnitsName: Option[String] = None, subunitsMap: Option[Map[String, ScrubJayUnitsSchemaQuery]] = None)
 case class DimensionArg(name: Option[String] = None, subDimensions: Option[Seq[ScrubJayDimensionSchemaQuery]] = None)
 
 object QueryParser extends RegexParsers {
@@ -149,10 +149,10 @@ object QueryParser extends RegexParsers {
   def dimensionMember: Parser[DimensionArg] = (dimensionNameArg | dimensionSubDimensionListArg)
 
   //Example: UNITS(name(list), elemType(MULTIPOINT), subunits(key:UNITS(...))
-  def unitsMember: Parser[ScrubJayUnitsQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
+  def unitsMember: Parser[ScrubJayUnitsSchemaQuery] = (units ~ openParen ~ unitsItems ~ closeParen) ^^ {
     case units ~ openParen ~ unitsItems ~ closeParen =>
       verifyUnits(unitsItems)
-      ScrubJayUnitsQuery(
+      ScrubJayUnitsSchemaQuery(
         findUnitsArgString(unitsItems, "name"),
         findUnitsArgString(unitsItems, "elementType"),
         findUnitsArgString(unitsItems, "aggregator"),
@@ -178,7 +178,7 @@ object QueryParser extends RegexParsers {
     None
   }
 
-  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsQuery]] = {
+  def findUnitsArgMap(unitsItems: Seq[UnitsArg], target:String): Option[Map[String, ScrubJayUnitsSchemaQuery]] = {
     for (arg <- unitsItems) {
       if (arg.name.equals(target)) {
         return arg.subunitsMap

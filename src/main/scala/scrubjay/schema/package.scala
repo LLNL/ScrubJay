@@ -7,10 +7,6 @@ package object schema {
 
   val UNKNOWN_STRING = "UNKNOWN_STRING"
 
-  def wildMatch[T](s1: T, s2: Option[T]): Boolean = {
-    s2.isEmpty || s1 == s2.get
-  }
-
   implicit class RichDataFrame(df: DataFrame) {
     def updateSparkSchemaNames(scrubJaySchema: ScrubJaySchema): DataFrame = {
       val newSchemaNames = df.schema.map(field => {

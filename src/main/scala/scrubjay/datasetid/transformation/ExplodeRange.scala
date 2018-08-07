@@ -11,7 +11,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame}
 import org.apache.spark.unsafe.types.UTF8String
 import scrubjay.datasetid._
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJayUnitsSchemaQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, SparkSchema}
 
 case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
@@ -28,7 +28,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
   lazy val explodeColumnQuery = ScrubJayColumnSchemaQuery(
     name=Some(column),
     dimension=Some(ScrubJayDimensionSchemaQuery(continuous=Some(true))),
-    units=Some(ScrubJayUnitsQuery(name=Some("range")))
+    units=Some(ScrubJayUnitsSchemaQuery(name=Some("range")))
   )
 
   lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(explodeColumnQuery)
@@ -36,7 +36,7 @@ case class ExplodeRange(override val dsID: DatasetID, column: String, interval: 
   override def scrubJaySchemaFn: ScrubJaySchema = {
     ScrubJaySchema(
       dsID.scrubJaySchema.columns.map {
-        case explodeColumn if explodeColumn.matchesQuery(explodeColumnQuery) => newField
+        case explodeColumn if explodeColumnQuery.matches(explodeColumn) => newField
         case other => other
       }
     )

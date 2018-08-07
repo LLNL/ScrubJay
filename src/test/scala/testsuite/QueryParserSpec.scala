@@ -1,7 +1,7 @@
 package testsuite
 
 import scrubjay.query._
-import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsQuery}
+import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJaySchemaQuery, ScrubJayUnitsSchemaQuery}
 class QueryParserSpec extends ScrubJaySpec {
     describe("Testing second version of the Parser.") {
       //Default unit use unknown or any?
@@ -32,7 +32,7 @@ class QueryParserSpec extends ScrubJaySpec {
       it("Test D3: Query with non-default units. Should pass") {
         val actual = ScrubJaySchemaQuery(Set(
           ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
-          ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("time"))), units = Some(ScrubJayUnitsQuery(Some("seconds"), Some("POINT"))))
+          ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("time"))), units = Some(ScrubJayUnitsSchemaQuery(Some("seconds"), Some("POINT"))))
         ))
 
         verifyParse("SELECT DOMAIN(DIM(NAME(job))), VALUE(DIM(NAME(time)), UNITS(name(seconds), elementType(POINT)))", actual)
@@ -43,8 +43,8 @@ class QueryParserSpec extends ScrubJaySpec {
         val actual = ScrubJaySchemaQuery(Set(
           ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
           ScrubJayColumnSchemaQuery(domain = Some(false), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("time"))),
-            units = Some(ScrubJayUnitsQuery(Some("seconds"), Some("POINT"),
-              subUnits = Some(Map("test" -> ScrubJayUnitsQuery(Some("testName"), Some("testElem"))))))
+            units = Some(ScrubJayUnitsSchemaQuery(Some("seconds"), Some("POINT"),
+              subUnits = Some(Map("test" -> ScrubJayUnitsSchemaQuery(Some("testName"), Some("testElem"))))))
         )))
 
         verifyParse("SELECT DOMAIN(DIM(NAME(job))), VALUE(DIM(NAME(time)), UNITS(name(seconds), elementType(POINT), subUnits(test:UNITS(name(testName), elementType(testElem)))))", actual)
