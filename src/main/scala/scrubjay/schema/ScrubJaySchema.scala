@@ -2,8 +2,7 @@ package scrubjay.schema
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import scrubjay.datasetid.DatasetID
-import scrubjay.datasetid.transformation.Transformation
-import scrubjay.query.schema.ScrubJaySchemaQuery
+import scrubjay.query.constraintsolver.Combinatorics
 
 object ScrubJaySchema {
   def unknown(sparkSchema: SparkSchema): ScrubJaySchema = {
@@ -76,6 +75,17 @@ case class ScrubJaySchema(columns: Set[ScrubJayColumnSchema]) {
           ++ other.valueFields))
     else
       None
+  }
+
+  def transformationPaths: Iterator[DatasetID => DatasetID] = {
+    val pathsPerColumn = columns.map(column =>
+      column.transformationPaths.toSeq).toSeq
+
+    val combinations = Combinatorics.cartesian(pathsPerColumn).map(c =>
+      c.reduce((a: DatasetID => DatasetID, b: DatasetID => DatasetID) =>
+        (dsID: DatasetID) => a.apply(b.apply(dsID))))
+
+    combinations
   }
 
   @JsonIgnore

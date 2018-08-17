@@ -14,7 +14,7 @@ import scrubjay.datasetid._
 import scrubjay.query.schema.{ScrubJayColumnSchemaQuery, ScrubJayDimensionSchemaQuery, ScrubJayUnitsSchemaQuery}
 import scrubjay.schema.{ScrubJayColumnSchema, ScrubJaySchema, SparkSchema}
 
-case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double)
+case class ExplodeRange(override val dsID: DatasetID, column: String, interval: Double = 30)
   extends Transformation("ExplodeRange") {
 
   // Modify column units from range to the units of points within the range

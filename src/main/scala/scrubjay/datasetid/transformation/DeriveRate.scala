@@ -12,7 +12,7 @@ import scrubjay.schema.{ScrubJayColumnSchema, ScrubJayDimensionSchema, ScrubJayS
 /**
  * Derive finite difference dY/dX for dimensions X and Y using a window of N rows
  */
-case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimension: String, window: Int )
+case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimension: String, window: Int = 10 )
   extends Transformation("DeriveRate") {
 
   def xFieldOption = {
@@ -28,13 +28,6 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
   @JsonIgnore
   def getYField: ScrubJayColumnSchema = yFieldOption.get
 
-  @JsonIgnore
-  def getRateFieldName = "value:" + getRateDimensionName + ":rate"
-  @JsonIgnore
-  def getRateUnitsName = getYField.units.name + "_PER_" + getXField.units.name
-  @JsonIgnore
-  def getRateDimensionName = getYField.dimension + "_PER_" + getXField.dimension
-
   lazy override val columnDependencies: Set[ScrubJayColumnSchemaQuery] = Set(
     ScrubJayColumnSchemaQuery(dimension=Some(ScrubJayDimensionSchemaQuery(name=Some(xDimension)))),
     ScrubJayColumnSchemaQuery(dimension=Some(ScrubJayDimensionSchemaQuery(name=Some(yDimension))))
@@ -45,10 +38,19 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
     val xField: ScrubJayColumnSchema = getXField
     val yField: ScrubJayColumnSchema = getYField
 
+    // TODO: an original dataset with subunits will attempt decomposition... need to prevent
     val rateSubUnits = Map("numerator" -> yField.units, "denominator" -> xField.units)
-    val rateUnits = ScrubJayUnitsSchema(getRateUnitsName, "POINT", "average", "linear", rateSubUnits)
+    val rateUnits = ScrubJayUnitsSchema("rate", "POINT", "average", "linear", rateSubUnits)
 
-    val rateField = ScrubJayColumnSchema(domain = false, name = getRateFieldName, ScrubJayDimensionSchema(getRateDimensionName), rateUnits)
+    val rateField = ScrubJayColumnSchema(
+      domain=false,
+      name="rate",
+      ScrubJayDimensionSchema(
+        name="rate",
+        subDimensions = Seq(
+          yField.dimension,
+          xField.dimension)),
+      units=rateUnits)
 
     new ScrubJaySchema(dsID.scrubJaySchema.columns + rateField)
   }
@@ -99,7 +101,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
       Row.fromSeq(row.toSeq :+ rate)
     })
 
-    val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField(getRateFieldName, DoubleType))
+    val newSparkSchema = StructType(dfSortedWithLags.schema.fields :+ StructField("rate", DoubleType))
 
     spark.createDataFrame(rddWithRate, newSparkSchema)
       .drop(xLagColumn, yLagColumn)

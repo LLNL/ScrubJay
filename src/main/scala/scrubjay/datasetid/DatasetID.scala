@@ -80,6 +80,16 @@ object DatasetID {
     "h" + toJsonString(dsID).sha256.hex
   }
 
+  def derivationPathJson(dsID: DatasetID): Map[String, Any] = {
+    Map(dsID.name -> {
+      dsID match {
+        case c: Combination => derivationPathJson(c.dsID1) ++ derivationPathJson(c.dsID2)
+        case t: Transformation => derivationPathJson(t.dsID)
+        case o: CSVDatasetID => o.csvFileName
+      }
+    })
+  }
+
   def toDotGraphString(dsID: DatasetID): String = {
 
     val (nodes, edges) = toNodeEdgeTuple(dsID)

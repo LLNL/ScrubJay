@@ -53,7 +53,8 @@
             "dimension" : {
               "name": "job",
               "ordered": false,
-              "continuous": false
+              "continuous": false,
+              "subDimensions": []
             },
             "units" : {
               "name" : "identifier",
@@ -65,7 +66,8 @@
             "dimension" : {
               "name": "node",
               "ordered": false,
-              "continuous": false
+              "continuous": false,
+              "subDimensions": []
             },
             "domain" : true,
             "units" : {
@@ -84,7 +86,8 @@
             "dimension" : {
               "name": "time",
               "ordered": true,
-              "continuous": true
+              "continuous": true,
+              "subDimensions": []
             },
             "domain" : false,
             "units" : {
@@ -97,7 +100,8 @@
             "dimension" : {
               "name": "time",
               "ordered": true,
-              "continuous": true
+              "continuous": true,
+              "subDimensions": []
             },
             "domain" : true,
             "units" : {
@@ -146,7 +150,8 @@
             "dimension" : {
               "name": "node",
               "ordered": false,
-              "continuous": false
+              "continuous": false,
+              "subDimensions": []
             },
             "units" : {
               "name" : "identifier",
@@ -159,7 +164,8 @@
             "dimension" : {
               "name": "rack",
               "ordered": false,
-              "continuous": false
+              "continuous": false,
+              "subDimensions": []
             },
             "units" : {
               "name" : "identifier",
@@ -212,7 +218,8 @@
             "dimension" : {
               "name": "node",
               "ordered": false,
-              "continuous": false
+              "continuous": false,
+              "subDimensions": []
             },
             "units" : {
               "name" : "identifier",
@@ -225,7 +232,8 @@
             "dimension" : {
               "name": "time",
               "ordered": true,
-              "continuous": true
+              "continuous": true,
+              "subDimensions": []
             },
             "units" : {
               "name" : "datetimestamp",
@@ -238,7 +246,8 @@
             "dimension" : {
               "name": "flops",
               "ordered": true,
-              "continuous": true
+              "continuous": true,
+              "subDimensions": []
             },
             "units" : {
               "name" : "count",

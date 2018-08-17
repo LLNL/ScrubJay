@@ -54,7 +54,7 @@ class QuerySpec extends ScrubJaySpec {
   }
 
 
-  describe("Query with single derived datasource solution") {
+  describe("Query with single decomposed datasource solution") {
 
     val queryTarget = ScrubJaySchemaQuery(Set(
       ScrubJayColumnSchemaQuery(domain = Some(true), dimension = Some(ScrubJayDimensionSchemaQuery(name = Some("job")))),
@@ -76,6 +76,40 @@ class QuerySpec extends ScrubJaySpec {
         solution._1.debugPrint
       })
       assert(solutions.nonEmpty)
+    }
+  }
+
+  describe("Query with single derived datasource solution") {
+
+    val queryTarget = ScrubJaySchemaQuery(Set(
+      ScrubJayColumnSchemaQuery(
+        domain = Some(false),
+        dimension = Some(ScrubJayDimensionSchemaQuery(
+          name = Some("rate"),
+          subDimensions = Some(
+            Seq(
+              ScrubJayDimensionSchemaQuery(name=Some("flops")),
+              ScrubJayDimensionSchemaQuery(name=Some("time"))
+            )))
+        ))
+    ))
+
+    val query = Query(dataSpace, queryTarget)
+
+
+    it("should find the correct solution") {
+
+      println("Query:")
+      println(queryTarget)
+
+      val solutions = query.solutions.toList
+
+      solutions.zipWithIndex.foreach(solution => {
+        println("Solution: " + solution._2)
+        solution._1.debugPrint
+      })
+      assert(solutions.length > 0)
+      assert(solutions.forall(solution => queryTarget.matches(solution.scrubJaySchema)))
     }
   }
 
@@ -131,16 +165,13 @@ class QuerySpec extends ScrubJaySpec {
   }
 
   describe("Enumerate all possible derivations") {
-    /*
-    lazy val solutions = Query(dataSources, Set.empty)
-      .allDerivations
+    lazy val solutions = Query.allDerivations(dataSpace)
 
     it("should do things") {
       solutions.foreach(solution => {
-        println(DatasetID.toDotString(solution))
+        solution.debugPrint
       })
       assert(true)
     }
-    */
   }
 }

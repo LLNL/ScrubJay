@@ -1,5 +1,7 @@
 package scrubjay.schema
 
+import scrubjay.datasetid.DatasetID
+
 case class ScrubJayColumnSchema(domain: Boolean,
                                 name: String = UNKNOWN_STRING,
                                 dimension: ScrubJayDimensionSchema = ScrubJayDimensionSchema(),
@@ -16,6 +18,10 @@ case class ScrubJayColumnSchema(domain: Boolean,
 
   def withGeneratedColumnName: ScrubJayColumnSchema = {
     copy(name = generateFieldName)
+  }
+
+  def transformationPaths: Iterator[DatasetID => DatasetID] = {
+    units.transformationPaths(name)
   }
 }
 

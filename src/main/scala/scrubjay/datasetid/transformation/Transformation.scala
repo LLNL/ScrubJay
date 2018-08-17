@@ -26,5 +26,6 @@ abstract class Transformation(name: String) extends DatasetID(name) {
   val dsID: DatasetID
   val columnDependencies: Set[ScrubJayColumnSchemaQuery]
 
-  override def validFn: Boolean = ScrubJaySchemaQuery(columnDependencies).matches(dsID.scrubJaySchema)
+  override def validFn: Boolean = dsID.valid &&
+    ScrubJaySchemaQuery(columnDependencies).matches(dsID.scrubJaySchema)
 }
