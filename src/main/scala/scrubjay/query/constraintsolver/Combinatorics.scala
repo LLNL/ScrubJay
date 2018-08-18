@@ -1,5 +1,8 @@
 package scrubjay.query.constraintsolver
 
+import scrubjay.datasetid.DatasetID
+import scrubjay.datasetid.original.CSVDatasetID
+
 import scala.reflect.ClassTag
 
 object Combinatorics {
@@ -7,7 +10,7 @@ object Combinatorics {
   // Cartesian of N Sequences
   def cartesianUntyped(ss: Seq[Seq[Any]]): Iterator[Seq[Any]] = ss match {
     case Seq() => Iterator()
-    case Seq(a) => Iterator(a)
+    case Seq(a) => a.map(i => Seq(i)).iterator
     case Seq(a, b) => {
       for (aa <- a.toIterator; bb <- b.toIterator) yield {
         Seq(aa, bb)
@@ -41,14 +44,12 @@ object Combinatorics {
           subcomponents.map(s =>
             decompositions(s, decomposableTest, decompose, applySingleComposition).toSeq)
 
-        val combinations: Iterator[D => D] = {
-          // Cross product of expansions of subcomponents (ways to do first * ways to do second * ...)
-          Combinatorics.cartesian(recursiveCase).map(c =>
-            c.reduce((a: D => D, b: D => D) =>
-              (dsID: D) => applySingleComposition(composite).apply(a.apply(b.apply(dsID)))))
-        }
+        // Cross product of expansions of subcomponents (ways to do first * ways to do second * ...)
+        val combinations: Seq[D => D] =
+          Combinatorics.cartesian(recursiveCase).toSeq.map(c =>
+            c.foldLeft(applySingleComposition(composite))((b, f) => (d: D) => b.apply(f.apply(d))))
 
-        Iterator(applySingleComposition(composite)) ++ combinations
+        combinations.iterator
       } else {
         Iterator.empty
       }

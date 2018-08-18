@@ -1,6 +1,7 @@
 package scrubjay.schema
 
 import scrubjay.datasetid.DatasetID
+import scrubjay.datasetid.original.CSVDatasetID
 import scrubjay.datasetid.transformation.{ExplodeList, ExplodeRange}
 import scrubjay.query.constraintsolver.Combinatorics
 

@@ -40,7 +40,6 @@ object Query {
         f(dataset)
       )
     })
-    // TODO: Too many decompositions here...
 
     // Run all composition transformations on each above result that will yield a query solution,
     //   where a composition takes one or more simple dimensions like "flopCount, time"

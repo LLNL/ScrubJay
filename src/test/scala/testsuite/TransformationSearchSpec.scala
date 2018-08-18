@@ -21,7 +21,7 @@ class TransformationSearchSpec extends ScrubJaySpec {
       )
 
       val transformations = listUnits.transformationPaths("domain:time:range").toSeq
-      val transformedData = transformations.map(_.apply(jobQueue)).toArray
+      //val transformedData = transformations.map(_.apply(jobQueue)).toArray
 
       it("should include no-op") {
         val correctTransformation = transformations(0).apply(jobQueue) match {
@@ -52,7 +52,7 @@ class TransformationSearchSpec extends ScrubJaySpec {
       )
 
       val transformations = listUnits.transformationPaths("domain:node:list").toSeq
-      val transformedData = transformations.map(_.apply(jobQueue)).toArray
+      //val transformedData = transformations.map(_.apply(jobQueue)).toArray
 
       it("should include no-op") {
         val correctTransformation = transformations(0).apply(jobQueue) match {

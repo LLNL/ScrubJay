@@ -15,17 +15,9 @@ case class ScrubJaySchemaQuery(columns: Set[ScrubJayColumnSchemaQuery]) {
     val pathsPerColumn = columns.map(column =>
       column.transformationPaths.toSeq).toSeq
 
-
-    val combinations = {
-      if (columns.size > 1) {
-        Combinatorics.cartesian(pathsPerColumn)
-          .map(c =>
-            c.reduce((a: DatasetID => DatasetID, b: DatasetID => DatasetID) =>
-              (dsID: DatasetID) => a.apply(b.apply(dsID))))
-      } else {
-        pathsPerColumn.flatten.iterator
-      }
-    }
+    val combinations = Combinatorics.cartesian(pathsPerColumn).map(c =>
+      c.reduce((a: DatasetID => DatasetID, b: DatasetID => DatasetID) =>
+        (dsID: DatasetID) => a.apply(b.apply(dsID))))
 
     combinations
   }
