@@ -65,8 +65,16 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 // META-INF discarding for fat jar
 assemblyMergeStrategy in assembly := {
+
+  case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
+  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
+  case n if n.contains("services") => MergeStrategy.concat
+  case n if n.startsWith("reference.conf") => MergeStrategy.concat
+  case n if n.endsWith(".conf") => MergeStrategy.concat
+
   case PathList("META-INF", "services", "org.apache.hadoop.fs.FileSystem") => MergeStrategy.filterDistinctLines
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
+
   case _ => MergeStrategy.first
 }

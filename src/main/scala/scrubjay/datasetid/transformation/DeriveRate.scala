@@ -59,6 +59,7 @@ case class DeriveRate(override val dsID: DatasetID, yDimension: String, xDimensi
 
     val spark = SparkSession.builder().getOrCreate()
 
+    spark.sparkContext.hadoopConfiguration
     val df = dsID.realize
 
     val xField: ScrubJayColumnSchema = xFieldOption.get
