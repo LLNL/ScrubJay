@@ -23,6 +23,7 @@ import scrubjay.schema.ScrubJaySchema
   new Type(value = classOf[CassandraDatasetID], name = "CassandraDatasetID"),
   new Type(value = classOf[LocalDatasetID], name = "LocalDatasetID"),
   new Type(value = classOf[CSVDatasetID], name = "CSVDatasetID"),
+  new Type(value = classOf[ParquetDatasetID], name = "ParquetDatasetID"),
   new Type(value = classOf[CaliperKeyValueDatasetID], name = "CaliperKeyValueDatasetID")
 ))
 abstract class OriginalDatasetID(name: String, originalScrubJaySchema: ScrubJaySchema) extends DatasetID(name) {
