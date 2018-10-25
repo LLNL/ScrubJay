@@ -113,3 +113,20 @@ which produces
                             │    value:flops:count     │
                             └──────────────────────────┘
 ```
+
+License
+----------------
+
+ScrubJay is distributed under the terms of both the MIT license and the
+Apache License (Version 2.0). Users may choose either license, at their
+option.
+
+All new contributions must be made under both the MIT and Apache-2.0
+licenses.
+
+See [LICENSE-MIT](https://github.com/LLNL/ScrubJay/blob/master/LICENSE-MIT),
+[LICENSE-APACHE](https://github.com/LLNL/ScrubJay/blob/master/LICENSE-APACHE),
+[COPYRIGHT](https://github.com/LLNL/ScrubJay/blob/master/COPYRIGHT), and
+[NOTICE](https://github.com/LLNL/ScrubJay/blob/master/NOTICE) for details.
+
+``LLNL-CODE-759938``
