@@ -114,6 +114,19 @@ which produces
                             └──────────────────────────┘
 ```
 
+Authors
+----------------
+ScrubJay was created by Alfredo Gimenez, alfredo.gimenez@gmail.com.
+
+### Citing ScrubJay
+
+If you are referencing ScrubJay in a publication, please cite the following paper:
+
+ * Alfredo Giménez, Todd Gamblin, Abhinav Bhatele, Chad Wood, Kathleen Shoga, 
+   Aniruddha Marathe, Peer-Timo Bremer, Bernd Hamann, and Martin Schulz
+   [**ScrubJay: deriving knowledge from the disarray of HPC performance data**](http://charm.cs.illinois.edu/~bhatele/pubs/pdf/2017/sc2017b.pdf).
+   In *Supercomputing 2017 (SC’17)*, Denver, Colorado, November 12-17 2017. LLNL-CONF-735962.
+
 License
 ----------------
 
