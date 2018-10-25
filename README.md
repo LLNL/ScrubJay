@@ -1,11 +1,19 @@
 # ScrubJay
 
-A framework for automatic and scalable data integration. 
+ScrubJay is a framework for automatic and scalable data integration. 
 Describe your datasets (files, formats, database tables), then describe the integrated dataset(s) you desire, and let 
 ScrubJay derive it for you in a consistent and reproducible way.
 
 ScrubJay was developed for analyzing the supercomputing facilities at Lawrence Livermore National Laboratory, but is 
 not specifically tied to any one kind of data. 
+
+## Documentation
+
+* [Sphinx Documentation](https://scrubjay.readthedocs.io/en/latest/)
+
+* [Supercomputing 2017 Paper](https://github.com/LLNL/ScrubJay/blob/master/doc/resources/SC2017%20Paper.pdf)
+
+* [Supercomputing 2017 Talk Slides](https://github.com/LLNL/ScrubJay/blob/master/doc/resources/ScrubTalk%20SC17.pdf)
 
 ## Install
 
@@ -124,7 +132,7 @@ If you are referencing ScrubJay in a publication, please cite the following pape
 
  * Alfredo Giménez, Todd Gamblin, Abhinav Bhatele, Chad Wood, Kathleen Shoga, 
    Aniruddha Marathe, Peer-Timo Bremer, Bernd Hamann, and Martin Schulz
-   [**ScrubJay: deriving knowledge from the disarray of HPC performance data**](http://charm.cs.illinois.edu/~bhatele/pubs/pdf/2017/sc2017b.pdf).
+   [**ScrubJay: deriving knowledge from the disarray of HPC performance data**](https://github.com/LLNL/ScrubJay/blob/master/doc/resources/SC2017%20Paper.pdf).
    In *Supercomputing 2017 (SC’17)*, Denver, Colorado, November 12-17 2017. LLNL-CONF-735962.
 
 License
